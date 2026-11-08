@@ -1,0 +1,66 @@
+activate_mode:
+  name: Activate mode
+  description: Temporarily activate an assigned mode until the next scheduled change.
+  fields:
+    schedule_id:
+      name: Heating plan
+      description: Stable ID of the heating plan.
+      required: true
+      selector:
+        text:
+    mode_id:
+      name: Mode
+      description: Stable ID of the mode assigned to the heating plan.
+      required: true
+      selector:
+        text:
+    assignment_id:
+      name: Mode assignment
+      description: Optional stable ID to select one of several identical mode assignments.
+      required: false
+      selector:
+        text:
+
+clear_override:
+  name: Clear manual override
+  description: Return a heating plan to its automatic schedule immediately.
+  fields:
+    schedule_id:
+      name: Heating plan
+      description: Stable ID of the heating plan.
+      required: true
+      selector:
+        text:
+
+apply_matched:
+  name: Apply matched mode
+  description: Apply the currently matching mode while ignoring all enable switches.
+  fields:
+    schedule_id:
+      name: Heating plan
+      description: Optional stable ID; omit it to apply all heating plans.
+      required: false
+      selector:
+        text:
+
+apply_enabled_matching:
+  name: Apply enabled matching mode
+  description: Apply the matching mode only when the heating plan and its mode assignment are enabled.
+  fields:
+    schedule_id:
+      name: Heating plan
+      description: Optional stable ID; omit it to apply all heating plans.
+      required: false
+      selector:
+        text:
+
+apply_enabled_mode_matching:
+  name: Apply enabled mode matching
+  description: Apply the matching enabled mode assignment even when the heating plan itself is disabled.
+  fields:
+    schedule_id:
+      name: Heating plan
+      description: Optional stable ID; omit it to apply all heating plans.
+      required: false
+      selector:
+        text:

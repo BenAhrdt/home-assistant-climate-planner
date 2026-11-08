@@ -1,0 +1,8 @@
+{
+  "name": "Climate Planner",
+  "homeassistant": "2025.12.4",
+  "content_in_root": false,
+  "zip_release": true,
+  "filename": "climate_planner.zip",
+  "render_readme": true
+}

@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version from manifest.json, without the leading v"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Create GitHub release
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify version
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$RELEASE_VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid semantic version: $RELEASE_VERSION" >&2
+            exit 1
+          fi
+          manifest_version="$(jq -r '.version' custom_components/climate_planner/manifest.json)"
+          const_version="$(sed -n 's/^VERSION = "\(.*\)"$/\1/p' custom_components/climate_planner/const.py)"
+          if [[ "$RELEASE_VERSION" != "$manifest_version" || "$RELEASE_VERSION" != "$const_version" ]]; then
+            echo "Input version does not match manifest ($manifest_version) and const.py ($const_version)." >&2
+            exit 1
+          fi
+      - name: Build HACS release archive
+        run: |
+          set -euo pipefail
+          rm -f climate_planner.zip
+          (cd custom_components && zip -r ../climate_planner.zip climate_planner -x '*/__pycache__/*' '*.pyc')
+      - name: Create release and tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_VERSION: ${{ inputs.version }}
+        run: |
+          gh release create "v${RELEASE_VERSION}" climate_planner.zip \
+            --target "${GITHUB_SHA}" \
+            --title "Climate Planner v${RELEASE_VERSION}" \
+            --generate-notes

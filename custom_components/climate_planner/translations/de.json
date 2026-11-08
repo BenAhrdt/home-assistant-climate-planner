@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Climate Planner",
+        "description": "Erstelle den lokalen Planer. Heizpläne und Modes werden im Climate-Planner-Panel verwaltet.",
+        "data": {
+          "name": "Name des Planers"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Climate Planner ist bereits eingerichtet."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Climate Planner",
+        "description": "Die Planner-Daten werden im Climate-Planner-Panel verwaltet."
+      }
+    }
+  }
+}

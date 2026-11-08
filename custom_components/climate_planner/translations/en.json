@@ -1,0 +1,24 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Climate Planner",
+        "description": "Create the local planner. Heating schedules and modes are managed in the Climate Planner panel.",
+        "data": {
+          "name": "Planner name"
+        }
+      }
+    },
+    "abort": {
+      "already_configured": "Climate Planner is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Climate Planner",
+        "description": "Planner data is managed in the Climate Planner panel."
+      }
+    }
+  }
+}
