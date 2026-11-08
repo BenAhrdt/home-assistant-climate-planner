@@ -1,6 +1,9 @@
 {
   "domain": "climate_planner",
   "name": "Climate Planner",
+  "categories": [
+    "climate"
+  ],
   "codeowners": [
     "@BenAhrdt"
   ],
