@@ -1,80 +1,76 @@
-# Climate Planner für Home Assistant
+# Climate Planner for Home Assistant
 
-Climate Planner ist eine lokale Home-Assistant-Custom-Integration für mehrere
-zeitgesteuerte Heizpläne. Jeder Heizplan referenziert eine oder mehrere
-`climate`-Entitäten und verwendet zentral gepflegte Modes mit Zieltemperaturen.
+Climate Planner is a local Home Assistant custom integration for multiple
+time-based heating plans. Each heating plan references one or more `climate`
+entities and uses centrally managed modes with target temperatures.
 
-## Funktionen
+## Features
 
-- zentrale Mode-Bibliothek mit stabilen IDs
-- flache Mode-Kacheln oberhalb der Heizpläne für direktes Drag-and-Drop; bei
-  vielen Plänen scrollt ausschließlich der Heizplanbereich
-- per Heizplan steuerbarer Mode-Zustand mit Play/Pause und konfigurierbarer Priorität
-- beliebig viele Heizpläne und Mode-Zuordnungen
-- vollständige Heizplan-Duplikation mit neuen stabilen IDs und zunächst
-  pausierter Kopie
-- mehrere Klima-Entitäten pro Heizplan über den nativen, durchsuchbaren
-  Home-Assistant-Entitätspicker; Integration, Bereich und Gerät bleiben in der
-  Auswahl sichtbar
-- Anzeige des zuletzt erfolgreich aktivierten Modes sowie getrennter Werte für
-  Sollwertvorgabe, Sollwert-Rückmeldung und Isttemperatur; abweichende externe
-  Vorgaben werden zeitlich korrekt markiert und die letzte Aktivierung bleibt
-  über Integrationsneustarts erhalten
-- direkte Mode-Auswahl auf der Heizplan-Kachel mit temporärem manuellen Override,
-  auch wenn die automatische Heizplan-Auswertung pausiert ist
-- mehrere Phasen pro Wochentag mit Drag-and-Drop und lokalen Temperatur-Overrides
-- gleiche oder individuelle Uhrzeiten je Wochentag
-- prioritätsbasierte, deterministische Auswahl aktivierter Modes über Wochenwechsel
-- einmalige Sollwertsetzung über `climate.set_temperature`
-- gezielte Terminplanung ohne kurzes Dauer-Polling
-- helle Kachel-Übersicht für Heizpläne und Modes sowie eine Detailansicht je
-  Heizplan, deren konfigurierte Zeitblöcke auch bei pausierter Ausführung
-  sichtbar bleiben
-- responsive Wochen-Timeline mit 15-Minuten-Drag-and-Drop, Zeitgriffen,
-  Zielzeitvorschau, 8-Stunden-Richtwert für neue Eingaben und festem Tagesende
-  des letzten Blocks,
-  Mehrfach-Wochentagen und Phasen-Duplikation per Icon eine Stunde vor dem
-  gewählten Block
-- versionierte, atomare Persistenz und serverseitige Validierung
-- automationstaugliche Dienste für direkte Mode-Aktivierung und die drei
-  ioBroker-kompatiblen Apply-Varianten (`apply_matched`,
-  `apply_enabled_matching`, `apply_enabled_mode_matching`)
-- steuerbare Home-Assistant-Switches und -Buttons pro Heizplan und pro
-  Mode-Zuordnung
-- eigene Home-Assistant-Gerätegruppierung je Heizplan
+- central mode library with stable IDs
+- flat mode cards above the heating plans for direct drag-and-drop; with many
+  plans, only the heating-plan area scrolls
+- per-plan mode state with play/pause and configurable priority
+- any number of heating plans and mode assignments
+- complete heating-plan duplication with new stable IDs and a paused copy
+- multiple climate entities per plan through the native searchable Home
+  Assistant entity picker; integration, area and device remain visible
+- display of the last mode successfully activated by the planner, with
+  separate requested target, reported target and current temperature values
+- external-target indication and persistence of the last activation across
+  integration restarts
+- direct mode selection on a heating-plan card with a temporary manual override,
+  including while automatic schedule evaluation is paused
+- multiple phases per weekday with drag-and-drop and local temperature
+  overrides
+- same or individual times for each weekday
+- priority-based, deterministic selection of enabled modes across week changes
+- one-time target-temperature application through `climate.set_temperature`
+- point-in-time scheduling without short-interval polling
+- responsive heating-plan and mode overview plus a detail view for each plan
+- 15-minute timeline controls, target-time preview, an eight-hour guideline for
+  new entries, and a fixed 24:00 end for the final daily phase
+- phase duplication one hour before the selected phase
+- versioned atomic persistence and server-side validation
+- automation services for direct mode activation and the three ioBroker-
+  compatible Apply variants (`apply_matched`, `apply_enabled_matching`, and
+  `apply_enabled_mode_matching`)
+- controllable Home Assistant switches and buttons per heating plan and mode
+  assignment
+- a dedicated Home Assistant device for each heating plan
 
-Bewusst nicht enthalten sind Feedback-Regelkreise, zyklische Nachregelung,
-HVAC-Moduswechsel und ioBroker-State- oder Device-Manager-Strukturen.
+The integration intentionally does not implement feedback control loops,
+cyclic re-adjustment, HVAC mode changes or ioBroker state/device-manager
+structures.
 
-## Installation und Nutzung
+## Installation and use
 
-Die Integration wird über die Home-Assistant-Integrationsseite eingerichtet.
-Anschließend steht das **Climate Planner**-Panel in der Seitenleiste bereit.
-Details zu Datenmodell, Zustandsübergängen und Bedienung stehen in
-[docs/architecture.md](docs/architecture.md) und [docs/usage.md](docs/usage.md).
-
-## English documentation
+Install the **Climate Planner** integration through the Home Assistant
+integration setup. After setup, the **Climate Planner** panel is available in
+the sidebar.
 
 The complete English installation, user, automation, data-model and
 troubleshooting guide is maintained in the
 [Climate Planner Wiki](https://github.com/BenAhrdt/home-assistant-climate-planner/wiki).
 
-### Installation über HACS
+### Installation through HACS
 
-Das Repository kann in HACS zunächst als **Custom repository** vom Typ
-**Integration** hinzugefügt werden. Nach einer veröffentlichten GitHub-Release
-steht die Integration über das Release-Archiv zur Verfügung. Nach der
-Installation ist Home Assistant neu zu starten.
+Until the repository is available in the default HACS catalog, add it as a
+**Custom repository** with type **Integration**:
 
-### Manuelle Installation
+`https://github.com/BenAhrdt/home-assistant-climate-planner`
 
-Den Ordner `custom_components/climate_planner` in das gleichnamige Verzeichnis
-der Home-Assistant-Konfiguration kopieren und Home Assistant neu starten.
+After a GitHub release has been published, install or update the integration
+from the release archive and restart Home Assistant.
 
-## Entwicklung
+### Manual installation
 
-Zur reproduzierbaren Prüfung werden die Entwicklungsabhängigkeiten aus
-`requirements_test.txt` installiert:
+Copy `custom_components/climate_planner` into the matching
+`custom_components` directory of the Home Assistant configuration and restart
+Home Assistant.
+
+## Development
+
+Install the reproducible development dependencies from `requirements_test.txt`:
 
 ```bash
 python -m pip install -r requirements_test.txt
@@ -84,14 +80,15 @@ python -m compileall -q custom_components tests
 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTHONPATH=. python -m pytest -p pytest_asyncio.plugin -q
 ```
 
-`AGENTS.md` und `secondBrain/` bleiben lokale, von Git ignorierte Projektnotizen.
+`AGENTS.md` and `secondBrain/` are local project notes and are intentionally
+ignored by Git.
 
-## Veröffentlichung
+## Release
 
-Die Versionsnummer muss in `custom_components/climate_planner/const.py` und
-`custom_components/climate_planner/manifest.json` übereinstimmen. Nach einem
-erfolgreichen Validierungs- und Testlauf kann der Workflow **Release** unter
-GitHub Actions manuell mit dieser Versionsnummer gestartet werden. Er prüft
-beide Dateien, erstellt das HACS-Archiv `climate_planner.zip` sowie den Tag
-`v<version>` und veröffentlicht eine GitHub-Release mit automatisch erzeugten
-Release Notes. Das HACS-Archiv enthält ausschließlich die Integration.
+The version in `custom_components/climate_planner/const.py` must match the
+`version` in `custom_components/climate_planner/manifest.json`. After the
+validation and test workflows succeed, start the **Release** workflow manually
+under GitHub Actions with that version. It verifies both files, creates the
+HACS archive `climate_planner.zip`, creates the tag `v<version>` and publishes a
+GitHub release with generated release notes. The archive contains only the
+integration.
