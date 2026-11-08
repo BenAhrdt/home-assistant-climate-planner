@@ -53,6 +53,12 @@ Anschließend steht das **Climate Planner**-Panel in der Seitenleiste bereit.
 Details zu Datenmodell, Zustandsübergängen und Bedienung stehen in
 [docs/architecture.md](docs/architecture.md) und [docs/usage.md](docs/usage.md).
 
+## English documentation
+
+The complete English installation, user, automation, data-model and
+troubleshooting guide is maintained in the
+[Climate Planner Wiki](https://github.com/BenAhrdt/home-assistant-climate-planner/wiki).
+
 ### Installation über HACS
 
 Das Repository kann in HACS zunächst als **Custom repository** vom Typ
