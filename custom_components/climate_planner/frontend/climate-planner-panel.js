@@ -442,15 +442,17 @@ class ClimatePlannerPanel extends HTMLElement {
       if (admin) segment.addEventListener("dragstart", (event) => { if (event.target.closest("[data-duplicate-phase]")) { event.preventDefault(); return; } this.dragActive = true; event.stopPropagation(); const rect = segment.getBoundingClientRect(); const start = Number(segment.dataset.segmentStart); const end = Number(segment.dataset.segmentEnd); const duration = Number.isFinite(start) && Number.isFinite(end) && end > start ? end - start : 0; const offsetMinutes = rect.height && duration ? Math.max(0, Math.min(duration, ((event.clientY - rect.top) / rect.height) * duration)) : 0; const copy = event.altKey || event.ctrlKey || event.metaKey; this.dragState = { phaseId: segment.dataset.phaseId, offsetMinutes }; event.dataTransfer.setData("text/plain", `${copy ? "copy-phase" : "phase"}:${segment.dataset.phaseId}`); event.dataTransfer.effectAllowed = copy ? "copy" : "move"; segment.classList.add("dragging"); });
       if (admin) segment.addEventListener("dragend", () => { segment.classList.remove("dragging"); this.finishDrag(); });
     });
-    target.querySelectorAll(".transition-handle[data-phase-id]").forEach((handle) => {
-      handle.addEventListener("pointerdown", (event) => {
+    target.querySelectorAll("[data-drop-day]").forEach((track) => {
+      track.addEventListener("pointerdown", (event) => {
+        const handle = Array.from(track.querySelectorAll(".transition-handle[data-phase-id]")).find((candidate) => {
+          const rect = candidate.getBoundingClientRect();
+          return event.clientY >= rect.top && event.clientY <= rect.bottom;
+        });
+        if (!handle) return;
         event.preventDefault();
         event.stopPropagation();
-        this.beginPhaseResize(event, this.selectedSchedule, handle.dataset.phaseId, handle.dataset.segmentDay, "transition", handle.closest(".day-track"));
-      });
-      handle.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); });
-    });
-    target.querySelectorAll("[data-drop-day]").forEach((track) => {
+        this.beginPhaseResize(event, this.selectedSchedule, handle.dataset.phaseId, handle.dataset.segmentDay, "transition", track);
+      }, true);
       track.addEventListener("dragover", (event) => { event.preventDefault(); track.classList.add("drop-target"); this.showDropIndicator(track, event, this.dragState?.offsetMinutes || 0); });
       track.addEventListener("dragleave", (event) => { if (!track.contains(event.relatedTarget)) { track.classList.remove("drop-target"); this.clearDropIndicator(track); } });
       track.addEventListener("drop", (event) => {
