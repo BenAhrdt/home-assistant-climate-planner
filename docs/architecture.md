@@ -150,17 +150,14 @@ erfolgreichen Serviceaufruf den zuletzt aktivierten Mode im Panel; der Override
 wird nicht dauerhaft gespeichert. Der Button-State zeigt separat, wie viele
 Temperatur-Serviceaufrufe erfolgreich waren.
 
-Das Panel stellt die Sollwertvorgabe der Climate-Entität
-(`target_temperature_set`, `Soll ↗`), die separate vom Klima-Gerät gemeldete
-Zieltemperatur (`target_temperature_status`, `Soll ↘`) und die aktuelle
-Temperatur (`Ist`) getrennt dar. Fehlt das separate Rückmeldeattribut, bleibt
-`Soll ↘` leer. Weicht die
-aktuelle Vorgabe unter Berücksichtigung der gemeldeten Zieltemperatur-
-Schrittweite von der letzten Climate-Planner-Vorgabe ab, wird der zuletzt
-aktivierte Mode als `extern` markiert. Dadurch aktualisiert ein fremder
-`climate.set_temperature`-Aufruf `Soll ↗`, ohne fälschlich einem Planner-Mode
-zugeordnet zu werden. Das ist reine Zustandsdarstellung: Es gibt weder Polling
-noch automatische Nachregelung.
+Das Panel stellt den Sollwert der Climate-Entität (`temperature`, `Soll`) und
+die aktuelle Temperatur (`Ist`) getrennt dar. Weicht der Sollwert unter
+Berücksichtigung der Thermostat-Schrittweite von der letzten
+Climate-Planner-Vorgabe ab, wird der zuletzt aktivierte Mode als `extern`
+markiert. Dadurch aktualisiert ein fremder `climate.set_temperature`-Aufruf
+den angezeigten Sollwert, ohne fälschlich einem Planner-Mode zugeordnet zu
+werden. Das ist reine Zustandsdarstellung: Es gibt weder Polling noch
+automatische Nachregelung.
 
 Beim Übergang eines Heizplans von pausiert zu aktiviert wird ein vorhandener
 manueller Override beendet, der zu diesem Zeitpunkt passende Zeitplan-Mode

@@ -483,12 +483,6 @@ class PlannerRuntime:
                     label_parts.append(normalized)
                     seen_parts.add(key)
             label = " · ".join(label_parts) or state.entity_id
-            target_temperature_set = state.attributes.get("target_temperature_set")
-            if target_temperature_set is None:
-                target_temperature_set = state.attributes.get(ATTR_TEMPERATURE)
-            target_temperature_status = state.attributes.get("target_temperature_status")
-            if target_temperature_status is None:
-                target_temperature_status = state.attributes.get("target_temperature")
             result.append(
                 {
                     "entity_id": state.entity_id,
@@ -500,11 +494,8 @@ class PlannerRuntime:
                     "current_temperature": self._temperature_to_celsius(
                         state.attributes.get("current_temperature"), temperature_unit
                     ),
-                    "target_temperature_set": self._temperature_to_celsius(
-                        target_temperature_set, temperature_unit
-                    ),
-                    "target_temperature_status": self._temperature_to_celsius(
-                        target_temperature_status, temperature_unit
+                    "target_temperature": self._temperature_to_celsius(
+                        state.attributes.get(ATTR_TEMPERATURE), temperature_unit
                     ),
                 }
             )

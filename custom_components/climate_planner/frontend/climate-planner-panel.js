@@ -19,7 +19,7 @@ const labels = {
     icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", enabled: "Aktiviert",
     sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage",
     time: "Uhrzeit", bulkTime: "Uhrzeit für ausgewählte Tage", weekday: "Wochentag", transition: "Übergang verschieben", phase: "Phase", duplicate: "Duplizieren", placeDuplicate: "Duplikat platzieren", duplicateTimeOccupied: "Eine Stunde vor diesem Mode liegt bereits ein Wechsel. Bitte eine andere Uhrzeit wählen.", duplicateNoRoom: "Vor diesem Mode ist nicht genug Platz für die Duplikatdauer. Der vorherige Mode behält mindestens eine Stunde.", selectAllDays: "Alle anwählen", clearAllDays: "Alle abwählen", copySuffix: "Kopie", defaultDuration: "Richtwert: 8 Stunden · letzter Block bis 24:00", drop: "Mode auf die Heizplankachel ziehen", dropTimeline: "Mode auf einen Tag und eine Uhrzeit ziehen · Richtwert 8 h · letzter Block bis 24:00 · Alt/Strg/Cmd = kopieren", chooseMode: "Mode direkt aktivieren", noModes: "Noch keine Modes angelegt.",
-    noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode aktivieren", pauseMode: "Mode pausieren", targetRequestShort: "Soll ↗", targetRequest: "Sollwertvorgabe", targetFeedbackShort: "Soll ↘", targetFeedback: "Sollwertrückmeldung", currentShort: "Ist", next: "Nächster Wechsel",
+    noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode aktivieren", pauseMode: "Mode pausieren", targetRequestShort: "Soll", targetRequest: "Sollwert", currentShort: "Ist", next: "Nächster Wechsel",
     none: "Noch kein Mode aktiviert", connected: "Bereit", loading: "Wird geladen …",
     saveError: "Speichern fehlgeschlagen", conflict: "Die Daten wurden geändert. Ansicht wird neu geladen.",
     invalid: "Bitte prüfe die Eingaben.", localTemperature: "Temperatur für diese Phase überschreiben", inherited: "Mode-Temperatur", deleteMode: "Mode wirklich löschen? Zugehörige Zuordnungen werden entfernt.", deletePhase: "Phase wirklich löschen?",
@@ -36,7 +36,7 @@ const labels = {
     icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", enabled: "Enabled",
     sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", time: "Time", bulkTime: "Time for selected days", weekday: "Weekday", transition: "Move transition", phase: "Phase", duplicate: "Duplicate", placeDuplicate: "Place duplicate", duplicateTimeOccupied: "There is already a change one hour before this mode. Choose another time.", duplicateNoRoom: "There is not enough room for the duplicate duration. The previous mode keeps at least one hour.", selectAllDays: "Select all", clearAllDays: "Clear all", copySuffix: "Copy", defaultDuration: "Guideline: 8 hours · last block until 24:00", dropTimeline: "Drag a mode onto a day and time · guideline 8 h · last block until 24:00 · Alt/Ctrl/Cmd = copy",
     drop: "Drop mode on the heating plan", chooseMode: "Activate mode directly", noModes: "No modes have been created yet.", noSchedules: "No heating plans have been created yet.",
-    active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode", pauseMode: "Pause mode", targetRequestShort: "Target ↗", targetRequest: "Requested target", targetFeedbackShort: "Target ↘", targetFeedback: "Reported target", currentShort: "Current", next: "Next change", none: "No mode activated yet", connected: "Ready", loading: "Loading …",
+    active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode", pauseMode: "Pause mode", targetRequestShort: "Target", targetRequest: "Target temperature", currentShort: "Current", next: "Next change", none: "No mode activated yet", connected: "Ready", loading: "Loading …",
     saveError: "Save failed", conflict: "The data changed. Reloading the view.", invalid: "Please check the input.", localTemperature: "Override temperature for this phase", inherited: "Mode temperature",
     deleteMode: "Delete this mode? Its assignments will be removed.", deleteSchedule: "Delete this heating plan?",
     deleteAssignment: "Remove this mode from the heating plan? All of its phases will be deleted.", modeAlreadyAssigned: "This mode is already part of this heating plan.", deletePhase: "Delete this phase?", missingDay: "Select at least one weekday.",
@@ -143,7 +143,7 @@ class ClimatePlannerPanel extends HTMLElement {
       admin: Boolean(this._hass?.user?.is_admin),
       entities: entityIds.map((entityId) => {
         const state = this._hass?.states?.[entityId];
-        return [entityId, state?.state, state?.last_updated, state?.attributes?.temperature, state?.attributes?.target_temperature, state?.attributes?.target_temperature_set, state?.attributes?.target_temperature_status, state?.attributes?.current_temperature, state?.attributes?.target_temp_step];
+        return [entityId, state?.state, state?.last_updated, state?.attributes?.temperature, state?.attributes?.current_temperature, state?.attributes?.target_temp_step];
       }),
     });
   }
@@ -1341,7 +1341,7 @@ class ClimatePlannerPanel extends HTMLElement {
     if (!Number.isFinite(requested)) return false;
     const entityIds = schedule.climate_entity_ids || [];
     return entityIds.some((entityId) => {
-      const entityTarget = this.climateEntityTemperatureValue(entityId, "target_temperature_set");
+      const entityTarget = this.climateEntityTemperatureValue(entityId, "temperature", "target_temperature");
       return entityTarget != null
         && Math.abs(entityTarget - requested) > this.targetTemperatureTolerance(entityId);
     });
@@ -1350,7 +1350,7 @@ class ClimatePlannerPanel extends HTMLElement {
   climateEntityRows(entityIds) {
     const ids = Array.isArray(entityIds) ? entityIds : entityIds ? [entityIds] : [];
     if (!ids.length) return `<p class="muted schedule-entities-empty">${this.t.noClimate}</p>`;
-    return ids.map((entityId) => `<div class="schedule-entity-row"><span class="schedule-entity-name">${escapeHTML(this.climateEntityLabel(entityId))}</span><span class="schedule-entity-values"><span><b title="${escapeHTML(this.t.targetRequest)}">${escapeHTML(this.t.targetRequestShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "target_temperature_set"))}</span><span><b title="${escapeHTML(this.t.targetFeedback)}">${escapeHTML(this.t.targetFeedbackShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "target_temperature_status"))}</span><span><b>${escapeHTML(this.t.currentShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "current_temperature"))}</span></span></div>`).join("");
+    return ids.map((entityId) => `<div class="schedule-entity-row"><span class="schedule-entity-name">${escapeHTML(this.climateEntityLabel(entityId))}</span><span class="schedule-entity-values"><span><b title="${escapeHTML(this.t.targetRequest)}">${escapeHTML(this.t.targetRequestShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "temperature", "target_temperature"))}</span><span><b>${escapeHTML(this.t.currentShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "current_temperature"))}</span></span></div>`).join("");
   }
 
   openScheduleDialog(scheduleId = null) {
