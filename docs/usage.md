@@ -116,9 +116,10 @@ gesendete Wert. Der aktuelle Rückgabewert der Climate-Entität aus dem Attribut
 `temperature` wird damit verglichen, aber nicht als Sollwert überschrieben.
 Weicht der Rückgabewert unter Berücksichtigung der Thermostat-Schrittweite von
 der letzten Planner-Vorgabe ab, erscheint beim zuletzt aktivierten Mode der
-Hinweis **extern**. Der Hinweis löst keine automatische Nachregelung aus. Der
-zuletzt aktivierte Mode bleibt auch nach einem Neustart der Integration
-erhalten.
+Hinweis **extern** mit dem aktuell von der Climate-Entität zurückgemeldeten
+Sollwert in Klammern, zum Beispiel **extern (18,6 °C)**. Der Hinweis löst keine
+automatische Nachregelung aus. Der zuletzt aktivierte Mode bleibt auch nach
+einem Neustart der Integration erhalten.
 
 Phasen lassen sich im 15-Minuten-Raster verschieben, über die sichtbaren
 Zeitgriffe bis zur nächsten Phase verlängern oder verkürzen und einzeln

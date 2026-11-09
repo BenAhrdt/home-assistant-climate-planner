@@ -423,9 +423,9 @@ class ClimatePlannerPanel extends HTMLElement {
       const lastActivated = this.data.last_activated?.[schedule.id];
       const lastActivatedMode = lastActivated ? this.mode(lastActivated.mode_id) : null;
       const phases = this.schedulePhases(schedule);
-      const external = this.scheduleHasExternalTarget(schedule, lastActivated);
+      const externalTarget = this.externalTargetText(schedule, lastActivated);
       const lastActivatedMarkup = lastActivated
-        ? `${escapeHTML(lastActivatedMode?.name || lastActivated.mode_name)} · ${escapeHTML(this.temperatureText(lastActivated.target_temperature))}${external ? ` <span class="external-badge">${escapeHTML(this.t.external)}</span>` : ""}`
+        ? `${escapeHTML(lastActivatedMode?.name || lastActivated.mode_name)} · ${escapeHTML(this.temperatureText(lastActivated.target_temperature))}${externalTarget ? ` <span class="external-badge">${escapeHTML(`${this.t.external} (${externalTarget})`)}</span>` : ""}`
         : escapeHTML(this.t.none);
       const availableModes = [];
       schedule.assignments.forEach((assignment) => {
@@ -1344,15 +1344,22 @@ class ClimatePlannerPanel extends HTMLElement {
     return Math.max(0.051, celsiusStep / 2 + 0.001);
   }
 
-  scheduleHasExternalTarget(schedule, lastActivated) {
+  externalTargetText(schedule, lastActivated) {
     const requested = Number(lastActivated?.target_temperature);
-    if (!Number.isFinite(requested)) return false;
+    if (!Number.isFinite(requested)) return "";
     const entityIds = schedule.climate_entity_ids || [];
-    return entityIds.some((entityId) => {
+    const externalTargets = [];
+    entityIds.forEach((entityId) => {
       const entityTarget = this.climateEntityTemperatureValue(entityId, "temperature", "target_temperature");
-      return entityTarget != null
-        && Math.abs(entityTarget - requested) > this.targetTemperatureTolerance(entityId);
+      if (entityTarget == null || Math.abs(entityTarget - requested) <= this.targetTemperatureTolerance(entityId)) return;
+      const text = this.temperatureText(entityTarget);
+      if (!externalTargets.includes(text)) externalTargets.push(text);
     });
+    return externalTargets.join(", ");
+  }
+
+  scheduleHasExternalTarget(schedule, lastActivated) {
+    return Boolean(this.externalTargetText(schedule, lastActivated));
   }
 
   climateEntityRows(entityIds, requestedTemperature = null) {

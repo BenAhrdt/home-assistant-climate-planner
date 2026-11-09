@@ -17,7 +17,8 @@ entities and uses centrally managed modes with target temperatures.
 - multiple climate entities per plan through the native searchable Home
   Assistant entity picker; integration, area and device remain visible
 - display of the last target sent by the planner and current temperature, with
-  an external-change indicator when the climate readback differs
+  an external-change indicator (including the differing climate target) when
+  the climate readback differs
 - external-target indication and persistence of the last activation across
   integration restarts
 - direct mode selection on a heating-plan card with a temporary manual override,
