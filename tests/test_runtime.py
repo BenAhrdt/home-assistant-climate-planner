@@ -535,6 +535,7 @@ async def test_snapshot_includes_integration_area_and_device_labels(fake_runtime
             "friendly_name": "Living climate",
             "current_temperature": 20.5,
             "temperature": 21.0,
+            "target_temperature": 20.0,
         },
     )
     entity_entry = SimpleNamespace(platform="demo", device_id="device_1", area_id=None, name=None)
@@ -577,6 +578,7 @@ async def test_snapshot_includes_integration_area_and_device_labels(fake_runtime
             "integration": "Demo Integration",
             "current_temperature": 20.5,
             "target_temperature": 21.0,
+            "reported_target_temperature": 20.0,
         }
     ]
     await runtime.async_shutdown()

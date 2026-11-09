@@ -27,13 +27,18 @@ Rand scrollt die Liste automatisch weiter. Auf schmalen Mobilansichten bleibt
 der normale Seitenlauf erhalten, damit kein enger verschachtelter
 Touch-Scrollbereich entsteht.
 
-Jede Mode-Zuordnung kann innerhalb eines Heizplans pausiert oder aktiviert
-werden. Das Play/Pause-Symbol an der Mode-Schaltfläche des Heizplans steuert
-diesen Zustand. Ein pausierter Mode bleibt in der zentralen Bibliothek und in
-anderen Heizplänen unverändert, wird in diesem Heizplan aber nicht mehr in der
-normalen zeitgesteuerten Auswahl oder Direktwahl verwendet. Die Priorität wird
-als ganze Zahl gespeichert. Bei gleichzeitig passenden Regeln gewinnt
-die höhere Priorität, danach die zuletzt aktivierte Regel.
+Jeder Mode kann einem Heizplan genau einmal zugeordnet werden. Ein erneutes
+Hinzufügen desselben Modes wird abgewiesen. Die Zuordnung kann innerhalb des
+Heizplans pausiert oder aktiviert werden; das Play/Pause-Symbol an der
+Mode-Schaltfläche steuert diesen Zustand. Der rote Papierkorb direkt darunter
+entfernt den Mode einschließlich seiner Wochenphasen aus diesem Heizplan, ohne
+den zentralen Mode oder seine Zuordnungen in anderen Heizplänen zu verändern.
+Bei älteren Daten mit mehreren Zuordnungen desselben Modes entfernt die Aktion
+alle diese Zuordnungen gemeinsam.
+Ein pausierter Mode wird in diesem Heizplan nicht mehr in der normalen
+zeitgesteuerten Auswahl verwendet. Die Priorität wird als ganze Zahl
+gespeichert. Bei gleichzeitig passenden Regeln gewinnt die höhere Priorität,
+danach die zuletzt aktivierte Regel.
 
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.
@@ -73,14 +78,16 @@ wenn eine Automation einen Climate-Planner-Dienst oder Aktivierungs-Button
 verwendet.
 
 Für jede Klima-Entität stehen drei Werte nebeneinander: **Soll ↗** ist die
-letzte Vorgabe des Climate Planners, **Soll ↘** die vom Gerät zurückgemeldete
-Zieltemperatur und **Ist** die aktuelle Temperatur. Ändert sich die
-Sollwert-Rückmeldung nach der Planner-Aktivierung auf einen abweichenden Wert,
-erscheint beim zuletzt aktivierten Mode der Hinweis **extern**. Eine direkt
-nach dem Aktivieren noch alte Rückmeldung wird nicht als externer Eingriff
-gewertet. Die Schrittweite des Thermostats wird beim Vergleich berücksichtigt.
-Der Hinweis löst keine automatische Nachregelung aus. Der zuletzt aktivierte
-Mode bleibt auch nach einem Neustart der Integration erhalten.
+aktuelle Vorgabe der Home-Assistant-Climate-Entität (`temperature`) und ändert
+sich deshalb auch bei einem fremden `climate.set_temperature`-Aufruf.
+**Soll ↘** ist die separate, vom Gerät zurückgemeldete Zieltemperatur
+(`target_temperature`), **Ist** die aktuelle Temperatur. Stellt eine
+Climate-Integration keine separate Zieltemperatur-Rückmeldung bereit, erscheint
+für **Soll ↘** ein Gedankenstrich. Weicht **Soll ↗** unter Berücksichtigung der
+Thermostat-Schrittweite von der letzten Climate-Planner-Vorgabe ab, erscheint
+beim zuletzt aktivierten Mode der Hinweis **extern**. Der Hinweis löst keine
+automatische Nachregelung aus. Der zuletzt aktivierte Mode bleibt auch nach
+einem Neustart der Integration erhalten.
 
 Phasen lassen sich im 15-Minuten-Raster verschieben, über die sichtbaren
 Zeitgriffe bis zur nächsten Phase verlängern oder verkürzen und einzeln
@@ -151,11 +158,10 @@ Home Assistant gruppiert diese Entitäten in einem eigenen Gerät pro Heizplan.
 Die Climate-Planner-Konfiguration bleibt zentral, aber jeder Heizplan erscheint
 im Gerätebereich separat mit seinen Schaltern und Buttons.
 
-Die Zuordnungs-ID ist Teil der stabilen Unique-ID. Wird derselbe Mode mehrfach
-in einen Heizplan aufgenommen, entstehen deshalb getrennte Switches und
-Aktivierungs-Buttons. Pause/Automatik gilt jeweils nur für diese eine
-Zuordnung; ein Aktivierungs-Button kann auch eine pausierte Zuordnung manuell
-aktivieren.
+Die Zuordnungs-ID ist Teil der stabilen Unique-ID. Pro Mode und Heizplan gibt es
+in der Oberfläche nur eine Zuordnung und damit einen Switch sowie einen
+Aktivierungs-Button. Ein Aktivierungs-Button kann auch eine pausierte Zuordnung
+manuell aktivieren.
 
 ## Wochenansicht
 

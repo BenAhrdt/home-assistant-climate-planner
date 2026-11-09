@@ -94,6 +94,11 @@ abwärtskompatibel in `assignments[].enabled` des jeweiligen Heizplans
 überführt; neue Daten führen den Aktivierungszustand ausschließlich an der
 Mode-Zuordnung.
 
+Das Panel erzeugt pro Heizplan und Mode höchstens eine Zuordnung und verwendet
+sie für weitere Phasen wieder. Bereits vorhandene Mehrfachzuordnungen bleiben
+aus Kompatibilitätsgründen lesbar; beim Entfernen des Modes aus dem Heizplan
+werden sie gemeinsam gelöscht.
+
 Beim Duplizieren eines Heizplans werden Heizplan-, Zuordnungs- und Phasen-IDs
 neu erzeugt. Mode-Referenzen und fachliche Werte bleiben erhalten. Die Kopie
 startet mit `enabled: false`, damit Original und Kopie nicht unbeabsichtigt
@@ -133,16 +138,16 @@ erfolgreichen Serviceaufruf den zuletzt aktivierten Mode im Panel; der Override
 wird nicht dauerhaft gespeichert. Der Button-State zeigt separat, wie viele
 Temperatur-Serviceaufrufe erfolgreich waren.
 
-Das Panel stellt die letzte Sollwertvorgabe des Planners (`Soll ↗`), die vom
-Klima-Gerät gemeldete Zieltemperatur (`Soll ↘`) und die aktuelle Temperatur
-(`Ist`) getrennt dar. Weicht die Rückmeldung unter Berücksichtigung der
-gemeldeten Zieltemperatur-Schrittweite von der letzten Vorgabe ab und wurde sie
-erst nach der Planner-Aktivierung aktualisiert, wird der zuletzt aktivierte
-Mode als `extern` markiert. Eine beim Aktivieren noch alte Rückmeldung erzeugt
-daher keinen falschen Hinweis. Das ist reine Zustandsdarstellung: Es gibt weder
-Polling noch automatische Nachregelung. Direkte fremde
-`climate.set_temperature`-Aufrufe enthalten keine eindeutige Mode-ID und werden
-deshalb nicht fälschlich einem Mode zugeordnet.
+Das Panel stellt die aktuelle Vorgabe der Climate-Entität (`temperature`,
+`Soll ↗`), die separate vom Klima-Gerät gemeldete Zieltemperatur
+(`target_temperature`, `Soll ↘`) und die aktuelle Temperatur (`Ist`) getrennt
+dar. Fehlt das separate Rückmeldeattribut, bleibt `Soll ↘` leer. Weicht die
+aktuelle Vorgabe unter Berücksichtigung der gemeldeten Zieltemperatur-
+Schrittweite von der letzten Climate-Planner-Vorgabe ab, wird der zuletzt
+aktivierte Mode als `extern` markiert. Dadurch aktualisiert ein fremder
+`climate.set_temperature`-Aufruf `Soll ↗`, ohne fälschlich einem Planner-Mode
+zugeordnet zu werden. Das ist reine Zustandsdarstellung: Es gibt weder Polling
+noch automatische Nachregelung.
 
 Beim Übergang eines Heizplans von pausiert zu aktiviert wird ein vorhandener
 manueller Override beendet, der zu diesem Zeitpunkt passende Zeitplan-Mode

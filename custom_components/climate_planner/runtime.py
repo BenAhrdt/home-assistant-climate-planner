@@ -497,6 +497,9 @@ class PlannerRuntime:
                     "target_temperature": self._temperature_to_celsius(
                         state.attributes.get(ATTR_TEMPERATURE), temperature_unit
                     ),
+                    "reported_target_temperature": self._temperature_to_celsius(
+                        state.attributes.get("target_temperature"), temperature_unit
+                    ),
                 }
             )
         return sorted(result, key=lambda item: (item["label"].casefold(), item["entity_id"]))
