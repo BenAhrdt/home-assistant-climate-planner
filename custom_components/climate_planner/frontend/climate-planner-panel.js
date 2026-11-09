@@ -336,11 +336,19 @@ class ClimatePlannerPanel extends HTMLElement {
     return this.schedulePhases(schedule).find((entry) => this.phaseId(entry.phase) === phaseId);
   }
 
-  phaseConfiguredOnWeekday(schedule, weekday, phaseId) {
-    if (!schedule || !weekday || !phaseId) return false;
-    return schedule.assignments.some((assignment) => (
-      (assignment.weekday_rules?.[weekday] || []).some((phase) => this.phaseId(phase) === phaseId)
-    ));
+  phaseForSegmentStart(schedule, weekday, segment) {
+    if (!schedule || !weekday || !segment) return "";
+    if (segment.start > 0) return segment.phase_id || "";
+    const candidates = schedule.assignments
+      .flatMap((assignment) => (assignment.weekday_rules?.[weekday] || []).map((phase) => ({ assignment, phase })))
+      .filter(({ phase }) => this.phaseMinutes(phase) === 0);
+    const modeCandidates = candidates
+      .filter(({ assignment }) => assignment.mode_id === segment.mode_id)
+      .map(({ phase }) => phase);
+    const midnightCandidates = candidates.map(({ phase }) => phase);
+    return modeCandidates.find((phase) => this.phaseId(phase) === segment.phase_id)
+      ? segment.phase_id
+      : this.phaseId(modeCandidates[0] || midnightCandidates[0]);
   }
 
   renderSchedules(admin) {
@@ -416,15 +424,19 @@ class ClimatePlannerPanel extends HTMLElement {
     const schedule = this.data.schedules.find((item) => item.id === this.selectedSchedule);
     const admin = Boolean(this._hass.user?.is_admin);
     const days = view?.days.map((day) => {
-      const segments = day.segments.map((segment) => {
+      const segments = day.segments.map((segment, segmentIndex) => {
         const startText = `${String(Math.floor(segment.start / 60)).padStart(2, "0")}:${String(segment.start % 60).padStart(2, "0")}`;
         const endText = `${String(Math.floor(segment.end / 60)).padStart(2, "0")}:${String(segment.end % 60).padStart(2, "0")}`;
         const duplicate = admin && segment.phase_id
           ? `<button type="button" class="segment-duplicate" data-duplicate-phase aria-label="${escapeHTML(this.t.duplicate)}" title="${escapeHTML(this.t.duplicate)}" draggable="false"><ha-icon icon="mdi:content-copy" aria-hidden="true"></ha-icon></button>`
           : "";
-        const explicitStart = segment.start > 0 || (schedule && this.phaseConfiguredOnWeekday(schedule, day.weekday, segment.phase_id));
-        const transition = admin && segment.phase_id && explicitStart
-          ? `<span class="transition-handle" data-phase-id="${escapeHTML(segment.phase_id)}" data-segment-day="${escapeHTML(day.weekday)}" style="top:${(segment.start / 1440) * 100}%" tabindex="0" title="${escapeHTML(this.t.transition)}" draggable="false"></span>`
+        const transitionPhaseId = schedule ? this.phaseForSegmentStart(schedule, day.weekday, segment) : "";
+        const previousSegment = day.segments[segmentIndex - 1];
+        const nextSegment = day.segments[segmentIndex + 1];
+        const minimumStart = previousSegment ? previousSegment.start + 15 : 0;
+        const maximumStart = nextSegment ? nextSegment.start - 15 : 1439;
+        const transition = admin && transitionPhaseId
+          ? `<span class="transition-handle" data-phase-id="${escapeHTML(transitionPhaseId)}" data-segment-day="${escapeHTML(day.weekday)}" data-min-start="${minimumStart}" data-max-start="${maximumStart}" style="top:${(segment.start / 1440) * 100}%" tabindex="0" title="${escapeHTML(this.t.transition)}" draggable="false"></span>`
           : "";
         return `<div class="segment" draggable="${admin && Boolean(segment.phase_id)}" data-phase-id="${escapeHTML(segment.phase_id || "")}" data-segment-day="${escapeHTML(day.weekday)}" data-segment-start="${segment.start}" data-segment-end="${segment.end}" style="top:${(segment.start / 1440) * 100}%;height:${((segment.end - segment.start) / 1440) * 100}%;${segment.color ? `border-left-color:${escapeHTML(segment.color)};background:color-mix(in srgb,${escapeHTML(segment.color)} 20%,var(--card-background-color))` : ""}">${duplicate}<div class="segment-head">${segment.icon ? `<ha-icon class="segment-icon" icon="${escapeHTML(segment.icon)}"></ha-icon>` : ""}<strong>${escapeHTML(segment.mode_name)}</strong></div><small>${escapeHTML(this.temperatureText(segment.target_temperature))}</small><small class="segment-time">${escapeHTML(startText)}–${escapeHTML(endText)}</small></div>${transition}`;
       }).join("");
@@ -465,7 +477,7 @@ class ClimatePlannerPanel extends HTMLElement {
       handle.addEventListener("pointerdown", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        this.beginPhaseResize(event, this.selectedSchedule, handle.dataset.phaseId, handle.dataset.segmentDay, "transition", handle.closest(".day-track"));
+        this.beginPhaseResize(event, this.selectedSchedule, handle.dataset.phaseId, handle.dataset.segmentDay, "transition", handle.closest(".day-track"), Number(handle.dataset.minStart), Number(handle.dataset.maxStart));
       });
       handle.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); });
     });
@@ -558,7 +570,7 @@ class ClimatePlannerPanel extends HTMLElement {
     return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
   }
 
-  beginPhaseResize(event, scheduleId, phaseId, weekday, edge, track) {
+  beginPhaseResize(event, scheduleId, phaseId, weekday, edge, track, minimumStart = 0, maximumStart = 1439) {
     if (edge !== "transition" || this.phaseResizeActive) return;
     const handle = event.currentTarget;
     const pointerId = event.pointerId;
@@ -587,14 +599,14 @@ class ClimatePlannerPanel extends HTMLElement {
       delete track.dataset.resizeTime;
       this.clearDropIndicator(track);
       this.suppressPhaseClickUntil = Date.now() + 750;
-      await this.resizePhaseStart(scheduleId, phaseId, weekday, time);
+      await this.resizePhaseStart(scheduleId, phaseId, weekday, time, minimumStart, maximumStart);
     };
     window.addEventListener("pointermove", move, { passive: false });
     window.addEventListener("pointerup", finish, { once: true });
     window.addEventListener("pointercancel", finish, { once: true });
   }
 
-  async resizePhaseStart(scheduleId, phaseId, weekday, time) {
+  async resizePhaseStart(scheduleId, phaseId, weekday, time, visibleMinimum = null, visibleMaximum = null) {
     const next = this.cloneData();
     const schedule = next.schedules.find((item) => item.id === scheduleId);
     if (!schedule) return;
@@ -606,11 +618,15 @@ class ClimatePlannerPanel extends HTMLElement {
     }
     if (!entry) return;
     const currentStart = this.phaseMinutes(entry.phase);
+    const requested = this.phaseMinutes({ time });
     const previousBoundary = this.previousPhase(schedule, weekday, currentStart, phaseId);
     const nextBoundary = this.followingPhase(schedule, weekday, currentStart, phaseId);
-    const requested = this.phaseMinutes({ time });
-    const minimum = previousBoundary ? previousBoundary.minutes + 15 : 0;
-    const maximum = nextBoundary ? nextBoundary.minutes - 15 : 1439;
+    const minimum = Number.isFinite(visibleMinimum)
+      ? Math.max(0, visibleMinimum)
+      : previousBoundary ? previousBoundary.minutes + 15 : 0;
+    const maximum = Number.isFinite(visibleMaximum)
+      ? Math.min(1439, visibleMaximum)
+      : nextBoundary ? nextBoundary.minutes - 15 : 1439;
     if (maximum < minimum) return this.notice(this.t.invalid, true);
     entry.phase.time = this.timeFromMinutes(Math.max(minimum, Math.min(maximum, requested)));
     entry.phases.sort((left, right) => this.phaseMinutes(left) - this.phaseMinutes(right));
