@@ -99,6 +99,14 @@ sie für weitere Phasen wieder. Bereits vorhandene Mehrfachzuordnungen bleiben
 aus Kompatibilitätsgründen lesbar; beim Entfernen des Modes aus dem Heizplan
 werden sie gemeinsam gelöscht.
 
+Die Detailansicht trennt die Bearbeitung der Zuordnung von der Bearbeitung
+einer einzelnen Phase. Der Zuordnungsdialog verwaltet die ausgewählten
+Wochentage und alle dazugehörigen Uhrzeiten; eine obere Sammelzeit wird jeweils
+in das erste Zeitfeld der ausgewählten Tage übernommen. Der Phasendialog
+verändert dagegen ausschließlich die über ihre stabile ID ausgewählte Phase
+und bietet deshalb keine Wochentags-Mehrfachauswahl. So entstehen beim
+Bearbeiten eines sichtbaren Tagesblocks keine zusätzlichen Phasen.
+
 Beim Duplizieren eines Heizplans werden Heizplan-, Zuordnungs- und Phasen-IDs
 neu erzeugt. Mode-Referenzen und fachliche Werte bleiben erhalten. Die Kopie
 startet mit `enabled: false`, damit Original und Kopie nicht unbeabsichtigt

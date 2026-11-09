@@ -63,10 +63,22 @@ Ein Heizplan kann pro Wochentag mehrere Phasen enthalten. Die erste Ansicht
 zeigt Heizpläne und Modes als Kacheln; ausschließlich **Details öffnen** öffnet
 die Wochen-Timeline. Die übrige Kachelfläche löst keinen Ansichtswechsel aus,
 damit die direkt bedienbaren Schaltflächen zuverlässig und ohne versehentliche
-Navigation reagieren. Modes lassen sich auf einen konkreten Tag und eine
-Uhrzeit ziehen; die Vorschau zeigt dabei die Zielzeit. Ein Klick auf eine Phase
-öffnet den Detaildialog für Mode, Wochentage, Uhrzeit und einen optionalen
-lokalen Temperatur-Override. Der globale Mode bleibt dabei unverändert.
+Navigation reagieren. In der Detailansicht stehen die im Heizplan verwendeten
+Modes direkt neben der Heizplanauswahl. Ein Klick auf einen dieser Modes öffnet
+**Mode bearbeiten**; **Mode hinzufügen** ordnet einen noch nicht verwendeten
+Mode zu. Beim Hinzufügen dient die obere Uhrzeit als Sammelwert für alle
+ausgewählten Wochentage. Unter jedem ausgewählten Tag bleibt ein eigenes
+Uhrzeitfeld sichtbar und kann danach unabhängig angepasst werden. Bereits
+vorhandene mehrere Zeiten desselben Modes an einem Tag bleiben als getrennte
+Felder erhalten.
+
+Modes lassen sich außerdem auf einen konkreten Tag und eine Uhrzeit ziehen; die
+Vorschau zeigt dabei die Zielzeit und öffnet denselben Dialog **Mode
+hinzufügen** mit vorausgewähltem Tag. Ein Klick auf einen einzelnen Block der
+Wochenansicht öffnet dagegen **Phase bearbeiten** ausschließlich für diesen
+Block. Der Wochentag wird nur angezeigt und es erscheinen keine
+Wochentags-Checkboxen, sodass die Bearbeitung keine weiteren Phasen erzeugt.
+Der globale Mode bleibt dabei unverändert.
 
 Zusätzlich zeigt jede Heizplan-Kachel die dort zugeordneten Modes mit ihrer
 Zieltemperatur. Ein Klick auf einen dieser Modes aktiviert ihn sofort als
@@ -107,9 +119,11 @@ gezogen werden, um sie dort zu kopieren; auch dabei verhindert die Zeitauswahl
 doppelte Startzeiten.
 
 Ein Mode kann auf einen Heizplan gezogen werden. Auf mobilen Geräten oder per
-Tastatur ist die Schaltfläche **Mode hinzufügen** die gleichwertige Alternative.
-Vor dem Speichern müssen mindestens ein Wochentag und je Regel eine Zeit im
-Format `HH:mm` angegeben sein.
+Tastatur ist die Schaltfläche **Mode hinzufügen** in der Detailansicht die
+gleichwertige Alternative. Vor dem Speichern müssen mindestens ein Wochentag
+und für jeden ausgewählten Tag eine Zeit im Format `HH:mm` angegeben sein. Eine
+Uhrzeit darf innerhalb eines Modes am selben Wochentag nicht doppelt
+vorkommen.
 
 ## Zeitverhalten
 

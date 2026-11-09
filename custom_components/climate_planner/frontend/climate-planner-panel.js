@@ -14,33 +14,33 @@ const labels = {
   de: {
     title: "Zeitgesteuerte Heizpläne", overview: "Übersicht", modes: "Mode-Bibliothek", schedules: "Heizpläne",
     week: "Wochenansicht", addMode: "Mode anlegen", addSchedule: "Heizplan anlegen",
-    addAssignment: "Mode hinzufügen", details: "Details öffnen", edit: "Bearbeiten", remove: "Löschen", save: "Speichern",
+    addAssignment: "Mode hinzufügen", editAssignment: "Mode bearbeiten", editPhase: "Phase bearbeiten", usedModes: "Verwendete Modes", details: "Details öffnen", edit: "Bearbeiten", remove: "Löschen", save: "Speichern",
     cancel: "Abbrechen", name: "Name", temperature: "Zieltemperatur", priority: "Priorität", color: "Farbe (optional)",
     icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", enabled: "Aktiviert",
     sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage",
-    time: "Uhrzeit", transition: "Übergang verschieben", phase: "Phase", addPhase: "Phase hinzufügen", duplicate: "Duplizieren", placeDuplicate: "Duplikat platzieren", duplicateTimeOccupied: "Eine Stunde vor diesem Mode liegt bereits ein Wechsel. Bitte eine andere Uhrzeit wählen.", copySuffix: "Kopie", defaultDuration: "Richtwert: 8 Stunden · letzter Block bis 24:00", drop: "Mode auf die Heizplankachel ziehen", dropTimeline: "Mode auf einen Tag und eine Uhrzeit ziehen · Richtwert 8 h · letzter Block bis 24:00 · Alt/Strg/Cmd = kopieren", chooseMode: "Mode direkt aktivieren", noModes: "Noch keine Modes angelegt.",
+    time: "Uhrzeit", bulkTime: "Uhrzeit für ausgewählte Tage", weekday: "Wochentag", transition: "Übergang verschieben", phase: "Phase", duplicate: "Duplizieren", placeDuplicate: "Duplikat platzieren", duplicateTimeOccupied: "Eine Stunde vor diesem Mode liegt bereits ein Wechsel. Bitte eine andere Uhrzeit wählen.", copySuffix: "Kopie", defaultDuration: "Richtwert: 8 Stunden · letzter Block bis 24:00", drop: "Mode auf die Heizplankachel ziehen", dropTimeline: "Mode auf einen Tag und eine Uhrzeit ziehen · Richtwert 8 h · letzter Block bis 24:00 · Alt/Strg/Cmd = kopieren", chooseMode: "Mode direkt aktivieren", noModes: "Noch keine Modes angelegt.",
     noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode aktivieren", pauseMode: "Mode pausieren", targetRequestShort: "Soll ↗", targetRequest: "Sollwertvorgabe", targetFeedbackShort: "Soll ↘", targetFeedback: "Sollwertrückmeldung", currentShort: "Ist", next: "Nächster Wechsel",
     none: "Noch kein Mode aktiviert", connected: "Bereit", loading: "Wird geladen …",
     saveError: "Speichern fehlgeschlagen", conflict: "Die Daten wurden geändert. Ansicht wird neu geladen.",
     invalid: "Bitte prüfe die Eingaben.", localTemperature: "Temperatur für diese Phase überschreiben", inherited: "Mode-Temperatur", deleteMode: "Mode wirklich löschen? Zugehörige Zuordnungen werden entfernt.", deletePhase: "Phase wirklich löschen?",
     deleteSchedule: "Heizplan wirklich löschen?", deleteAssignment: "Mode aus diesem Heizplan entfernen? Alle zugehörigen Phasen werden gelöscht.", modeAlreadyAssigned: "Dieser Mode ist bereits in diesem Heizplan enthalten.",
-    missingDay: "Mindestens ein Wochentag ist erforderlich.", invalidTime: "Jede ausgewählte Regel braucht eine gültige Uhrzeit (HH:mm).",
+    missingDay: "Mindestens ein Wochentag ist erforderlich.", invalidTime: "Jede ausgewählte Regel braucht eine gültige Uhrzeit (HH:mm).", duplicateDayTime: "Jede Uhrzeit darf pro Wochentag nur einmal vorkommen.",
     noClimate: "Keine climate-Entität gefunden.", selectSchedule: "Heizplan auswählen", noWeek: "Keine Zeitbereiche vorhanden.",
     dragHint: "Ziehe einen Mode aus der Bibliothek auf eine beliebige Stelle der Heizplankachel.", unavailable: "nicht verfügbar",
     monday: "Montag", tuesday: "Dienstag", wednesday: "Mittwoch", thursday: "Donnerstag", friday: "Freitag", saturday: "Samstag", sunday: "Sonntag",
   },
   en: {
     title: "Time-based heating plans", overview: "Overview", modes: "Mode library", schedules: "Heating plans", week: "Week view",
-    addMode: "Add mode", addSchedule: "Add heating plan", addAssignment: "Add mode", details: "Open details", edit: "Edit", remove: "Delete",
+    addMode: "Add mode", addSchedule: "Add heating plan", addAssignment: "Add mode", editAssignment: "Edit mode", editPhase: "Edit phase", usedModes: "Used modes", details: "Open details", edit: "Edit", remove: "Delete",
     save: "Save", cancel: "Cancel", name: "Name", temperature: "Target temperature", priority: "Priority", color: "Color (optional)",
     icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", enabled: "Enabled",
-    sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", time: "Time", transition: "Move transition", phase: "Phase", addPhase: "Add phase", duplicate: "Duplicate", placeDuplicate: "Place duplicate", duplicateTimeOccupied: "There is already a change one hour before this mode. Choose another time.", copySuffix: "Copy", defaultDuration: "Guideline: 8 hours · last block until 24:00", dropTimeline: "Drag a mode onto a day and time · guideline 8 h · last block until 24:00 · Alt/Ctrl/Cmd = copy",
+    sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", time: "Time", bulkTime: "Time for selected days", weekday: "Weekday", transition: "Move transition", phase: "Phase", duplicate: "Duplicate", placeDuplicate: "Place duplicate", duplicateTimeOccupied: "There is already a change one hour before this mode. Choose another time.", copySuffix: "Copy", defaultDuration: "Guideline: 8 hours · last block until 24:00", dropTimeline: "Drag a mode onto a day and time · guideline 8 h · last block until 24:00 · Alt/Ctrl/Cmd = copy",
     drop: "Drop mode on the heating plan", chooseMode: "Activate mode directly", noModes: "No modes have been created yet.", noSchedules: "No heating plans have been created yet.",
     active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode", pauseMode: "Pause mode", targetRequestShort: "Target ↗", targetRequest: "Requested target", targetFeedbackShort: "Target ↘", targetFeedback: "Reported target", currentShort: "Current", next: "Next change", none: "No mode activated yet", connected: "Ready", loading: "Loading …",
     saveError: "Save failed", conflict: "The data changed. Reloading the view.", invalid: "Please check the input.", localTemperature: "Override temperature for this phase", inherited: "Mode temperature",
     deleteMode: "Delete this mode? Its assignments will be removed.", deleteSchedule: "Delete this heating plan?",
     deleteAssignment: "Remove this mode from the heating plan? All of its phases will be deleted.", modeAlreadyAssigned: "This mode is already part of this heating plan.", deletePhase: "Delete this phase?", missingDay: "Select at least one weekday.",
-    invalidTime: "Every selected rule needs a valid time (HH:mm).", noClimate: "No climate entity found.",
+    invalidTime: "Every selected rule needs a valid time (HH:mm).", duplicateDayTime: "Each time may only occur once per weekday.", noClimate: "No climate entity found.",
     selectSchedule: "Select a heating plan", noWeek: "No time ranges are configured.",
     dragHint: "Drag a mode from the library onto any part of a heating-plan card.", unavailable: "unavailable",
     monday: "Monday", tuesday: "Tuesday", wednesday: "Wednesday", thursday: "Thursday", friday: "Friday", saturday: "Saturday", sunday: "Sunday",
@@ -184,6 +184,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".schedule-card{cursor:default}.segment-head{padding-right:25px}.segment-duplicate{position:absolute;z-index:4;top:3px;right:3px;width:24px;height:24px;padding:3px;border:0;background:color-mix(in srgb,var(--card-background-color) 72%,transparent);line-height:1}.segment-duplicate ha-icon{--mdc-icon-size:16px}.schedule-card-top-tools{align-items:flex-start}.schedule-card-icon-tools{display:grid;gap:4px}.schedule-toggle,.schedule-duplicate{width:30px;height:30px;padding:5px;font-size:13px;line-height:1}.schedule-duplicate ha-icon{--mdc-icon-size:18px}";
     style.textContent += ".external-badge{display:inline-block;margin-left:5px;padding:2px 6px;border-radius:999px;color:var(--warning-color,#b06a00);background:color-mix(in srgb,var(--warning-color,#b06a00) 14%,transparent);font-size:11px;font-weight:600}";
     style.textContent += ".climate-selector-field{min-height:56px}.climate-selector-label{display:block;margin-bottom:8px;font-size:13px}.climate-entity-picker-row+.climate-entity-picker-row{margin-top:8px}.climate-entity-add{display:block;margin-top:8px}";
+    style.textContent += ".week-toolbar-main{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}.week-used-modes{display:grid;gap:5px}.week-used-modes-label{font-size:12px;color:var(--secondary-text-color)}.week-mode-list{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.week-mode-chip,.week-mode-add{display:inline-flex;align-items:center;gap:5px;min-height:38px;padding:7px 9px;font-size:12px}.week-mode-chip.paused{opacity:.6}.week-mode-chip .quick-mode-dot{width:9px;height:9px}.week-mode-chip ha-icon{--mdc-icon-size:16px}.mode-day-grid{display:grid;grid-template-columns:repeat(7,minmax(92px,1fr));gap:7px}.mode-day-card{display:grid;align-content:start;gap:7px;padding:8px;border:1px solid var(--divider-color);border-radius:7px}.mode-day-card>label{display:flex;align-items:center;gap:5px;font-weight:600}.mode-day-card input[type=checkbox]{width:auto}.mode-day-times{display:grid;gap:5px}.mode-day-times[hidden]{display:none}.mode-day-times input{min-width:0;padding:7px}.fixed-weekday{display:block;padding:10px;border:1px solid var(--divider-color);border-radius:7px;background:var(--secondary-background-color)}@media(max-width:900px){.mode-day-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.mode-day-grid{grid-template-columns:1fr}}";
     style.textContent += ".mode-palette{position:static;max-height:none;overflow:visible}.mode-palette h2{margin:4px 0}.mode-palette #drag-hint{margin:0 0 8px;font-size:12px}.mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px}.mode-palette .mode-card{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:12px;row-gap:3px;min-height:58px;padding:10px 12px;cursor:grab}.mode-palette .mode-card-top{grid-column:1;grid-row:1}.mode-palette .mode-meta{grid-column:1;grid-row:2;min-width:0;flex-wrap:nowrap}.mode-palette .mode-priority{margin-left:0}.mode-palette .mode-card .actions{grid-column:2;grid-row:1/3;align-self:center;margin:0;flex-wrap:nowrap}.mode-palette .mode-card .actions button{padding:7px 9px;font-size:12px}main.overview-layout{height:100vh;overflow:hidden}main.overview-layout #schedules-section{display:flex;min-height:0;flex-direction:column}main.overview-layout #schedules-title{flex:none;margin:8px 0 10px}main.overview-layout #schedules{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:start;padding:2px 10px 12px 2px;scrollbar-gutter:stable}@media(max-width:1100px){main.overview-layout{display:grid!important}}@media(max-width:700px){main.overview-layout{height:auto;min-height:100vh;overflow:visible;grid-template-rows:auto!important}main.overview-layout #schedules{overflow:visible}.mode-palette .grid{grid-template-columns:1fr}.mode-palette .mode-meta{flex-wrap:wrap}}";
     style.textContent += ".mode-palette .grid,#schedules{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}@media(max-width:1100px){.mode-palette .grid,#schedules{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.mode-palette .grid,#schedules{grid-template-columns:1fr}}";
     this.shadowRoot.querySelector("header").style.gridArea = "header";
@@ -448,8 +449,35 @@ class ClimatePlannerPanel extends HTMLElement {
         : "";
       return `<section class="day-column"><h3>${escapeHTML(this.t[day.weekday])}</h3><div class="day-track" data-drop-day="${escapeHTML(day.weekday)}"><div class="drop-indicator" hidden><span></span></div>${segments}${nowLine}<div class="time-labels"><span style="top:0">00:00</span><span style="top:25%">06:00</span><span style="top:50%">12:00</span><span style="top:75%">18:00</span></div></div></section>`;
     }).join("") || "";
-    target.innerHTML = `<div class="week-toolbar"><label>${this.t.selectSchedule}<select id="week-select">${this.data.schedules.map((schedule) => `<option value="${escapeHTML(schedule.id)}" ${schedule.id === this.selectedSchedule ? "selected" : ""}>${escapeHTML(schedule.name)}</option>`).join("")}</select></label><p class="muted timeline-hint">${admin ? this.t.dropTimeline : ""}</p></div>${view ? `<div class="week-scroll"><div class="week-grid">${days}</div></div>` : `<p class="empty">${this.t.noWeek}</p>`}`;
+    const usedModes = [];
+    schedule?.assignments.forEach((assignment) => {
+      const mode = this.mode(assignment.mode_id);
+      const existing = mode && usedModes.find((item) => item.mode.id === mode.id);
+      if (mode && !existing) usedModes.push({ mode, assignmentId: assignment.id, enabled: assignment.enabled });
+      else if (existing && assignment.enabled) existing.enabled = true;
+    });
+    usedModes.sort((left, right) => left.mode.name.localeCompare(right.mode.name, this._hass?.language, { sensitivity: "base" }));
+    const usedModeMarkup = usedModes.map(({ mode, assignmentId, enabled }) => {
+      const dot = mode.color ? `<span class="quick-mode-dot" style="background:${escapeHTML(mode.color)}"></span>` : "<span class=\"quick-mode-dot default\"></span>";
+      const icon = mode.icon ? `<ha-icon icon="${escapeHTML(mode.icon)}" aria-hidden="true"></ha-icon>` : "";
+      const content = `${dot}${icon}<span>${escapeHTML(mode.name)}</span>`;
+      return admin
+        ? `<button type="button" class="week-mode-chip ${enabled ? "" : "paused"}" data-edit-assignment="${escapeHTML(assignmentId)}" title="${escapeHTML(this.t.editAssignment)}">${content}</button>`
+        : `<span class="week-mode-chip ${enabled ? "" : "paused"}">${content}</span>`;
+    }).join("");
+    const assignedModeIds = new Set(usedModes.map((item) => item.mode.id));
+    const addModeButton = admin && this.data.modes.some((mode) => !assignedModeIds.has(mode.id))
+      ? `<button type="button" class="week-mode-add" data-add-assignment>＋ ${escapeHTML(this.t.addAssignment)}</button>`
+      : "";
+    const modeToolbar = schedule
+      ? `<div class="week-used-modes"><span class="week-used-modes-label">${escapeHTML(this.t.usedModes)}</span><div class="week-mode-list">${usedModeMarkup}${addModeButton}</div></div>`
+      : "";
+    target.innerHTML = `<div class="week-toolbar"><div class="week-toolbar-main"><label>${this.t.selectSchedule}<select id="week-select">${this.data.schedules.map((schedule) => `<option value="${escapeHTML(schedule.id)}" ${schedule.id === this.selectedSchedule ? "selected" : ""}>${escapeHTML(schedule.name)}</option>`).join("")}</select></label>${modeToolbar}</div><p class="muted timeline-hint">${admin ? this.t.dropTimeline : ""}</p></div>${view ? `<div class="week-scroll"><div class="week-grid">${days}</div></div>` : `<p class="empty">${this.t.noWeek}</p>`}`;
     this.$("week-select").onchange = () => { this.selectedSchedule = this.$("week-select").value; this.storageSet("climate-planner-schedule", this.selectedSchedule); this.renderWeek(); };
+    target.querySelectorAll("[data-edit-assignment]").forEach((button) => {
+      button.onclick = () => this.openAssignmentDialog(this.selectedSchedule, button.dataset.editAssignment);
+    });
+    target.querySelector("[data-add-assignment]")?.addEventListener("click", () => this.openAssignmentDialog(this.selectedSchedule));
     target.querySelectorAll(".segment[data-phase-id]").forEach((segment) => {
       segment.addEventListener("click", (event) => {
         if (Date.now() < this.suppressPhaseClickUntil) {
@@ -501,7 +529,7 @@ class ClimatePlannerPanel extends HTMLElement {
         delete track.dataset.dropTime;
         if (phaseId) this.suppressPhaseClickUntil = Date.now() + 750;
         this.dragState = null;
-        if (payload.startsWith("mode:")) return this.openPhaseDialog(this.selectedSchedule, null, track.dataset.dropDay, time, payload.slice(5));
+        if (payload.startsWith("mode:")) return this.openAssignmentDialog(this.selectedSchedule, null, payload.slice(5), track.dataset.dropDay, time);
         if (payload.startsWith("copy-phase:")) return this.duplicatePhaseAt(this.selectedSchedule, payload.slice(11), track.dataset.dropDay, time);
         if (payload.startsWith("phase:")) return this.movePhase(this.selectedSchedule, payload.slice(6), track.dataset.dropDay, time);
       });
@@ -743,76 +771,185 @@ class ClimatePlannerPanel extends HTMLElement {
     if (!this._hass.user?.is_admin) return;
     const schedule = this.data.schedules.find((item) => item.id === scheduleId);
     if (!schedule || !this.data.modes.length) return;
-    if (!phaseId && draggedModeId && !duplicateTemplate && schedule.assignments.some((item) => item.mode_id === draggedModeId)) {
-      this.notice(this.t.modeAlreadyAssigned, true);
-      return;
-    }
     const existing = phaseId ? this.phaseEntry(schedule, phaseId) : null;
+    if (!existing && !duplicateTemplate) return;
     const mode = existing ? this.mode(existing.assignment.mode_id) : this.mode(draggedModeId) || this.data.modes[0];
     const currentWeekday = existing?.weekday || weekday;
     const currentTime = existing ? this.phaseTime(existing.phase) : time;
-    const currentTemperature = existing ? existing.phase?.target_temperature : duplicateTemplate?.target_temperature;
+    const currentTemperature = existing && typeof existing.phase === "object"
+      ? existing.phase.target_temperature
+      : duplicateTemplate?.target_temperature;
     const dialog = this.$("dialog"); this.dialogKind = "phase"; this.dialogContext = { scheduleId, phaseId };
-    dialog.innerHTML = `<form method="dialog" class="dialog-form"><h2>${phaseId ? this.t.edit : duplicateTemplate ? this.t.placeDuplicate : this.t.addPhase}</h2>${duplicateTemplate ? `<p class="muted">${escapeHTML(this.t.duplicateTimeOccupied)}</p>` : ""}<div class="form-grid"><label>${this.t.modes}<select name="mode_id">${this.data.modes.map((item) => `<option value="${escapeHTML(item.id)}" ${item.id === mode?.id ? "selected" : ""}>${escapeHTML(item.name)} · ${escapeHTML(this.temperatureText(item.target_temperature))}</option>`).join("")}</select></label><label>${this.t.time}<input name="time" type="time" required step="900" value="${escapeHTML(currentTime)}"><small class="muted">${this.t.defaultDuration}</small></label><label>${this.t.temperature}<input name="target_temperature" type="number" step="0.1" value="${currentTemperature == null ? "" : escapeHTML(this.displayTemperature(currentTemperature))}" placeholder="${escapeHTML(this.temperatureText(mode?.target_temperature))}"><small class="muted">${this.t.localTemperature}</small></label><fieldset class="phase-days full"><legend>${this.t.weekdays}</legend><div class="days">${DAYS.map((day) => `<label class="day-check"><input type="checkbox" name="phase-day-${day}" ${day === currentWeekday ? "checked" : ""}>${escapeHTML(this.t[day])}</label>`).join("")}</div></fieldset></div><div class="dialog-actions">${phaseId ? `<button type="button" class="danger" data-delete-phase>${this.t.remove}</button>` : ""}<button type="button" data-cancel>${this.t.cancel}</button><button class="primary" type="submit">${this.t.save}</button></div></form>`;
+    dialog.innerHTML = `<form method="dialog" class="dialog-form"><h2>${phaseId ? this.t.editPhase : this.t.placeDuplicate}</h2>${duplicateTemplate ? `<p class="muted">${escapeHTML(this.t.duplicateTimeOccupied)}</p>` : ""}<div class="form-grid"><label>${this.t.modes}<select name="mode_id">${this.data.modes.map((item) => `<option value="${escapeHTML(item.id)}" ${item.id === mode?.id ? "selected" : ""}>${escapeHTML(item.name)} · ${escapeHTML(this.temperatureText(item.target_temperature))}</option>`).join("")}</select></label><label>${this.t.time}<input name="time" type="time" required step="900" value="${escapeHTML(currentTime)}"><small class="muted">${this.t.defaultDuration}</small></label><label>${this.t.temperature}<input name="target_temperature" type="number" step="0.1" value="${currentTemperature == null ? "" : escapeHTML(this.displayTemperature(currentTemperature))}" placeholder="${escapeHTML(this.temperatureText(mode?.target_temperature))}"><small class="muted">${this.t.localTemperature}</small></label><label>${this.t.weekday}<span class="fixed-weekday">${escapeHTML(this.t[currentWeekday])}</span></label></div><div class="dialog-actions">${phaseId ? `<button type="button" class="danger" data-delete-phase>${this.t.remove}</button>` : ""}<button type="button" data-cancel>${this.t.cancel}</button><button class="primary" type="submit">${this.t.save}</button></div></form>`;
     const form = dialog.querySelector("form");
     form.elements.time.addEventListener("input", () => form.elements.time.setCustomValidity(""));
     dialog.querySelector("[data-cancel]").onclick = () => this.closeDialog();
-    if (phaseId) {
-      dialog.querySelector("[data-delete-phase]").onclick = () => this.deletePhase(scheduleId, phaseId);
-    }
+    if (phaseId) dialog.querySelector("[data-delete-phase]").onclick = () => this.deletePhase(scheduleId, phaseId);
     form.onsubmit = async (event) => {
       event.preventDefault();
       const selectedModeId = form.elements.mode_id.value;
-      const selectedDays = DAYS.filter((day) => form.elements[`phase-day-${day}`].checked);
-      if (!selectedDays.length) return this.notice(this.t.missingDay, true);
       const selectedTime = form.elements.time.value;
       if (!TIME_PATTERN.test(selectedTime)) return this.notice(this.t.invalidTime, true);
-      if (duplicateTemplate) {
-        const selectedMinutes = this.phaseMinutes({ time: selectedTime });
-        const occupied = this.schedulePhases(schedule).some((item) => (
-          selectedDays.includes(item.weekday) && this.phaseMinutes(item.phase) === selectedMinutes
-        ));
-        if (occupied) {
-          form.elements.time.setCustomValidity(this.t.duplicateTimeOccupied);
-          form.elements.time.reportValidity();
-          return;
-        }
+      const selectedMinutes = this.phaseMinutes({ time: selectedTime });
+      const occupied = this.schedulePhases(schedule).some((item) => (
+        item.weekday === currentWeekday
+        && this.phaseId(item.phase) !== phaseId
+        && this.phaseMinutes(item.phase) === selectedMinutes
+      ));
+      if (occupied) {
+        form.elements.time.setCustomValidity(duplicateTemplate ? this.t.duplicateTimeOccupied : this.t.duplicateDayTime);
+        form.elements.time.reportValidity();
+        return;
       }
       const next = this.cloneData();
       const targetSchedule = next.schedules.find((item) => item.id === scheduleId);
       if (!targetSchedule) return;
-      let targetAssignment = targetSchedule.assignments.find((item) => item.id === existing?.assignment.id);
-      if (phaseId && targetAssignment) {
-        for (const [day, phases] of Object.entries(targetAssignment.weekday_rules || {})) {
-          const index = phases.findIndex((item) => this.phaseId(item) === phaseId);
-          if (index >= 0) { phases.splice(index, 1); if (!phases.length) delete targetAssignment.weekday_rules[day]; break; }
-        }
-        if (targetAssignment.mode_id !== selectedModeId) {
-          if (!Object.keys(targetAssignment.weekday_rules).length) targetSchedule.assignments = targetSchedule.assignments.filter((item) => item !== targetAssignment);
-          targetAssignment = null;
-        }
+      let sourceAssignment = targetSchedule.assignments.find((item) => item.id === existing?.assignment.id);
+      let phase = phaseId && typeof existing?.phase === "object"
+        ? { ...existing.phase, time: selectedTime }
+        : { id: newId("phase"), time: selectedTime };
+      if (phaseId && sourceAssignment) {
+        const sourcePhases = sourceAssignment.weekday_rules?.[currentWeekday] || [];
+        const sourceIndex = sourcePhases.findIndex((item) => this.phaseId(item) === phaseId);
+        if (sourceIndex >= 0) sourcePhases.splice(sourceIndex, 1);
+        if (!sourcePhases.length) delete sourceAssignment.weekday_rules[currentWeekday];
       }
-      if (!targetAssignment) {
-        // A mode has one assignment per heating plan.  Reuse an existing
-        // assignment even when it is currently paused instead of creating a
-        // second assignment for the same mode.
-        targetAssignment = targetSchedule.assignments.find((item) => item.mode_id === selectedModeId);
+      let targetAssignment = sourceAssignment?.mode_id === selectedModeId ? sourceAssignment : null;
+      if (!targetAssignment) targetAssignment = targetSchedule.assignments.find((item) => item.mode_id === selectedModeId);
+      if (sourceAssignment && sourceAssignment !== targetAssignment && !Object.keys(sourceAssignment.weekday_rules || {}).length) {
+        targetSchedule.assignments = targetSchedule.assignments.filter((item) => item !== sourceAssignment);
+        sourceAssignment = null;
       }
       if (!targetAssignment) {
         targetAssignment = { id: newId("assignment"), mode_id: selectedModeId, enabled: true, weekday_rules: {} };
         targetSchedule.assignments.push(targetAssignment);
       }
-      const phase = { id: phaseId || newId("phase"), time: selectedTime };
       const displayTemperature = form.elements.target_temperature.value;
-      if (displayTemperature !== "") {
+      if (displayTemperature === "") delete phase.target_temperature;
+      else {
         const storedTemperature = this.storedTemperature(displayTemperature);
         if (!Number.isFinite(storedTemperature)) return this.notice(this.t.invalid, true);
         phase.target_temperature = Number(storedTemperature.toFixed(2));
       }
-      selectedDays.forEach((day, index) => {
-        const phaseForDay = index === 0 ? phase : { ...phase, id: newId("phase") };
-        targetAssignment.weekday_rules[day] = [...(targetAssignment.weekday_rules[day] || []), phaseForDay].sort((left, right) => this.phaseMinutes(left) - this.phaseMinutes(right));
+      targetAssignment.weekday_rules[currentWeekday] = [...(targetAssignment.weekday_rules[currentWeekday] || []), phase].sort((left, right) => this.phaseMinutes(left) - this.phaseMinutes(right));
+      await this.save(next);
+    };
+    dialog.showModal(); form.querySelector("select")?.focus();
+  }
+
+  openModeScheduleDialog(scheduleId, assignmentId = null, draggedModeId = null, initialWeekday = "monday", initialTime = "06:00") {
+    if (!this._hass.user?.is_admin) return;
+    const schedule = this.data.schedules.find((item) => item.id === scheduleId);
+    if (!schedule || !this.data.modes.length) return;
+    const assignment = assignmentId ? schedule.assignments.find((item) => item.id === assignmentId) : null;
+    const normalizedModeId = draggedModeId?.startsWith("mode:") ? draggedModeId.slice(5) : draggedModeId;
+    if (!assignment && normalizedModeId && schedule.assignments.some((item) => item.mode_id === normalizedModeId)) {
+      this.notice(this.t.modeAlreadyAssigned, true);
+      return;
+    }
+    const assignedModeIds = new Set(schedule.assignments.filter((item) => item.id !== assignmentId).map((item) => item.mode_id));
+    const selectableModes = this.data.modes.filter((mode) => mode.id === assignment?.mode_id || !assignedModeIds.has(mode.id));
+    if (!selectableModes.length) return this.notice(this.t.modeAlreadyAssigned, true);
+    const selectedMode = this.mode(assignment?.mode_id || normalizedModeId) || selectableModes[0];
+    const phaseEntries = assignment
+      ? this.schedulePhases(schedule).filter((item) => item.assignment.id === assignment.id)
+      : [];
+    const firstTime = phaseEntries[0] ? this.phaseTime(phaseEntries[0].phase) : initialTime;
+    const overrides = phaseEntries.map((item) => typeof item.phase === "object" ? item.phase.target_temperature : undefined);
+    const sharedOverride = overrides.length && overrides.every((value) => value === overrides[0]) ? overrides[0] : undefined;
+    const dayMarkup = DAYS.map((day) => {
+      const dayEntries = phaseEntries.filter((item) => item.weekday === day);
+      const checked = dayEntries.length > 0 || (!assignment && day === initialWeekday);
+      const timeEntries = dayEntries.length ? dayEntries : [{ phase: null }];
+      const timeLabel = `${this.t[day]} ${this.t.time}`;
+      return `<div class="mode-day-card" data-mode-day="${escapeHTML(day)}"><label><input type="checkbox" data-day-enabled ${checked ? "checked" : ""}>${escapeHTML(this.t[day])}</label><div class="mode-day-times" data-day-times ${checked ? "" : "hidden"}>${timeEntries.map((entry) => `<input type="time" step="900" required data-day-time data-phase-id="${escapeHTML(entry.phase ? this.phaseId(entry.phase) : "")}" value="${escapeHTML(entry.phase ? this.phaseTime(entry.phase) : firstTime)}" aria-label="${escapeHTML(timeLabel)}" ${checked ? "" : "disabled"}>`).join("")}</div></div>`;
+    }).join("");
+    const dialog = this.$("dialog"); this.dialogKind = "assignment"; this.dialogContext = { scheduleId, assignmentId };
+    dialog.innerHTML = `<form method="dialog" class="dialog-form"><h2>${assignment ? this.t.editAssignment : this.t.addAssignment}</h2><div class="form-grid"><label>${this.t.modes}<select name="mode_id">${selectableModes.map((item) => `<option value="${escapeHTML(item.id)}" ${item.id === selectedMode.id ? "selected" : ""}>${escapeHTML(item.name)} · ${escapeHTML(this.temperatureText(item.target_temperature))}</option>`).join("")}</select></label><label>${this.t.bulkTime}<input name="bulk_time" type="time" required step="900" value="${escapeHTML(firstTime)}"><small class="muted">${this.t.defaultDuration}</small></label><label>${this.t.temperature}<input name="target_temperature" type="number" step="0.1" value="${sharedOverride == null ? "" : escapeHTML(this.displayTemperature(sharedOverride))}" placeholder="${escapeHTML(this.temperatureText(selectedMode.target_temperature))}"><small class="muted">${this.t.localTemperature}</small></label><fieldset class="full"><legend>${this.t.weekdays}</legend><div class="mode-day-grid">${dayMarkup}</div></fieldset></div><div class="dialog-actions"><button type="button" data-cancel>${this.t.cancel}</button><button class="primary" type="submit">${this.t.save}</button></div></form>`;
+    const form = dialog.querySelector("form");
+    const bulkTime = form.elements.bulk_time;
+    const temperature = form.elements.target_temperature;
+    let temperatureTouched = false;
+    const updateDayCard = (card, copyBulkTime = false) => {
+      const checked = card.querySelector("[data-day-enabled]").checked;
+      const times = card.querySelector("[data-day-times]");
+      const inputs = [...times.querySelectorAll("[data-day-time]")];
+      times.hidden = !checked;
+      inputs.forEach((input, index) => {
+        input.disabled = !checked;
+        if (checked && copyBulkTime && index === 0) input.value = bulkTime.value;
+        input.setCustomValidity("");
       });
+    };
+    dialog.querySelectorAll("[data-mode-day]").forEach((card) => {
+      card.querySelector("[data-day-enabled]").addEventListener("change", () => updateDayCard(card, true));
+      card.querySelectorAll("[data-day-time]").forEach((input) => input.addEventListener("input", () => input.setCustomValidity("")));
+    });
+    bulkTime.addEventListener("input", () => {
+      bulkTime.setCustomValidity("");
+      dialog.querySelectorAll("[data-mode-day]").forEach((card) => {
+        if (card.querySelector("[data-day-enabled]").checked) updateDayCard(card, true);
+      });
+    });
+    form.elements.mode_id.addEventListener("change", () => {
+      const mode = this.mode(form.elements.mode_id.value);
+      temperature.placeholder = mode ? this.temperatureText(mode.target_temperature) : "";
+    });
+    temperature.addEventListener("input", () => { temperatureTouched = true; });
+    dialog.querySelector("[data-cancel]").onclick = () => this.closeDialog();
+    form.onsubmit = async (event) => {
+      event.preventDefault();
+      const selectedCards = [...dialog.querySelectorAll("[data-mode-day]")].filter((card) => card.querySelector("[data-day-enabled]").checked);
+      if (!selectedCards.length) return this.notice(this.t.missingDay, true);
+      for (const card of selectedCards) {
+        const inputs = [...card.querySelectorAll("[data-day-time]")];
+        const values = inputs.map((input) => input.value);
+        const invalidInput = inputs.find((input) => !TIME_PATTERN.test(input.value));
+        if (invalidInput) {
+          invalidInput.setCustomValidity(this.t.invalidTime);
+          invalidInput.reportValidity();
+          return;
+        }
+        if (new Set(values).size !== values.length) {
+          inputs[0].setCustomValidity(this.t.duplicateDayTime);
+          inputs[0].reportValidity();
+          return;
+        }
+      }
+      let storedTemperature = null;
+      if (temperatureTouched && temperature.value !== "") {
+        storedTemperature = this.storedTemperature(temperature.value);
+        if (!Number.isFinite(storedTemperature)) return this.notice(this.t.invalid, true);
+        storedTemperature = Number(storedTemperature.toFixed(2));
+      }
+      const next = this.cloneData();
+      const targetSchedule = next.schedules.find((item) => item.id === scheduleId);
+      if (!targetSchedule) return;
+      let targetAssignment = assignmentId ? targetSchedule.assignments.find((item) => item.id === assignmentId) : null;
+      if (!targetAssignment) {
+        targetAssignment = { id: newId("assignment"), mode_id: form.elements.mode_id.value, enabled: true, weekday_rules: {} };
+        targetSchedule.assignments.push(targetAssignment);
+      }
+      targetAssignment.mode_id = form.elements.mode_id.value;
+      for (const day of DAYS) {
+        const card = dialog.querySelector(`[data-mode-day="${day}"]`);
+        if (!card.querySelector("[data-day-enabled]").checked) {
+          delete targetAssignment.weekday_rules[day];
+          continue;
+        }
+        const existingPhases = targetAssignment.weekday_rules[day] || [];
+        targetAssignment.weekday_rules[day] = [...card.querySelectorAll("[data-day-time]")].map((input) => {
+          const existingPhase = existingPhases.find((phase) => this.phaseId(phase) === input.dataset.phaseId);
+          const phase = existingPhase && typeof existingPhase === "object"
+            ? { ...existingPhase, time: input.value }
+            : { id: newId("phase"), time: input.value };
+          if (temperatureTouched) {
+            if (temperature.value === "") delete phase.target_temperature;
+            else phase.target_temperature = storedTemperature;
+          }
+          return phase;
+        }).sort((left, right) => this.phaseMinutes(left) - this.phaseMinutes(right));
+      }
       await this.save(next);
     };
     dialog.showModal(); form.querySelector("select")?.focus();
@@ -1111,17 +1248,8 @@ class ClimatePlannerPanel extends HTMLElement {
     dialog.showModal(); dialog.querySelector("input")?.focus();
   }
 
-  openAssignmentDialog(scheduleId, assignmentId = null, draggedModeId = null) {
-    const schedule = this.data.schedules.find((item) => item.id === scheduleId);
-    if (!schedule) return;
-    const assignment = assignmentId ? schedule.assignments.find((item) => item.id === assignmentId) : null;
-    const firstPhase = assignment ? this.schedulePhases(schedule).find((item) => item.assignment.id === assignmentId) : null;
-    const modeId = draggedModeId?.startsWith("mode:") ? draggedModeId.slice(5) : draggedModeId;
-    if (!assignmentId && modeId && schedule.assignments.some((item) => item.mode_id === modeId)) {
-      this.notice(this.t.modeAlreadyAssigned, true);
-      return;
-    }
-    this.openPhaseDialog(scheduleId, firstPhase?.phase ? this.phaseId(firstPhase.phase) : null, firstPhase?.weekday || "monday", firstPhase?.phase ? this.phaseTime(firstPhase.phase) : "06:00", modeId || assignment?.mode_id || null);
+  openAssignmentDialog(scheduleId, assignmentId = null, draggedModeId = null, initialWeekday = "monday", initialTime = "06:00") {
+    this.openModeScheduleDialog(scheduleId, assignmentId, draggedModeId, initialWeekday, initialTime);
   }
 
   closeDialog() { const dialog = this.$("dialog"); if (dialog.open) dialog.close(); dialog.innerHTML = ""; this.dialogKind = null; this.dialogContext = null; }
