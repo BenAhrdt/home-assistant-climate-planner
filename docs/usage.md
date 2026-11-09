@@ -109,12 +109,14 @@ wenn eine Automation einen Climate-Planner-Dienst oder Aktivierungs-Button
 verwendet.
 
 Für jede Klima-Entität stehen **Soll** und **Ist** nebeneinander. **Soll** ist
-direkt das Climate-Attribut `temperature` und ändert sich deshalb auch bei
-einem fremden `climate.set_temperature`-Aufruf. Weicht **Soll** unter
-Berücksichtigung der Thermostat-Schrittweite von der letzten
-Climate-Planner-Vorgabe ab, erscheint beim zuletzt aktivierten Mode der Hinweis
-**extern**. Der Hinweis löst keine automatische Nachregelung aus. Der zuletzt
-aktivierte Mode bleibt auch nach einem Neustart der Integration erhalten.
+der zuletzt erfolgreich vom Climate Planner an `climate.set_temperature`
+gesendete Wert. Der aktuelle Rückgabewert der Climate-Entität aus dem Attribut
+`temperature` wird damit verglichen, aber nicht als Sollwert überschrieben.
+Weicht der Rückgabewert unter Berücksichtigung der Thermostat-Schrittweite von
+der letzten Planner-Vorgabe ab, erscheint beim zuletzt aktivierten Mode der
+Hinweis **extern**. Der Hinweis löst keine automatische Nachregelung aus. Der
+zuletzt aktivierte Mode bleibt auch nach einem Neustart der Integration
+erhalten.
 
 Phasen lassen sich im 15-Minuten-Raster verschieben, über die sichtbaren
 Zeitgriffe bis zur nächsten Phase verlängern oder verkürzen und einzeln

@@ -150,13 +150,12 @@ erfolgreichen Serviceaufruf den zuletzt aktivierten Mode im Panel; der Override
 wird nicht dauerhaft gespeichert. Der Button-State zeigt separat, wie viele
 Temperatur-Serviceaufrufe erfolgreich waren.
 
-Das Panel stellt den Sollwert der Climate-Entität (`temperature`, `Soll`) und
-die aktuelle Temperatur (`Ist`) getrennt dar. Weicht der Sollwert unter
-Berücksichtigung der Thermostat-Schrittweite von der letzten
-Climate-Planner-Vorgabe ab, wird der zuletzt aktivierte Mode als `extern`
-markiert. Dadurch aktualisiert ein fremder `climate.set_temperature`-Aufruf
-den angezeigten Sollwert, ohne fälschlich einem Planner-Mode zugeordnet zu
-werden. Das ist reine Zustandsdarstellung: Es gibt weder Polling noch
+Das Panel stellt den zuletzt erfolgreich vom Climate Planner gesetzten Wert als
+`Soll` und die aktuelle Temperatur als `Ist` dar. Der Rückgabewert der
+Climate-Entität aus `temperature` wird ausschließlich mit der letzten
+Planner-Vorgabe verglichen. Weicht er unter Berücksichtigung der
+Thermostat-Schrittweite ab, wird der zuletzt aktivierte Mode als `extern`
+markiert. Das ist reine Zustandsdarstellung: Es gibt weder Polling noch
 automatische Nachregelung.
 
 Beim Übergang eines Heizplans von pausiert zu aktiviert wird ein vorhandener
