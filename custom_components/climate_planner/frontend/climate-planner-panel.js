@@ -26,7 +26,7 @@ const labels = {
     deleteSchedule: "Heizplan wirklich löschen?", deleteAssignment: "Mode aus diesem Heizplan entfernen? Alle zugehörigen Phasen werden gelöscht.", modeAlreadyAssigned: "Dieser Mode ist bereits in diesem Heizplan enthalten.",
     missingDay: "Mindestens ein Wochentag ist erforderlich.", invalidTime: "Jede ausgewählte Regel braucht eine gültige Uhrzeit (HH:mm).", duplicateDayTime: "Jede Uhrzeit darf pro Wochentag nur einmal vorkommen.",
     noClimate: "Keine climate-Entität gefunden.", selectSchedule: "Heizplan auswählen", noWeek: "Keine Zeitbereiche vorhanden.",
-    dragHint: "Ziehe einen Mode aus der Bibliothek auf eine beliebige Stelle der Heizplankachel.", unavailable: "nicht verfügbar",
+    dragHint: "Ziehe einen Mode aus der Bibliothek auf eine beliebige Stelle der Heizplankachel.", dropReady: "Mode ablegen", dropBlocked: "Bereits enthalten", unavailable: "nicht verfügbar",
     monday: "Montag", tuesday: "Dienstag", wednesday: "Mittwoch", thursday: "Donnerstag", friday: "Freitag", saturday: "Samstag", sunday: "Sonntag",
   },
   en: {
@@ -42,7 +42,7 @@ const labels = {
     deleteAssignment: "Remove this mode from the heating plan? All of its phases will be deleted.", modeAlreadyAssigned: "This mode is already part of this heating plan.", deletePhase: "Delete this phase?", missingDay: "Select at least one weekday.",
     invalidTime: "Every selected rule needs a valid time (HH:mm).", duplicateDayTime: "Each time may only occur once per weekday.", noClimate: "No climate entity found.",
     selectSchedule: "Select a heating plan", noWeek: "No time ranges are configured.",
-    dragHint: "Drag a mode from the library onto any part of a heating-plan card.", unavailable: "unavailable",
+    dragHint: "Drag a mode from the library onto any part of a heating-plan card.", dropReady: "Drop mode", dropBlocked: "Already included", unavailable: "unavailable",
     monday: "Monday", tuesday: "Tuesday", wednesday: "Wednesday", thursday: "Thursday", friday: "Friday", saturday: "Saturday", sunday: "Sunday",
   },
 };
@@ -81,6 +81,7 @@ class ClimatePlannerPanel extends HTMLElement {
 
   disconnectedCallback() {
     clearInterval(this.clockTimer);
+    this.removeModeDragCursor();
     this.eventUnsub?.();
     this.eventUnsub = null;
     this.started = false;
@@ -186,6 +187,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".external-badge{display:inline-block;margin-left:5px;padding:2px 6px;border-radius:999px;color:var(--warning-color,#b06a00);background:color-mix(in srgb,var(--warning-color,#b06a00) 14%,transparent);font-size:11px;font-weight:600}";
     style.textContent += ".climate-selector-field{min-height:56px}.climate-selector-label{display:block;margin-bottom:8px;font-size:13px}.climate-entity-picker-row+.climate-entity-picker-row{margin-top:8px}.climate-entity-add{display:block;margin-top:8px}";
     style.textContent += ".week-toolbar-main{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}.week-used-modes{display:grid;gap:5px}.week-used-modes-label{font-size:12px;color:var(--secondary-text-color)}.week-mode-list{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.week-mode-chip,.week-mode-add{display:inline-flex;align-items:center;gap:5px;min-height:38px;padding:7px 9px;font-size:12px}.week-mode-chip.paused{opacity:.6}.week-mode-chip .quick-mode-dot{width:9px;height:9px}.week-mode-chip ha-icon{--mdc-icon-size:16px}.mode-day-grid{display:grid;grid-template-columns:repeat(7,minmax(92px,1fr));gap:7px}.mode-day-card{display:grid;align-content:start;gap:7px;padding:8px;border:1px solid var(--divider-color);border-radius:7px}.mode-day-card>label{display:flex;align-items:center;gap:5px;font-weight:600}.mode-day-card input[type=checkbox]{width:auto}.mode-day-times{display:grid;gap:5px}.mode-day-times[hidden]{display:none}.mode-day-times input{min-width:0;padding:7px}.fixed-weekday{display:block;padding:10px;border:1px solid var(--divider-color);border-radius:7px;background:var(--secondary-background-color)}@media(max-width:900px){.mode-day-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.mode-day-grid{grid-template-columns:1fr}}";
+    style.textContent += ".schedule-card.drop-target{cursor:copy;animation:schedule-drop-ready .75s ease-in-out infinite alternate}.schedule-card.drop-invalid{cursor:not-allowed;border:2px solid var(--error-color,#db4437);background:color-mix(in srgb,var(--error-color,#db4437) 10%,var(--card-background-color));box-shadow:0 0 0 3px color-mix(in srgb,var(--error-color,#db4437) 18%,transparent)}.mode-drag-cursor{position:fixed;z-index:10000;display:flex;align-items:center;gap:8px;max-width:240px;padding:8px 11px;border:1px solid var(--divider-color);border-radius:12px;background:color-mix(in srgb,var(--card-background-color) 94%,transparent);box-shadow:0 8px 24px rgba(0,0,0,.24);opacity:0;transform:translate(18px,18px) scale(.92);pointer-events:none;transition:opacity .12s,transform .12s,border-color .12s,background .12s}.mode-drag-cursor.visible{opacity:1;transform:translate(18px,18px) scale(1)}.mode-drag-cursor.allowed{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 12%,var(--card-background-color));animation:drag-cursor-float .7s ease-in-out infinite alternate}.mode-drag-cursor.blocked{border-color:var(--error-color,#db4437);color:var(--error-color,#db4437);background:color-mix(in srgb,var(--error-color,#db4437) 12%,var(--card-background-color))}.mode-drag-cursor ha-icon{--mdc-icon-size:24px;flex:none}.mode-drag-cursor.allowed ha-icon{animation:drag-cursor-icon .55s ease-in-out infinite alternate}.mode-drag-cursor-copy{display:grid;gap:1px;min-width:0}.mode-drag-cursor-copy strong,.mode-drag-cursor-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mode-drag-cursor-copy strong{font-size:12px}.mode-drag-cursor-copy small{font-size:11px;color:var(--secondary-text-color)}@keyframes schedule-drop-ready{from{box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 16%,transparent)}to{box-shadow:0 0 0 6px color-mix(in srgb,var(--primary-color) 28%,transparent)}}@keyframes drag-cursor-float{from{margin-top:0}to{margin-top:-5px}}@keyframes drag-cursor-icon{from{transform:translateY(-2px)}to{transform:translateY(2px)}}";
     style.textContent += ".mode-palette{position:static;max-height:none;overflow:visible}.mode-palette h2{margin:4px 0}.mode-palette #drag-hint{margin:0 0 8px;font-size:12px}.mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px}.mode-palette .mode-card{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:12px;row-gap:3px;min-height:58px;padding:10px 12px;cursor:grab}.mode-palette .mode-card-top{grid-column:1;grid-row:1}.mode-palette .mode-meta{grid-column:1;grid-row:2;min-width:0;flex-wrap:nowrap}.mode-palette .mode-priority{margin-left:0}.mode-palette .mode-card .actions{grid-column:2;grid-row:1/3;align-self:center;margin:0;flex-wrap:nowrap}.mode-palette .mode-card .actions button{padding:7px 9px;font-size:12px}main.overview-layout{height:100vh;overflow:hidden}main.overview-layout #schedules-section{display:flex;min-height:0;flex-direction:column}main.overview-layout #schedules-title{flex:none;margin:8px 0 10px}main.overview-layout #schedules{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:start;padding:2px 10px 12px 2px;scrollbar-gutter:stable}@media(max-width:1100px){main.overview-layout{display:grid!important}}@media(max-width:700px){main.overview-layout{height:auto;min-height:100vh;overflow:visible;grid-template-rows:auto!important}main.overview-layout #schedules{overflow:visible}.mode-palette .grid{grid-template-columns:1fr}.mode-palette .mode-meta{flex-wrap:wrap}}";
     style.textContent += ".mode-palette .grid,#schedules{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}@media(max-width:1100px){.mode-palette .grid,#schedules{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.mode-palette .grid,#schedules{grid-template-columns:1fr}}";
     this.shadowRoot.querySelector("header").style.gridArea = "header";
@@ -209,10 +211,54 @@ class ClimatePlannerPanel extends HTMLElement {
   finishDrag() {
     this.dragActive = false;
     this.dragState = null;
+    this.removeModeDragCursor();
     if (this.pendingRender) {
       this.pendingRender = false;
       this.render();
     }
+  }
+
+  createModeDragCursor(mode) {
+    this.removeModeDragCursor();
+    const cursor = document.createElement("div");
+    cursor.className = "mode-drag-cursor";
+    cursor.setAttribute("aria-hidden", "true");
+    cursor.innerHTML = '<ha-icon data-drag-cursor-icon icon="mdi:tray-arrow-down"></ha-icon><span class="mode-drag-cursor-copy"><strong data-drag-cursor-label></strong><small data-drag-cursor-detail></small></span>';
+    cursor.querySelector("[data-drag-cursor-detail]").textContent = mode?.name || "";
+    this.shadowRoot.append(cursor);
+    this.modeDragCursor = cursor;
+    this.modeDragMoveHandler = (event) => this.moveModeDragCursor(event);
+    window.addEventListener("dragover", this.modeDragMoveHandler, { passive: true });
+  }
+
+  moveModeDragCursor(event) {
+    if (!this.modeDragCursor || !Number.isFinite(event.clientX) || !Number.isFinite(event.clientY)) return;
+    this.modeDragCursor.style.left = `${event.clientX}px`;
+    this.modeDragCursor.style.top = `${event.clientY}px`;
+  }
+
+  setModeDragCursorState(event, allowed, scheduleName) {
+    const cursor = this.modeDragCursor;
+    if (!cursor) return;
+    this.moveModeDragCursor(event);
+    cursor.classList.toggle("allowed", allowed);
+    cursor.classList.toggle("blocked", !allowed);
+    cursor.classList.add("visible");
+    cursor.querySelector("[data-drag-cursor-icon]").setAttribute("icon", allowed ? "mdi:tray-arrow-down" : "mdi:cancel");
+    cursor.querySelector("[data-drag-cursor-label]").textContent = allowed ? this.t.dropReady : this.t.dropBlocked;
+    cursor.querySelector("[data-drag-cursor-detail]").textContent = scheduleName || "";
+  }
+
+  hideModeDragCursor() {
+    this.modeDragCursor?.classList.remove("visible", "allowed", "blocked");
+  }
+
+  removeModeDragCursor() {
+    if (this.modeDragMoveHandler) window.removeEventListener("dragover", this.modeDragMoveHandler);
+    this.modeDragMoveHandler = null;
+    this.modeDragCursor?.remove();
+    this.modeDragCursor = null;
+    this.shadowRoot?.querySelectorAll(".schedule-card.drop-target,.schedule-card.drop-invalid").forEach((card) => card.classList.remove("drop-target", "drop-invalid"));
   }
 
   beginScheduleInteraction() {
@@ -313,7 +359,14 @@ class ClimatePlannerPanel extends HTMLElement {
     const sortedModes = [...this.data.modes].sort((left, right) => left.name.localeCompare(right.name, this._hass?.language, { sensitivity: "base" }));
     target.innerHTML = sortedModes.map((mode) => `<article class="card mode-card" draggable="${admin}" data-mode-drag="${escapeHTML(mode.id)}"><div class="mode-card-top"><h3>${escapeHTML(mode.name)}</h3></div><div class="mode-meta">${mode.color ? `<span class="mode-color" style="background:${escapeHTML(mode.color)}"></span>` : ""}${mode.icon ? `<ha-icon class="mode-icon" icon="${escapeHTML(mode.icon)}" aria-label="${escapeHTML(mode.icon)}" title="${escapeHTML(mode.icon)}"></ha-icon>` : ""}<span>${escapeHTML(this.temperatureText(mode.target_temperature))}</span><span class="muted mode-priority">${escapeHTML(this.t.priority)} ${escapeHTML(mode.priority ?? 0)}</span></div>${admin ? `<div class="actions"><button data-action="edit-mode" data-id="${escapeHTML(mode.id)}">${this.t.edit}</button><button class="danger" data-action="delete-mode" data-id="${escapeHTML(mode.id)}">${this.t.remove}</button></div>` : ""}</article>`).join("");
     if (admin) this.$("modes").querySelectorAll("[data-mode-drag]").forEach((card) => {
-      card.addEventListener("dragstart", (event) => { this.dragActive = true; this.dragState = null; event.dataTransfer.setData("text/plain", `mode:${card.dataset.modeDrag}`); event.dataTransfer.effectAllowed = "copy"; card.classList.add("dragging"); });
+      card.addEventListener("dragstart", (event) => {
+        this.dragActive = true;
+        this.dragState = { modeId: card.dataset.modeDrag };
+        event.dataTransfer.setData("text/plain", `mode:${card.dataset.modeDrag}`);
+        event.dataTransfer.effectAllowed = "copy";
+        card.classList.add("dragging");
+        this.createModeDragCursor(this.mode(card.dataset.modeDrag));
+      });
       card.addEventListener("dragend", () => { card.classList.remove("dragging"); this.finishDrag(); });
     });
     target.querySelectorAll("[data-action]").forEach((button) => button.onclick = () => this.handleAction(button.dataset.action, button.dataset.id));
@@ -393,9 +446,36 @@ class ClimatePlannerPanel extends HTMLElement {
       return `<article class="card schedule-card compact ${schedule.id === this.selectedSchedule ? "selected" : ""}" data-schedule-card="${escapeHTML(schedule.id)}"><div class="schedule-card-top"><div><h3>${escapeHTML(schedule.name)} <span class="status-dot ${schedule.enabled ? "" : "off"}" aria-label="${escapeHTML(schedule.enabled ? this.t.enabled : this.t.unavailable)}">${schedule.enabled ? "●" : "○"}</span></h3><div class="schedule-entities">${this.climateEntityRows(schedule.climate_entity_ids)}</div></div><div class="schedule-card-top-tools"><span class="muted schedule-count">${phases.length} ${this.t.phase}</span>${admin ? `<div class="schedule-card-icon-tools">${scheduleToggle}${scheduleDuplicate}</div>` : ""}</div></div><div class="schedule-summary"><span><strong>${this.t.lastActivated}:</strong> ${lastActivatedMarkup}</span><span class="muted"><strong>${this.t.next}:</strong> ${escapeHTML(this.formatDate(this.data.next_events?.[schedule.id]))}</span></div>${modeButtons}<div class="actions"><button data-action="open-schedule-details" data-schedule="${escapeHTML(schedule.id)}">${this.t.details}</button>${admin ? `<button data-action="edit-schedule" data-id="${escapeHTML(schedule.id)}">${this.t.edit}</button><button class="danger" data-action="delete-schedule" data-id="${escapeHTML(schedule.id)}">${this.t.remove}</button>` : ""}</div></article>`;
     }).join("");
     target.querySelectorAll("[data-schedule-card]").forEach((card) => {
-      card.addEventListener("dragover", (event) => { event.preventDefault(); card.classList.add("drop-target"); });
-      card.addEventListener("dragleave", (event) => { if (!card.contains(event.relatedTarget)) card.classList.remove("drop-target"); });
-      card.addEventListener("drop", (event) => { event.preventDefault(); card.classList.remove("drop-target"); const payload = event.dataTransfer.getData("text/plain"); if (payload.startsWith("mode:")) this.openAssignmentDialog(card.dataset.scheduleCard, null, payload); });
+      card.addEventListener("dragover", (event) => {
+        const modeId = this.dragState?.modeId;
+        if (!modeId) return;
+        event.preventDefault();
+        const schedule = this.data.schedules.find((item) => item.id === card.dataset.scheduleCard);
+        const allowed = Boolean(schedule) && !schedule.assignments.some((assignment) => assignment.mode_id === modeId);
+        event.dataTransfer.dropEffect = allowed ? "copy" : "none";
+        card.classList.toggle("drop-target", allowed);
+        card.classList.toggle("drop-invalid", !allowed);
+        this.setModeDragCursorState(event, allowed, schedule?.name);
+      });
+      card.addEventListener("dragleave", (event) => {
+        if (card.contains(event.relatedTarget)) return;
+        card.classList.remove("drop-target", "drop-invalid");
+        this.hideModeDragCursor();
+      });
+      card.addEventListener("drop", (event) => {
+        event.preventDefault();
+        card.classList.remove("drop-target", "drop-invalid");
+        this.hideModeDragCursor();
+        const payload = event.dataTransfer.getData("text/plain");
+        if (!payload.startsWith("mode:")) return;
+        const modeId = payload.slice(5);
+        const schedule = this.data.schedules.find((item) => item.id === card.dataset.scheduleCard);
+        if (!schedule || schedule.assignments.some((assignment) => assignment.mode_id === modeId)) {
+          this.notice(this.t.modeAlreadyAssigned, true);
+          return;
+        }
+        this.openAssignmentDialog(card.dataset.scheduleCard, null, modeId);
+      });
     });
     target.ondragover = (event) => {
       if (!this.dragActive || target.scrollHeight <= target.clientHeight) return;

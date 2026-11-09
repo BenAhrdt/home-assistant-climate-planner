@@ -7,8 +7,10 @@ entities and uses centrally managed modes with target temperatures.
 ## Features
 
 - central mode library with stable IDs
-- flat mode cards above the heating plans for direct drag-and-drop; with many
-  plans, only the heating-plan area scrolls
+- flat mode cards above the heating plans for direct drag-and-drop; valid
+  targets use an animated drop indicator, while plans that already contain the
+  mode show a red blocked indicator; with many plans, only the heating-plan
+  area scrolls
 - per-plan mode state with play/pause and configurable priority
 - any number of heating plans and mode assignments
 - complete heating-plan duplication with new stable IDs and a paused copy

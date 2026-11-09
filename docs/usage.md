@@ -27,6 +27,11 @@ Rand scrollt die Liste automatisch weiter. Auf schmalen Mobilansichten bleibt
 der normale Seitenlauf erhalten, damit kein enger verschachtelter
 Touch-Scrollbereich entsteht.
 
+Beim Ziehen zeigt ein noch verfügbarer Heizplan eine animierte Ablage-Markierung
+an der Maus und wird farblich hervorgehoben. Enthält der Heizplan den Mode
+bereits, erscheinen stattdessen ein rotes Verbotssymbol und eine rote
+Heizplankachel; ein Ablegen ist dort nicht möglich.
+
 Jeder Mode kann einem Heizplan genau einmal zugeordnet werden. Ein erneutes
 Hinzufügen desselben Modes wird abgewiesen. Die Zuordnung kann innerhalb des
 Heizplans pausiert oder aktiviert werden; das Play/Pause-Symbol an der
