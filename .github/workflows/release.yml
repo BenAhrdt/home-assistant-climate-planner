@@ -44,11 +44,11 @@ jobs:
         run: |
           set -euo pipefail
           rm -f climate_planner.zip
-          # Marketplace extracts the release archive into the Home Assistant
-          # config directory. Keep the custom_components path in the archive
-          # so the integration lands at /config/custom_components/climate_planner.
-          zip -r climate_planner.zip custom_components/climate_planner \
-            -x '*/__pycache__/*' '*.pyc'
+          # Marketplace/HACS extracts this archive directly into
+          # /config/custom_components/climate_planner. Keep the integration
+          # files at the archive root so manifest.json is found there.
+          (cd custom_components/climate_planner && zip -r ../../climate_planner.zip . \
+            -x '*/__pycache__/*' '*.pyc')
       - name: Create release and tag
         env:
           GH_TOKEN: ${{ github.token }}
