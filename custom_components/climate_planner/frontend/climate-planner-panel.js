@@ -176,6 +176,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".input-with-unit{display:flex;position:relative}.input-with-unit input{padding-right:42px}.unit-suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--secondary-text-color);pointer-events:none}.color-controls{display:flex;align-items:center;gap:8px}.color-controls input[type=color]{width:48px;height:40px;padding:3px}.color-controls input[name=color_hex]{flex:1}.full ha-icon-picker{display:block;min-height:40px}.full input[name=icon_text]{margin-top:8px}.mode-icon{--mdc-icon-size:20px;flex:none}.climate-select{min-height:160px}.climate-select option{padding:5px}.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.summary-card{background:var(--card-background-color);border:1px solid var(--divider-color);border-radius:12px;padding:14px}.summary-card strong{display:block;font-size:24px;margin-top:4px}.schedule-card{cursor:pointer}.schedule-card.selected{border-color:var(--primary-color);box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 22%,transparent)}.phase-list{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.phase-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--divider-color);border-radius:999px;padding:5px 8px;background:var(--secondary-background-color);font-size:12px}.timeline-hint{margin:0 0 10px}.mode-palette{position:sticky;top:12px}.mode-palette .grid{grid-template-columns:1fr}.week-toolbar{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap}.week-toolbar label{min-width:260px}.segment{cursor:grab;transition:filter .15s,transform .15s}.segment:hover{filter:brightness(.97);transform:translateY(-1px)}.segment.dragging{opacity:.45}.day-track.drop-target{outline:3px dashed var(--primary-color);outline-offset:-4px;background-color:color-mix(in srgb,var(--primary-color) 8%,var(--card-background-color))}.segment .segment-icon{--mdc-icon-size:16px;vertical-align:middle;margin-right:3px}.climate-select option{white-space:normal}@media(max-width:1100px){main{display:block!important}.mode-palette{position:static}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.summary-grid{grid-template-columns:1fr}.form-grid,.time-fields{grid-template-columns:1fr}.days{grid-template-columns:repeat(2,1fr)}.full{grid-column:auto}}";
     style.textContent += ".week-toolbar{margin-bottom:16px}";
     style.textContent += ".week-mode-chip[draggable=true]{cursor:grab}.week-mode-chip[draggable=true].dragging{opacity:.55}.mode-day-actions{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 8px}.mode-day-actions button{padding:6px 9px;font-size:12px}";
+    style.textContent += ".week-mode-chip-wrap{display:inline-flex;align-items:stretch}.week-mode-chip-wrap .week-mode-chip{border-radius:8px 0 0 8px}.week-mode-chip-toggle{padding:6px 8px;border-left:0;border-radius:0 8px 8px 0;line-height:1}.week-mode-chip.paused+.week-mode-chip-toggle{opacity:.65}";
     this.shadowRoot.querySelector("main").style.display = "grid";
     this.shadowRoot.querySelector("main").style.gridTemplateColumns = "minmax(0,1fr)";
     this.shadowRoot.querySelector("main").style.gridTemplateAreas = '"header" "notice" "modes" "schedules"';
@@ -550,7 +551,7 @@ class ClimatePlannerPanel extends HTMLElement {
       const icon = mode.icon ? `<ha-icon icon="${escapeHTML(mode.icon)}" aria-hidden="true"></ha-icon>` : "";
       const content = `${dot}${icon}<span>${escapeHTML(mode.name)}</span>`;
       return admin
-        ? `<button type="button" class="week-mode-chip ${enabled ? "" : "paused"}" draggable="true" data-edit-assignment="${escapeHTML(assignmentId)}" data-assignment-drag="${escapeHTML(assignmentId)}" title="${escapeHTML(this.t.editAssignment)}">${content}</button>`
+        ? `<span class="week-mode-chip-wrap"><button type="button" class="week-mode-chip ${enabled ? "" : "paused"}" draggable="true" data-edit-assignment="${escapeHTML(assignmentId)}" data-assignment-drag="${escapeHTML(assignmentId)}" title="${escapeHTML(this.t.editAssignment)}">${content}</button><button type="button" class="week-mode-chip-toggle" data-week-mode-toggle data-action="toggle-schedule-mode" data-schedule="${escapeHTML(this.selectedSchedule)}" data-id="${escapeHTML(mode.id)}" aria-pressed="${enabled}" aria-label="${escapeHTML(enabled ? this.t.pauseMode : this.t.activateMode)}" title="${escapeHTML(enabled ? this.t.pauseMode : this.t.activateMode)}">${enabled ? "⏸" : "▶"}</button></span>`
         : `<span class="week-mode-chip ${enabled ? "" : "paused"}">${content}</span>`;
     }).join("");
     const assignedModeIds = new Set(usedModes.map((item) => item.mode.id));
@@ -575,6 +576,13 @@ class ClimatePlannerPanel extends HTMLElement {
         button.classList.add("dragging");
       });
       button.addEventListener("dragend", () => { button.classList.remove("dragging"); this.finishDrag(); });
+    });
+    target.querySelectorAll("[data-week-mode-toggle]").forEach((button) => {
+      button.onclick = async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        await this.handleAction(button.dataset.action, button.dataset.id, button.dataset.schedule);
+      };
     });
     target.querySelector("[data-add-assignment]")?.addEventListener("click", () => this.openAssignmentDialog(this.selectedSchedule));
     target.querySelectorAll(".segment[data-phase-id]").forEach((segment) => {

@@ -28,6 +28,7 @@ entities and uses centrally managed modes with target temperatures.
   and clear-all controls
 - used modes in the detail view can be dragged directly onto a day and time to
   add another phase to their existing assignment
+- detail-view mode chips also expose the assignment's play/pause state
 - same or individual times for each weekday
 - priority-based, deterministic selection of enabled modes across week changes
 - one-time target-temperature application through `climate.set_temperature`

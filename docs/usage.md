@@ -84,6 +84,8 @@ verschoben, bleibt die bisherige Blockdauer erhalten und der unmittelbar
 folgende Wechsel wird entsprechend mitverschoben. Die verwendeten Modes neben
 der Heizplanauswahl sind ebenfalls ziehbar: Beim Ablegen auf einen Tag und eine
 Uhrzeit wird direkt eine weitere Phase derselben Mode-Zuordnung angelegt.
+Neben jedem verwendeten Mode steht außerdem der Play-/Pause-Schalter für diese
+Zuordnung zur Verfügung.
 
 Das Duplizieren-Symbol eines Tagesblocks übernimmt die Dauer dieses Blocks und
 setzt das Duplikat direkt davor. Reicht der Platz bis zum Tagesanfang nicht,
