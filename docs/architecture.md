@@ -102,10 +102,14 @@ werden sie gemeinsam gelöscht.
 Die Detailansicht trennt die Bearbeitung der Zuordnung von der Bearbeitung
 einer einzelnen Phase. Der Zuordnungsdialog verwaltet die ausgewählten
 Wochentage und alle dazugehörigen Uhrzeiten; eine obere Sammelzeit wird jeweils
-in das erste Zeitfeld der ausgewählten Tage übernommen. Der Phasendialog
-verändert dagegen ausschließlich die über ihre stabile ID ausgewählte Phase
-und bietet deshalb keine Wochentags-Mehrfachauswahl. So entstehen beim
-Bearbeiten eines sichtbaren Tagesblocks keine zusätzlichen Phasen.
+in das erste Zeitfeld der aktuell ausgewählten Tage übernommen. Das spätere
+Aktivieren eines Tages überschreibt dessen vorhandenes Zeitfeld nicht. Beim
+Verschieben einer bestehenden Zuordnungsphase bleibt ihre bisherige Dauer wie
+beim Timeline-Drag erhalten, indem die direkt folgende Grenze mitwandert. Der
+Phasendialog verändert dagegen ausschließlich die über ihre stabile ID
+ausgewählte Phase und bietet deshalb keine Wochentags-Mehrfachauswahl. So
+entstehen beim Bearbeiten eines sichtbaren Tagesblocks keine zusätzlichen
+Phasen.
 
 Beim Duplizieren eines Heizplans werden Heizplan-, Zuordnungs- und Phasen-IDs
 neu erzeugt. Mode-Referenzen und fachliche Werte bleiben erhalten. Die Kopie

@@ -173,6 +173,7 @@ class ClimatePlannerPanel extends HTMLElement {
     backButton.onclick = () => { this.detailOpen = false; this.render(); window.scrollTo({ top: 0, behavior: "smooth" }); };
     this.$("refresh").before(backButton);
     style.textContent += ".input-with-unit{display:flex;position:relative}.input-with-unit input{padding-right:42px}.unit-suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--secondary-text-color);pointer-events:none}.color-controls{display:flex;align-items:center;gap:8px}.color-controls input[type=color]{width:48px;height:40px;padding:3px}.color-controls input[name=color_hex]{flex:1}.full ha-icon-picker{display:block;min-height:40px}.full input[name=icon_text]{margin-top:8px}.mode-icon{--mdc-icon-size:20px;flex:none}.climate-select{min-height:160px}.climate-select option{padding:5px}.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.summary-card{background:var(--card-background-color);border:1px solid var(--divider-color);border-radius:12px;padding:14px}.summary-card strong{display:block;font-size:24px;margin-top:4px}.schedule-card{cursor:pointer}.schedule-card.selected{border-color:var(--primary-color);box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 22%,transparent)}.phase-list{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.phase-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--divider-color);border-radius:999px;padding:5px 8px;background:var(--secondary-background-color);font-size:12px}.timeline-hint{margin:0 0 10px}.mode-palette{position:sticky;top:12px}.mode-palette .grid{grid-template-columns:1fr}.week-toolbar{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap}.week-toolbar label{min-width:260px}.segment{cursor:grab;transition:filter .15s,transform .15s}.segment:hover{filter:brightness(.97);transform:translateY(-1px)}.segment.dragging{opacity:.45}.day-track.drop-target{outline:3px dashed var(--primary-color);outline-offset:-4px;background-color:color-mix(in srgb,var(--primary-color) 8%,var(--card-background-color))}.segment .segment-icon{--mdc-icon-size:16px;vertical-align:middle;margin-right:3px}.climate-select option{white-space:normal}@media(max-width:1100px){main{display:block!important}.mode-palette{position:static}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.summary-grid{grid-template-columns:1fr}.form-grid,.time-fields{grid-template-columns:1fr}.days{grid-template-columns:repeat(2,1fr)}.full{grid-column:auto}}";
+    style.textContent += ".week-toolbar{margin-bottom:16px}";
     this.shadowRoot.querySelector("main").style.display = "grid";
     this.shadowRoot.querySelector("main").style.gridTemplateColumns = "minmax(0,1fr)";
     this.shadowRoot.querySelector("main").style.gridTemplateAreas = '"header" "notice" "modes" "schedules"';
@@ -882,7 +883,7 @@ class ClimatePlannerPanel extends HTMLElement {
       });
     };
     dialog.querySelectorAll("[data-mode-day]").forEach((card) => {
-      card.querySelector("[data-day-enabled]").addEventListener("change", () => updateDayCard(card, true));
+      card.querySelector("[data-day-enabled]").addEventListener("change", () => updateDayCard(card));
       card.querySelectorAll("[data-day-time]").forEach((input) => input.addEventListener("input", () => input.setCustomValidity("")));
     });
     bulkTime.addEventListener("input", () => {
@@ -916,6 +917,16 @@ class ClimatePlannerPanel extends HTMLElement {
           return;
         }
       }
+      const phaseMoves = selectedCards.flatMap((card) => {
+        const day = card.dataset.modeDay;
+        return [...card.querySelectorAll("[data-day-time]")].flatMap((input) => {
+          if (!input.dataset.phaseId) return [];
+          const original = phaseEntries.find((entry) => this.phaseId(entry.phase) === input.dataset.phaseId);
+          if (!original || this.phaseTime(original.phase) === input.value) return [];
+          return [{ day, phaseId: input.dataset.phaseId, oldStart: this.phaseMinutes(original.phase), newStart: this.phaseMinutes({ time: input.value }) }];
+        });
+      });
+      const explicitlyMovedPhaseIds = new Set(phaseMoves.map((move) => move.phaseId));
       let storedTemperature = null;
       if (temperatureTouched && temperature.value !== "") {
         storedTemperature = this.storedTemperature(temperature.value);
@@ -950,6 +961,15 @@ class ClimatePlannerPanel extends HTMLElement {
           return phase;
         }).sort((left, right) => this.phaseMinutes(left) - this.phaseMinutes(right));
       }
+      phaseMoves.forEach((move) => {
+        const following = this.followingPhase(schedule, move.day, move.oldStart, move.phaseId);
+        const followingPhaseId = following ? this.phaseId(following.phase) : "";
+        if (!following || !followingPhaseId || explicitlyMovedPhaseIds.has(followingPhaseId)) return;
+        const targetFollowing = this.phaseEntry(targetSchedule, followingPhaseId);
+        if (!targetFollowing || targetFollowing.weekday !== move.day || typeof targetFollowing.phase !== "object") return;
+        targetFollowing.phase.time = this.timeFromMinutes(move.newStart + following.minutes - move.oldStart);
+        targetFollowing.assignment.weekday_rules[move.day].sort((left, right) => this.phaseMinutes(left) - this.phaseMinutes(right));
+      });
       await this.save(next);
     };
     dialog.showModal(); form.querySelector("select")?.focus();
