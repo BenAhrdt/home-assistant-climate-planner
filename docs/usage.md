@@ -72,14 +72,24 @@ Navigation reagieren. In der Detailansicht stehen die im Heizplan verwendeten
 Modes direkt neben der Heizplanauswahl. Ein Klick auf einen dieser Modes öffnet
 **Mode bearbeiten**; **Mode hinzufügen** ordnet einen noch nicht verwendeten
 Mode zu. Beim Hinzufügen dient die obere Uhrzeit als Sammelwert für alle
-ausgewählten Wochentage. Unter jedem ausgewählten Tag bleibt ein eigenes
+ausgewählten Wochentage. Über **Mode hinzufügen** wählen neue Zuordnungen
+standardmäßig alle sieben Wochentage; mit **Alle anwählen** und **Alle
+abwählen** lässt sich die Auswahl schnell ändern. Unter jedem ausgewählten Tag bleibt ein eigenes
 Uhrzeitfeld sichtbar und kann danach unabhängig angepasst werden. Eine
 Änderung der Sammelzeit betrifft ausschließlich die in diesem Moment
 ausgewählten Tage; später erneut ausgewählte Tage behalten ihre zuvor
 eingetragene Zeit. Bereits vorhandene mehrere Zeiten desselben Modes an einem
 Tag bleiben als getrennte Felder erhalten. Wird eine bestehende Startzeit
 verschoben, bleibt die bisherige Blockdauer erhalten und der unmittelbar
-folgende Wechsel wird entsprechend mitverschoben.
+folgende Wechsel wird entsprechend mitverschoben. Die verwendeten Modes neben
+der Heizplanauswahl sind ebenfalls ziehbar: Beim Ablegen auf einen Tag und eine
+Uhrzeit wird direkt eine weitere Phase derselben Mode-Zuordnung angelegt.
+
+Das Duplizieren-Symbol eines Tagesblocks übernimmt die Dauer dieses Blocks und
+setzt das Duplikat direkt davor. Reicht der Platz bis zum Tagesanfang nicht,
+wird die Startzeit so weit nach hinten verschoben, dass der vorherige Mode
+mindestens eine Stunde behält; ohne vorherigen Mode ist 01:00 die früheste
+Startzeit.
 
 Modes lassen sich außerdem auf einen konkreten Tag und eine Uhrzeit ziehen; die
 Vorschau zeigt dabei die Zielzeit und öffnet denselben Dialog **Mode

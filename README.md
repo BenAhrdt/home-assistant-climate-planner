@@ -24,6 +24,10 @@ entities and uses centrally managed modes with target temperatures.
   including while automatic schedule evaluation is paused
 - multiple phases per weekday with drag-and-drop and local temperature
   overrides
+- new mode assignments select all weekdays by default, with quick select-all
+  and clear-all controls
+- used modes in the detail view can be dragged directly onto a day and time to
+  add another phase to their existing assignment
 - same or individual times for each weekday
 - priority-based, deterministic selection of enabled modes across week changes
 - one-time target-temperature application through `climate.set_temperature`
