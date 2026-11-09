@@ -58,6 +58,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.dialogContext = null;
     this.dragActive = false;
     this.pendingRender = false;
+    this.suppressPhaseClickUntil = 0;
     this.lastScheduleRenderSignature = "";
     this.scheduleInteractionActive = false;
     this.scheduleRenderPending = false;
@@ -425,7 +426,15 @@ class ClimatePlannerPanel extends HTMLElement {
     target.innerHTML = `<div class="week-toolbar"><label>${this.t.selectSchedule}<select id="week-select">${this.data.schedules.map((schedule) => `<option value="${escapeHTML(schedule.id)}" ${schedule.id === this.selectedSchedule ? "selected" : ""}>${escapeHTML(schedule.name)}</option>`).join("")}</select></label><p class="muted timeline-hint">${admin ? this.t.dropTimeline : ""}</p></div>${view ? `<div class="week-scroll"><div class="week-grid">${days}</div></div>` : `<p class="empty">${this.t.noWeek}</p>`}`;
     this.$("week-select").onchange = () => { this.selectedSchedule = this.$("week-select").value; this.storageSet("climate-planner-schedule", this.selectedSchedule); this.renderWeek(); };
     target.querySelectorAll(".segment[data-phase-id]").forEach((segment) => {
-      segment.addEventListener("click", () => this.openPhaseDialog(this.selectedSchedule, segment.dataset.phaseId));
+      segment.addEventListener("click", (event) => {
+        if (Date.now() < this.suppressPhaseClickUntil) {
+          this.suppressPhaseClickUntil = 0;
+          event.preventDefault();
+          event.stopPropagation();
+          return;
+        }
+        this.openPhaseDialog(this.selectedSchedule, segment.dataset.phaseId);
+      });
       const duplicate = segment.querySelector("[data-duplicate-phase]");
       duplicate?.addEventListener("pointerdown", (event) => { event.preventDefault(); event.stopPropagation(); });
       duplicate?.addEventListener("dragstart", (event) => { event.preventDefault(); event.stopPropagation(); });
@@ -450,11 +459,18 @@ class ClimatePlannerPanel extends HTMLElement {
       track.addEventListener("dragover", (event) => { event.preventDefault(); track.classList.add("drop-target"); this.showDropIndicator(track, event, this.dragState?.offsetMinutes || 0); });
       track.addEventListener("dragleave", (event) => { if (!track.contains(event.relatedTarget)) { track.classList.remove("drop-target"); this.clearDropIndicator(track); } });
       track.addEventListener("drop", (event) => {
-        event.preventDefault(); track.classList.remove("drop-target"); this.clearDropIndicator(track);
+        event.preventDefault();
         const payload = event.dataTransfer.getData("text/plain");
         const phaseId = payload.startsWith("copy-phase:") ? payload.slice(11) : payload.startsWith("phase:") ? payload.slice(6) : "";
-        const offsetMinutes = this.dragState?.phaseId === phaseId ? this.dragState.offsetMinutes : 0;
-        const time = this.timeAtDrop(event, track, offsetMinutes);
+        const dragState = this.dragState;
+        const offsetMinutes = dragState?.phaseId === phaseId ? dragState.offsetMinutes : 0;
+        const previewTime = track.dataset.dropPhaseId === phaseId ? track.dataset.dropTime : null;
+        const time = previewTime || this.timeAtDrop(event, track, offsetMinutes);
+        track.classList.remove("drop-target");
+        this.clearDropIndicator(track);
+        delete track.dataset.dropPhaseId;
+        delete track.dataset.dropTime;
+        if (phaseId) this.suppressPhaseClickUntil = Date.now() + 750;
         this.dragState = null;
         if (payload.startsWith("mode:")) return this.openPhaseDialog(this.selectedSchedule, null, track.dataset.dropDay, time, payload.slice(5));
         if (payload.startsWith("copy-phase:")) return this.duplicatePhaseAt(this.selectedSchedule, payload.slice(11), track.dataset.dropDay, time);
@@ -467,6 +483,12 @@ class ClimatePlannerPanel extends HTMLElement {
     const indicator = track.querySelector(".drop-indicator");
     if (!indicator) return;
     const time = this.timeAtDrop(event, track, offsetMinutes);
+    if (this.dragState?.phaseId) {
+      this.dragState.dropDay = track.dataset.dropDay;
+      this.dragState.dropTime = time;
+      track.dataset.dropPhaseId = this.dragState.phaseId;
+    } else delete track.dataset.dropPhaseId;
+    track.dataset.dropTime = time;
     const minutes = Number(time.slice(0, 2)) * 60 + Number(time.slice(3));
     indicator.style.top = `${(minutes / 1440) * 100}%`;
     indicator.querySelector("span").textContent = `${this.t[track.dataset.dropDay]} ${time}`;
@@ -511,14 +533,27 @@ class ClimatePlannerPanel extends HTMLElement {
 
   beginPhaseResize(event, scheduleId, phaseId, weekday, edge, track) {
     const segment = Array.from(track.querySelectorAll("[data-phase-id]")).find((item) => item.dataset.phaseId === phaseId);
+    const handle = event.currentTarget;
     if (segment) segment.draggable = false;
-    const move = (moveEvent) => { moveEvent.preventDefault(); this.showDropIndicator(track, moveEvent); };
+    try { handle?.setPointerCapture?.(event.pointerId); } catch (_) { /* pointer capture is optional */ }
+    const move = (moveEvent) => {
+      moveEvent.preventDefault();
+      track.dataset.resizePhaseId = phaseId;
+      track.dataset.resizeTime = this.timeAtDrop(moveEvent, track);
+      this.showDropIndicator(track, moveEvent);
+    };
     const finish = async (upEvent) => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", finish);
       if (segment) segment.draggable = true;
+      try { handle?.releasePointerCapture?.(event.pointerId); } catch (_) { /* pointer capture is optional */ }
+      const time = track.dataset.resizePhaseId === phaseId
+        ? track.dataset.resizeTime
+        : this.timeAtDrop(upEvent, track);
+      delete track.dataset.resizePhaseId;
+      delete track.dataset.resizeTime;
       this.clearDropIndicator(track);
-      const time = this.timeAtDrop(upEvent, track);
+      this.suppressPhaseClickUntil = Date.now() + 750;
       await this.resizePhaseStart(scheduleId, phaseId, weekday, time);
     };
     window.addEventListener("pointermove", move);
