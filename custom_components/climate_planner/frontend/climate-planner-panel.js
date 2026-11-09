@@ -57,6 +57,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.dialogKind = null;
     this.dialogContext = null;
     this.dragActive = false;
+    this.phaseResizeActive = false;
     this.pendingRender = false;
     this.suppressPhaseClickUntil = 0;
     this.lastScheduleRenderSignature = "";
@@ -177,7 +178,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.shadowRoot.querySelector("main").style.gridTemplateAreas = '"header" "notice" "modes" "schedules"';
     this.shadowRoot.querySelector("main").style.gap = "16px";
     style.textContent += ".mode-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.mode-card-top h3{margin:0}.mode-toggle{padding:5px 8px;font-size:13px;line-height:1}.mode-card.disabled{opacity:.68}.mode-card .mode-meta{flex-wrap:wrap}.mode-priority{font-size:11px;margin-left:auto}.quick-mode-wrap{display:flex;align-items:stretch;min-width:178px;border:1px solid var(--divider-color);border-radius:10px;background:var(--secondary-background-color);overflow:hidden;transition:border-color .12s,box-shadow .12s,background .12s}.quick-mode-wrap.active{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 12%,var(--card-background-color));box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 18%,transparent)}.quick-mode-wrap.paused{opacity:.72}.quick-mode-wrap .quick-mode{min-width:0;flex:1;border:0;border-radius:0;background:transparent}.quick-mode-wrap .quick-mode:not(:disabled):hover{transform:none;border-color:transparent;box-shadow:none}.assignment-toggle{align-self:flex-start;padding:7px 8px;font-size:13px;line-height:1;color:var(--secondary-text-color);border:0;border-left:1px solid var(--divider-color);border-radius:0;background:transparent}.assignment-toggle:hover{color:var(--primary-text-color);border-color:var(--primary-color)}";
-    style.textContent += ".mode-palette{position:static}.day-track{z-index:0;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(1.041666% - 1px),color-mix(in srgb,var(--divider-color) 24%,transparent) 1.041666%),repeating-linear-gradient(to bottom,transparent 0,transparent calc(25% - 1px),color-mix(in srgb,var(--divider-color) 60%,transparent) 25%)}.segment{z-index:1;min-height:28px;padding:8px 8px 9px 10px;box-shadow:0 2px 5px rgba(0,0,0,.08)}.segment-head{display:flex;align-items:center;gap:4px}.segment-time{color:var(--secondary-text-color);font-size:11px}.resize-handle{position:absolute;left:0;right:0;height:14px;z-index:3;cursor:ns-resize;touch-action:none}.resize-handle.top{top:0}.resize-handle::after{content:\"\";position:absolute;left:18%;right:18%;top:0;border-top:2px solid color-mix(in srgb,var(--primary-text-color) 45%,transparent);opacity:0;transition:opacity .12s}.resize-handle.top::after{opacity:.65}.segment:hover .resize-handle::after,.resize-handle:focus::after{opacity:1}.drop-indicator{position:absolute;left:0;right:0;height:2px;background:var(--primary-color);z-index:5;pointer-events:none}.drop-indicator span{position:absolute;right:5px;top:-22px;padding:3px 6px;border-radius:5px;background:var(--primary-color);color:var(--text-primary-color,#fff);font-size:11px;white-space:nowrap}.phase-chip{cursor:pointer}.phase-chip:hover{border-color:var(--primary-color);background:var(--primary-color);color:var(--text-primary-color,#fff)}.schedule-card.compact{padding:14px}.schedule-card.compact h3{margin:0 0 4px}.schedule-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.schedule-card-top-tools{display:flex;align-items:center;gap:8px}.schedule-toggle{padding:5px 8px;font-size:13px;line-height:1}.schedule-count{white-space:nowrap;font-size:12px}.schedule-entities{display:grid;gap:5px;margin-top:5px;font-size:12px}.schedule-entity-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:8px;min-width:0}.schedule-entity-name{min-width:0;overflow-wrap:anywhere}.schedule-entity-values{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px 10px;min-width:0;color:var(--secondary-text-color)}.schedule-entity-values b{color:var(--primary-text-color);font-weight:600}.schedule-entities-empty{margin:0}.schedule-summary{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13px}.schedule-summary span{min-width:0}.schedule-override{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 0;font-size:12px;color:var(--warning-color,#b06a00)}.schedule-override button{padding:5px 8px;font-size:12px}.quick-mode-title{display:flex;justify-content:space-between;align-items:center;margin-top:14px;margin-bottom:7px;font-size:12px;font-weight:600}.quick-modes{display:flex;gap:7px;flex-wrap:wrap}.quick-mode{display:flex;align-items:center;gap:7px;min-width:132px;padding:8px 10px;border:1px solid var(--divider-color);border-radius:10px;background:var(--secondary-background-color);text-align:left;transition:transform .12s,box-shadow .12s,border-color .12s,background .12s}.quick-mode:not(:disabled):hover{transform:translateY(-1px);border-color:var(--primary-color);box-shadow:0 3px 10px color-mix(in srgb,var(--primary-color) 18%,transparent)}.quick-mode.active{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 12%,var(--card-background-color));box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 18%,transparent)}.quick-mode.manual{background:color-mix(in srgb,var(--warning-color,#b06a00) 12%,var(--card-background-color));border-color:var(--warning-color,#b06a00)}.quick-mode:disabled{opacity:.5}.quick-mode-dot{width:10px;height:10px;flex:none;border-radius:50%;border:1px solid var(--divider-color)}.quick-mode-dot.default{background:var(--primary-color)}.quick-mode-icon{--mdc-icon-size:18px;color:var(--secondary-text-color);flex:none}.quick-mode-copy{display:grid;gap:2px;min-width:0}.quick-mode-copy strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.quick-mode-copy small{font-size:11px;color:var(--secondary-text-color)}.quick-mode-check{margin-left:auto;color:var(--primary-color);font-weight:700}.schedule-modes{margin:10px 0 0;font-size:12px}.assignment-tools{margin-top:10px;border-top:1px solid var(--divider-color);padding-top:8px;font-size:12px}.assignment-tools summary{cursor:pointer;color:var(--secondary-text-color)}.assignment-tool-list{display:grid;gap:6px;margin-top:8px}.assignment-tool{display:flex;align-items:center;justify-content:space-between;gap:8px}.assignment-tool-actions{display:flex;gap:4px;flex-wrap:wrap}.assignment-tool-actions button{padding:5px 8px;font-size:12px}.compact-drop{padding:7px;margin-top:10px;font-size:12px}.mode-card{padding:12px}.mode-card h3{margin-bottom:6px}.mode-card .actions{margin-top:9px}.climate-picker{border:1px solid var(--divider-color);border-radius:10px;overflow:hidden;background:var(--card-background-color)}.climate-picker-search{border:0;border-bottom:1px solid var(--divider-color);border-radius:0}.climate-options{max-height:280px;overflow:auto}.climate-option{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid var(--divider-color);cursor:pointer}.climate-option:last-child{border-bottom:0}.climate-option:hover{background:color-mix(in srgb,var(--primary-color) 8%,var(--card-background-color))}.climate-option input{width:auto;margin-top:3px}.climate-option-copy{display:grid;gap:2px;min-width:0}.climate-option-copy strong{font-size:13px;overflow:hidden;text-overflow:ellipsis}.climate-option-copy small{font-size:11px;color:var(--secondary-text-color)}.climate-option-empty{padding:12px;margin:0}";
+    style.textContent += ".mode-palette{position:static}.day-track{z-index:0;background-image:repeating-linear-gradient(to bottom,transparent 0,transparent calc(1.041666% - 1px),color-mix(in srgb,var(--divider-color) 24%,transparent) 1.041666%),repeating-linear-gradient(to bottom,transparent 0,transparent calc(25% - 1px),color-mix(in srgb,var(--divider-color) 60%,transparent) 25%)}.segment{z-index:1;min-height:28px;padding:8px 8px 9px 10px;box-shadow:0 2px 5px rgba(0,0,0,.08)}.segment-head{display:flex;align-items:center;gap:4px}.segment-time{color:var(--secondary-text-color);font-size:11px}.transition-handle{position:absolute;left:0;right:0;height:18px;transform:translateY(-50%);z-index:6;cursor:ns-resize;touch-action:none}.transition-handle::after{content:\"\";position:absolute;left:18%;right:18%;top:8px;border-top:2px solid color-mix(in srgb,var(--primary-text-color) 45%,transparent);opacity:.65;transition:opacity .12s}.transition-handle:hover::after,.transition-handle:focus::after{opacity:1}.drop-indicator{position:absolute;left:0;right:0;height:2px;background:var(--primary-color);z-index:5;pointer-events:none}.drop-indicator span{position:absolute;right:5px;top:-22px;padding:3px 6px;border-radius:5px;background:var(--primary-color);color:var(--text-primary-color,#fff);font-size:11px;white-space:nowrap}.phase-chip{cursor:pointer}.phase-chip:hover{border-color:var(--primary-color);background:var(--primary-color);color:var(--text-primary-color,#fff)}.schedule-card.compact{padding:14px}.schedule-card.compact h3{margin:0 0 4px}.schedule-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.schedule-card-top-tools{display:flex;align-items:center;gap:8px}.schedule-toggle{padding:5px 8px;font-size:13px;line-height:1}.schedule-count{white-space:nowrap;font-size:12px}.schedule-entities{display:grid;gap:5px;margin-top:5px;font-size:12px}.schedule-entity-row{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:baseline;gap:8px;min-width:0}.schedule-entity-name{min-width:0;overflow-wrap:anywhere}.schedule-entity-values{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px 10px;min-width:0;color:var(--secondary-text-color)}.schedule-entity-values b{color:var(--primary-text-color);font-weight:600}.schedule-entities-empty{margin:0}.schedule-summary{display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;font-size:13px}.schedule-summary span{min-width:0}.schedule-override{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:8px 0 0;font-size:12px;color:var(--warning-color,#b06a00)}.schedule-override button{padding:5px 8px;font-size:12px}.quick-mode-title{display:flex;justify-content:space-between;align-items:center;margin-top:14px;margin-bottom:7px;font-size:12px;font-weight:600}.quick-modes{display:flex;gap:7px;flex-wrap:wrap}.quick-mode{display:flex;align-items:center;gap:7px;min-width:132px;padding:8px 10px;border:1px solid var(--divider-color);border-radius:10px;background:var(--secondary-background-color);text-align:left;transition:transform .12s,box-shadow .12s,border-color .12s,background .12s}.quick-mode:not(:disabled):hover{transform:translateY(-1px);border-color:var(--primary-color);box-shadow:0 3px 10px color-mix(in srgb,var(--primary-color) 18%,transparent)}.quick-mode.active{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 12%,var(--card-background-color));box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 18%,transparent)}.quick-mode.manual{background:color-mix(in srgb,var(--warning-color,#b06a00) 12%,var(--card-background-color));border-color:var(--warning-color,#b06a00)}.quick-mode:disabled{opacity:.5}.quick-mode-dot{width:10px;height:10px;flex:none;border-radius:50%;border:1px solid var(--divider-color)}.quick-mode-dot.default{background:var(--primary-color)}.quick-mode-icon{--mdc-icon-size:18px;color:var(--secondary-text-color);flex:none}.quick-mode-copy{display:grid;gap:2px;min-width:0}.quick-mode-copy strong{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.quick-mode-copy small{font-size:11px;color:var(--secondary-text-color)}.quick-mode-check{margin-left:auto;color:var(--primary-color);font-weight:700}.schedule-modes{margin:10px 0 0;font-size:12px}.assignment-tools{margin-top:10px;border-top:1px solid var(--divider-color);padding-top:8px;font-size:12px}.assignment-tools summary{cursor:pointer;color:var(--secondary-text-color)}.assignment-tool-list{display:grid;gap:6px;margin-top:8px}.assignment-tool{display:flex;align-items:center;justify-content:space-between;gap:8px}.assignment-tool-actions{display:flex;gap:4px;flex-wrap:wrap}.assignment-tool-actions button{padding:5px 8px;font-size:12px}.compact-drop{padding:7px;margin-top:10px;font-size:12px}.mode-card{padding:12px}.mode-card h3{margin-bottom:6px}.mode-card .actions{margin-top:9px}.climate-picker{border:1px solid var(--divider-color);border-radius:10px;overflow:hidden;background:var(--card-background-color)}.climate-picker-search{border:0;border-bottom:1px solid var(--divider-color);border-radius:0}.climate-options{max-height:280px;overflow:auto}.climate-option{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-bottom:1px solid var(--divider-color);cursor:pointer}.climate-option:last-child{border-bottom:0}.climate-option:hover{background:color-mix(in srgb,var(--primary-color) 8%,var(--card-background-color))}.climate-option input{width:auto;margin-top:3px}.climate-option-copy{display:grid;gap:2px;min-width:0}.climate-option-copy strong{font-size:13px;overflow:hidden;text-overflow:ellipsis}.climate-option-copy small{font-size:11px;color:var(--secondary-text-color)}.climate-option-empty{padding:12px;margin:0}";
     style.textContent += ".mode-palette{position:sticky;top:12px;align-self:start;max-height:calc(100vh - 24px);overflow:auto;scrollbar-gutter:stable}@media(max-width:1100px){.mode-palette{position:static;max-height:none;overflow:visible}}";
     style.textContent += ".schedule-card{cursor:default}.segment-head{padding-right:25px}.segment-duplicate{position:absolute;z-index:4;top:3px;right:3px;width:24px;height:24px;padding:3px;border:0;background:color-mix(in srgb,var(--card-background-color) 72%,transparent);line-height:1}.segment-duplicate ha-icon{--mdc-icon-size:16px}.schedule-card-top-tools{align-items:flex-start}.schedule-card-icon-tools{display:grid;gap:4px}.schedule-toggle,.schedule-duplicate{width:30px;height:30px;padding:5px;font-size:13px;line-height:1}.schedule-duplicate ha-icon{--mdc-icon-size:18px}";
     style.textContent += ".external-badge{display:inline-block;margin-left:5px;padding:2px 6px;border-radius:999px;color:var(--warning-color,#b06a00);background:color-mix(in srgb,var(--warning-color,#b06a00) 14%,transparent);font-size:11px;font-weight:600}";
@@ -335,6 +336,13 @@ class ClimatePlannerPanel extends HTMLElement {
     return this.schedulePhases(schedule).find((entry) => this.phaseId(entry.phase) === phaseId);
   }
 
+  phaseConfiguredOnWeekday(schedule, weekday, phaseId) {
+    if (!schedule || !weekday || !phaseId) return false;
+    return schedule.assignments.some((assignment) => (
+      (assignment.weekday_rules?.[weekday] || []).some((phase) => this.phaseId(phase) === phaseId)
+    ));
+  }
+
   renderSchedules(admin) {
     const target = this.$("schedules");
     this.lastScheduleRenderSignature = this.scheduleRenderSignature();
@@ -405,6 +413,7 @@ class ClimatePlannerPanel extends HTMLElement {
     if (!this.data.schedules.length) { target.innerHTML = `<p class="empty">${this.t.noSchedules}</p>`; return; }
     if (!this.data.schedules.some((schedule) => schedule.id === this.selectedSchedule)) this.selectedSchedule = this.data.schedules[0].id;
     const view = this.data.week_views?.[this.selectedSchedule];
+    const schedule = this.data.schedules.find((item) => item.id === this.selectedSchedule);
     const admin = Boolean(this._hass.user?.is_admin);
     const days = view?.days.map((day) => {
       const segments = day.segments.map((segment) => {
@@ -413,10 +422,11 @@ class ClimatePlannerPanel extends HTMLElement {
         const duplicate = admin && segment.phase_id
           ? `<button type="button" class="segment-duplicate" data-duplicate-phase aria-label="${escapeHTML(this.t.duplicate)}" title="${escapeHTML(this.t.duplicate)}" draggable="false"><ha-icon icon="mdi:content-copy" aria-hidden="true"></ha-icon></button>`
           : "";
-        const startHandle = admin && segment.phase_id && segment.start > 0
-          ? `<span class="resize-handle top" data-resize="start" tabindex="0" title="${escapeHTML(this.t.time)}" draggable="false"></span>`
+        const explicitStart = segment.start > 0 || (schedule && this.phaseConfiguredOnWeekday(schedule, day.weekday, segment.phase_id));
+        const transition = admin && segment.phase_id && explicitStart
+          ? `<span class="transition-handle" data-phase-id="${escapeHTML(segment.phase_id)}" data-segment-day="${escapeHTML(day.weekday)}" style="top:${(segment.start / 1440) * 100}%" tabindex="0" title="${escapeHTML(this.t.transition)}" draggable="false"></span>`
           : "";
-        return `<div class="segment" draggable="${admin && Boolean(segment.phase_id)}" data-phase-id="${escapeHTML(segment.phase_id || "")}" data-segment-day="${escapeHTML(day.weekday)}" data-segment-start="${segment.start}" data-segment-end="${segment.end}" style="top:${(segment.start / 1440) * 100}%;height:${((segment.end - segment.start) / 1440) * 100}%;${segment.color ? `border-left-color:${escapeHTML(segment.color)};background:color-mix(in srgb,${escapeHTML(segment.color)} 20%,var(--card-background-color))` : ""}">${duplicate}${startHandle}<div class="segment-head">${segment.icon ? `<ha-icon class="segment-icon" icon="${escapeHTML(segment.icon)}"></ha-icon>` : ""}<strong>${escapeHTML(segment.mode_name)}</strong></div><small>${escapeHTML(this.temperatureText(segment.target_temperature))}</small><small class="segment-time">${escapeHTML(startText)}–${escapeHTML(endText)}</small></div>`;
+        return `<div class="segment" draggable="${admin && Boolean(segment.phase_id)}" data-phase-id="${escapeHTML(segment.phase_id || "")}" data-segment-day="${escapeHTML(day.weekday)}" data-segment-start="${segment.start}" data-segment-end="${segment.end}" style="top:${(segment.start / 1440) * 100}%;height:${((segment.end - segment.start) / 1440) * 100}%;${segment.color ? `border-left-color:${escapeHTML(segment.color)};background:color-mix(in srgb,${escapeHTML(segment.color)} 20%,var(--card-background-color))` : ""}">${duplicate}<div class="segment-head">${segment.icon ? `<ha-icon class="segment-icon" icon="${escapeHTML(segment.icon)}"></ha-icon>` : ""}<strong>${escapeHTML(segment.mode_name)}</strong></div><small>${escapeHTML(this.temperatureText(segment.target_temperature))}</small><small class="segment-time">${escapeHTML(startText)}–${escapeHTML(endText)}</small></div>${transition}`;
       }).join("");
       const nowLine = view.current_weekday === day.weekday && view.current_minute != null
         ? `<div class="now-line" style="top:${(view.current_minute / 1440) * 100}%" title="now"></div>`
@@ -448,12 +458,16 @@ class ClimatePlannerPanel extends HTMLElement {
           Number(segment.dataset.segmentStart),
         );
       });
-      segment.querySelectorAll("[data-resize]").forEach((handle) => {
-        handle.addEventListener("pointerdown", (event) => { event.preventDefault(); event.stopPropagation(); this.beginPhaseResize(event, this.selectedSchedule, segment.dataset.phaseId, segment.dataset.segmentDay, handle.dataset.resize, segment.closest(".day-track")); });
-        handle.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); });
-      });
       if (admin) segment.addEventListener("dragstart", (event) => { if (event.target.closest("[data-duplicate-phase]")) { event.preventDefault(); return; } this.dragActive = true; event.stopPropagation(); const rect = segment.getBoundingClientRect(); const start = Number(segment.dataset.segmentStart); const end = Number(segment.dataset.segmentEnd); const duration = Number.isFinite(start) && Number.isFinite(end) && end > start ? end - start : 0; const offsetMinutes = rect.height && duration ? Math.max(0, Math.min(duration, ((event.clientY - rect.top) / rect.height) * duration)) : 0; const copy = event.altKey || event.ctrlKey || event.metaKey; this.dragState = { phaseId: segment.dataset.phaseId, offsetMinutes }; event.dataTransfer.setData("text/plain", `${copy ? "copy-phase" : "phase"}:${segment.dataset.phaseId}`); event.dataTransfer.effectAllowed = copy ? "copy" : "move"; segment.classList.add("dragging"); });
       if (admin) segment.addEventListener("dragend", () => { segment.classList.remove("dragging"); this.finishDrag(); });
+    });
+    target.querySelectorAll(".transition-handle[data-phase-id]").forEach((handle) => {
+      handle.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        this.beginPhaseResize(event, this.selectedSchedule, handle.dataset.phaseId, handle.dataset.segmentDay, "transition", handle.closest(".day-track"));
+      });
+      handle.addEventListener("click", (event) => { event.preventDefault(); event.stopPropagation(); });
     });
     target.querySelectorAll("[data-drop-day]").forEach((track) => {
       track.addEventListener("dragover", (event) => { event.preventDefault(); track.classList.add("drop-target"); this.showDropIndicator(track, event, this.dragState?.offsetMinutes || 0); });
@@ -526,27 +540,46 @@ class ClimatePlannerPanel extends HTMLElement {
     return candidates[0] || null;
   }
 
+  previousPhase(schedule, weekday, beforeMinutes, excludedPhaseId = "") {
+    const candidates = [];
+    schedule.assignments.forEach((assignment) => {
+      (assignment.weekday_rules?.[weekday] || []).forEach((phase) => {
+        if (this.phaseId(phase) === excludedPhaseId) return;
+        const minutes = this.phaseMinutes(phase);
+        if (minutes < beforeMinutes) candidates.push({ assignment, phase, minutes });
+      });
+    });
+    candidates.sort((left, right) => right.minutes - left.minutes);
+    return candidates[0] || null;
+  }
+
   timeFromMinutes(minutes) {
     const value = Math.max(0, Math.min(1439, Math.round(minutes / 15) * 15));
     return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
   }
 
   beginPhaseResize(event, scheduleId, phaseId, weekday, edge, track) {
-    const segment = Array.from(track.querySelectorAll("[data-phase-id]")).find((item) => item.dataset.phaseId === phaseId);
+    if (edge !== "transition" || this.phaseResizeActive) return;
     const handle = event.currentTarget;
-    if (segment) segment.draggable = false;
-    try { handle?.setPointerCapture?.(event.pointerId); } catch (_) { /* pointer capture is optional */ }
+    const pointerId = event.pointerId;
+    this.phaseResizeActive = true;
+    track.classList.add("resizing");
+    try { handle?.setPointerCapture?.(pointerId); } catch (_) { /* pointer capture is optional */ }
     const move = (moveEvent) => {
+      if (moveEvent.pointerId !== pointerId) return;
       moveEvent.preventDefault();
       track.dataset.resizePhaseId = phaseId;
       track.dataset.resizeTime = this.timeAtDrop(moveEvent, track);
       this.showDropIndicator(track, moveEvent);
     };
     const finish = async (upEvent) => {
+      if (upEvent.pointerId != null && upEvent.pointerId !== pointerId) return;
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", finish);
-      if (segment) segment.draggable = true;
-      try { handle?.releasePointerCapture?.(event.pointerId); } catch (_) { /* pointer capture is optional */ }
+      window.removeEventListener("pointercancel", finish);
+      this.phaseResizeActive = false;
+      track.classList.remove("resizing");
+      try { handle?.releasePointerCapture?.(pointerId); } catch (_) { /* pointer capture is optional */ }
       const time = track.dataset.resizePhaseId === phaseId
         ? track.dataset.resizeTime
         : this.timeAtDrop(upEvent, track);
@@ -556,8 +589,9 @@ class ClimatePlannerPanel extends HTMLElement {
       this.suppressPhaseClickUntil = Date.now() + 750;
       await this.resizePhaseStart(scheduleId, phaseId, weekday, time);
     };
-    window.addEventListener("pointermove", move);
+    window.addEventListener("pointermove", move, { passive: false });
     window.addEventListener("pointerup", finish, { once: true });
+    window.addEventListener("pointercancel", finish, { once: true });
   }
 
   async resizePhaseStart(scheduleId, phaseId, weekday, time) {
@@ -572,10 +606,13 @@ class ClimatePlannerPanel extends HTMLElement {
     }
     if (!entry) return;
     const currentStart = this.phaseMinutes(entry.phase);
+    const previousBoundary = this.previousPhase(schedule, weekday, currentStart, phaseId);
     const nextBoundary = this.followingPhase(schedule, weekday, currentStart, phaseId);
     const requested = this.phaseMinutes({ time });
+    const minimum = previousBoundary ? previousBoundary.minutes + 15 : 0;
     const maximum = nextBoundary ? nextBoundary.minutes - 15 : 1439;
-    entry.phase.time = this.timeFromMinutes(Math.max(0, Math.min(maximum, requested)));
+    if (maximum < minimum) return this.notice(this.t.invalid, true);
+    entry.phase.time = this.timeFromMinutes(Math.max(minimum, Math.min(maximum, requested)));
     entry.phases.sort((left, right) => this.phaseMinutes(left) - this.phaseMinutes(right));
     await this.save(next);
   }
