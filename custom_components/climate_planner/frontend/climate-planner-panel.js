@@ -143,7 +143,7 @@ class ClimatePlannerPanel extends HTMLElement {
       admin: Boolean(this._hass?.user?.is_admin),
       entities: entityIds.map((entityId) => {
         const state = this._hass?.states?.[entityId];
-        return [entityId, state?.state, state?.last_updated, state?.attributes?.temperature, state?.attributes?.target_temperature, state?.attributes?.current_temperature, state?.attributes?.target_temp_step];
+        return [entityId, state?.state, state?.last_updated, state?.attributes?.temperature, state?.attributes?.target_temperature, state?.attributes?.target_temperature_set, state?.attributes?.target_temperature_status, state?.attributes?.current_temperature, state?.attributes?.target_temp_step];
       }),
     });
   }
@@ -1341,7 +1341,7 @@ class ClimatePlannerPanel extends HTMLElement {
     if (!Number.isFinite(requested)) return false;
     const entityIds = schedule.climate_entity_ids || [];
     return entityIds.some((entityId) => {
-      const entityTarget = this.climateEntityTemperatureValue(entityId, "temperature", "target_temperature");
+      const entityTarget = this.climateEntityTemperatureValue(entityId, "target_temperature_set");
       return entityTarget != null
         && Math.abs(entityTarget - requested) > this.targetTemperatureTolerance(entityId);
     });
@@ -1350,7 +1350,7 @@ class ClimatePlannerPanel extends HTMLElement {
   climateEntityRows(entityIds) {
     const ids = Array.isArray(entityIds) ? entityIds : entityIds ? [entityIds] : [];
     if (!ids.length) return `<p class="muted schedule-entities-empty">${this.t.noClimate}</p>`;
-    return ids.map((entityId) => `<div class="schedule-entity-row"><span class="schedule-entity-name">${escapeHTML(this.climateEntityLabel(entityId))}</span><span class="schedule-entity-values"><span><b title="${escapeHTML(this.t.targetRequest)}">${escapeHTML(this.t.targetRequestShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "temperature", "target_temperature"))}</span><span><b title="${escapeHTML(this.t.targetFeedback)}">${escapeHTML(this.t.targetFeedbackShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "target_temperature", "reported_target_temperature"))}</span><span><b>${escapeHTML(this.t.currentShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "current_temperature"))}</span></span></div>`).join("");
+    return ids.map((entityId) => `<div class="schedule-entity-row"><span class="schedule-entity-name">${escapeHTML(this.climateEntityLabel(entityId))}</span><span class="schedule-entity-values"><span><b title="${escapeHTML(this.t.targetRequest)}">${escapeHTML(this.t.targetRequestShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "target_temperature_set"))}</span><span><b title="${escapeHTML(this.t.targetFeedback)}">${escapeHTML(this.t.targetFeedbackShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "target_temperature_status"))}</span><span><b>${escapeHTML(this.t.currentShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "current_temperature"))}</span></span></div>`).join("");
   }
 
   openScheduleDialog(scheduleId = null) {

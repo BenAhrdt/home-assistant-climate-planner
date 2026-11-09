@@ -109,10 +109,10 @@ wenn eine Automation einen Climate-Planner-Dienst oder Aktivierungs-Button
 verwendet.
 
 Für jede Klima-Entität stehen drei Werte nebeneinander: **Soll ↗** ist die
-aktuelle Vorgabe der Home-Assistant-Climate-Entität (`temperature`) und ändert
-sich deshalb auch bei einem fremden `climate.set_temperature`-Aufruf.
-**Soll ↘** ist die separate, vom Gerät zurückgemeldete Zieltemperatur
-(`target_temperature`), **Ist** die aktuelle Temperatur. Stellt eine
+aktuelle Sollwertvorgabe aus `target_temperature_set` und ändert sich deshalb
+auch bei einem fremden `climate.set_temperature`-Aufruf. **Soll ↘** ist die
+separate, vom Gerät zurückgemeldete Zieltemperatur aus
+`target_temperature_status`, **Ist** die aktuelle Temperatur. Stellt eine
 Climate-Integration keine separate Zieltemperatur-Rückmeldung bereit, erscheint
 für **Soll ↘** ein Gedankenstrich. Weicht **Soll ↗** unter Berücksichtigung der
 Thermostat-Schrittweite von der letzten Climate-Planner-Vorgabe ab, erscheint

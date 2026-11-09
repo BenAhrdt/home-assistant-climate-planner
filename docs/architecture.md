@@ -150,10 +150,11 @@ erfolgreichen Serviceaufruf den zuletzt aktivierten Mode im Panel; der Override
 wird nicht dauerhaft gespeichert. Der Button-State zeigt separat, wie viele
 Temperatur-Serviceaufrufe erfolgreich waren.
 
-Das Panel stellt die aktuelle Vorgabe der Climate-Entität (`temperature`,
-`Soll ↗`), die separate vom Klima-Gerät gemeldete Zieltemperatur
-(`target_temperature`, `Soll ↘`) und die aktuelle Temperatur (`Ist`) getrennt
-dar. Fehlt das separate Rückmeldeattribut, bleibt `Soll ↘` leer. Weicht die
+Das Panel stellt die Sollwertvorgabe der Climate-Entität
+(`target_temperature_set`, `Soll ↗`), die separate vom Klima-Gerät gemeldete
+Zieltemperatur (`target_temperature_status`, `Soll ↘`) und die aktuelle
+Temperatur (`Ist`) getrennt dar. Fehlt das separate Rückmeldeattribut, bleibt
+`Soll ↘` leer. Weicht die
 aktuelle Vorgabe unter Berücksichtigung der gemeldeten Zieltemperatur-
 Schrittweite von der letzten Climate-Planner-Vorgabe ab, wird der zuletzt
 aktivierte Mode als `extern` markiert. Dadurch aktualisiert ein fremder
