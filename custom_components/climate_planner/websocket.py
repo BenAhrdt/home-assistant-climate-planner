@@ -73,6 +73,34 @@ async def ws_configure(hass: HomeAssistant, connection, msg: dict) -> None:
 
 @websocket_api.websocket_command(
     {
+        vol.Required("type"): f"{DOMAIN}/set_window_label",
+        vol.Optional("label_id", default=""): str,
+    }
+)
+@websocket_api.async_response
+async def ws_set_window_label(hass: HomeAssistant, connection, msg: dict) -> None:
+    """Save the integration-wide window label from the panel."""
+
+    if not connection.user.is_admin:
+        connection.send_error(msg["id"], "unauthorized", "Administrator required")
+        return
+    runtime = _runtime(hass)
+    if runtime is None:
+        connection.send_error(msg["id"], "not_ready", "Climate Planner is not configured")
+        return
+    try:
+        await runtime.async_set_window_label(msg["label_id"])
+    except InvalidData as err:
+        connection.send_error(msg["id"], "invalid_input", err.code)
+    except Exception:
+        _LOGGER.exception("Climate Planner window label could not be saved")
+        connection.send_error(msg["id"], "save_failed", "The window label could not be saved")
+    else:
+        connection.send_result(msg["id"], {"saved": True, "window_label": runtime.window_label})
+
+
+@websocket_api.websocket_command(
+    {
         vol.Required("type"): f"{DOMAIN}/activate_mode",
         vol.Required("schedule_id"): str,
         vol.Required("mode_id"): str,
@@ -136,5 +164,11 @@ async def ws_clear_override(hass: HomeAssistant, connection, msg: dict) -> None:
 def register(hass: HomeAssistant) -> None:
     """Register all panel commands once per Home Assistant instance."""
 
-    for command in (ws_data, ws_configure, ws_activate_mode, ws_clear_override):
+    for command in (
+        ws_data,
+        ws_configure,
+        ws_set_window_label,
+        ws_activate_mode,
+        ws_clear_override,
+    ):
         websocket_api.async_register_command(hass, command)

@@ -17,7 +17,7 @@ const labels = {
     week: "Wochenansicht", addMode: "Mode anlegen", addSchedule: "Heizplan anlegen",
     addAssignment: "Mode hinzufügen", editAssignment: "Mode bearbeiten", editPhase: "Phase bearbeiten", usedModes: "Verwendete Modes", details: "Details öffnen", edit: "Bearbeiten", remove: "Löschen", save: "Speichern",
     cancel: "Abbrechen", name: "Name", temperature: "Zieltemperatur", priority: "Priorität", color: "Farbe (optional)",
-    icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", enabled: "Aktiviert", windowOpenTemperature: "Absenktemperatur bei offenem Fenster", windowOpenTemperatureHint: "Standard: 18,5 °C; gilt für Fenster mit dem zentral ausgewählten Label im selben Raum wie die Climate-Entität.", windowOpen: "Fenster offen – Absenkung aktiv",
+    icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", enabled: "Aktiviert", windowSettings: "Fenster-Erkennung", windowLabel: "Fenster-Label", windowLabelHint: "Zentrale Auswahl für Fensterkontakte in allen Heizplänen.", saveWindowLabel: "Speichern", windowOpenTemperature: "Absenktemperatur bei offenem Fenster", windowOpenTemperatureHint: "Standard: 18,5 °C; gilt für Fenster mit dem zentral ausgewählten Label im selben Raum wie die Climate-Entität.", windowOpen: "Fenster offen – Absenkung aktiv",
     sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage", addTime: "Weitere Zeit", removeTime: "Zeit entfernen", autoOnDate: "Auto ein (Datum)", autoOffDate: "Auto aus (Datum)",
     time: "Uhrzeit", bulkTime: "Uhrzeit für ausgewählte Tage", weekday: "Wochentag", transition: "Übergang verschieben", phase: "Phase", duplicate: "Duplizieren", placeDuplicate: "Duplikat platzieren", duplicateTimeOccupied: "Eine Stunde vor diesem Mode liegt bereits ein Wechsel. Bitte eine andere Uhrzeit wählen.", duplicateNoRoom: "Vor diesem Mode ist nicht genug Platz für die Duplikatdauer. Der vorherige Mode behält mindestens eine Stunde.", selectAllDays: "Alle anwählen", clearAllDays: "Alle abwählen", copySuffix: "Kopie", defaultDuration: "Richtwert: 8 Stunden · letzter Block bis 24:00", drop: "Mode auf die Heizplankachel ziehen", dropTimeline: "Mode auf einen Tag und eine Uhrzeit ziehen · Richtwert 8 h · letzter Block bis 24:00 · Alt/Strg/Cmd = kopieren", chooseMode: "Mode direkt aktivieren", noModes: "Noch keine Modes angelegt.",
     noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode aktivieren", pauseMode: "Mode pausieren", targetRequestShort: "Soll", targetRequest: "Vom Climate Planner gesetzter Sollwert", currentShort: "Ist", next: "Nächster Wechsel",
@@ -34,7 +34,7 @@ const labels = {
     title: "Time-based heating plans", overview: "Overview", modes: "Mode library", schedules: "Heating plans", week: "Week view",
     addMode: "Add mode", addSchedule: "Add heating plan", addAssignment: "Add mode", editAssignment: "Edit mode", editPhase: "Edit phase", usedModes: "Used modes", details: "Open details", edit: "Edit", remove: "Delete",
     save: "Save", cancel: "Cancel", name: "Name", temperature: "Target temperature", priority: "Priority", color: "Color (optional)",
-    icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", enabled: "Enabled", windowOpenTemperature: "Setback temperature with window open", windowOpenTemperatureHint: "Default: 18.5 °C; applies to windows with the centrally selected label in the same area as the climate entity.", windowOpen: "Window open – setback active",
+    icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", enabled: "Enabled", windowSettings: "Window detection", windowLabel: "Window label", windowLabelHint: "Central selection for window contacts in all heating plans.", saveWindowLabel: "Save", windowOpenTemperature: "Setback temperature with window open", windowOpenTemperatureHint: "Default: 18.5 °C; applies to windows with the centrally selected label in the same area as the climate entity.", windowOpen: "Window open – setback active",
     sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", addTime: "Add another time", removeTime: "Remove time", autoOnDate: "Auto on (date)", autoOffDate: "Auto off (date)", time: "Time", bulkTime: "Time for selected days", weekday: "Weekday", transition: "Move transition", phase: "Phase", duplicate: "Duplicate", placeDuplicate: "Place duplicate", duplicateTimeOccupied: "There is already a change one hour before this mode. Choose another time.", duplicateNoRoom: "There is not enough room for the duplicate duration. The previous mode keeps at least one hour.", selectAllDays: "Select all", clearAllDays: "Clear all", copySuffix: "Copy", defaultDuration: "Guideline: 8 hours · last block until 24:00", dropTimeline: "Drag a mode onto a day and time · guideline 8 h · last block until 24:00 · Alt/Ctrl/Cmd = copy",
     drop: "Drop mode on the heating plan", chooseMode: "Activate mode directly", noModes: "No modes have been created yet.", noSchedules: "No heating plans have been created yet.",
     active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode", pauseMode: "Pause mode", targetRequestShort: "Target", targetRequest: "Target set by Climate Planner", currentShort: "Current", next: "Next change", none: "No mode activated yet", connected: "Ready", loading: "Loading …",
@@ -64,6 +64,10 @@ class ClimatePlannerPanel extends HTMLElement {
     this.lastScheduleRenderSignature = "";
     this.scheduleInteractionActive = false;
     this.scheduleRenderPending = false;
+    this.windowLabelDraft = "";
+    this.windowLabelDirty = false;
+    this.windowLabelForm = null;
+    this.windowLabelFormLoading = false;
   }
 
   set hass(value) {
@@ -183,7 +187,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".week-mode-chip-wrap{display:inline-flex;align-items:stretch}.week-mode-chip-wrap .week-mode-chip{border-radius:8px 0 0 8px}.week-mode-chip-toggle{padding:6px 8px;border-left:0;border-radius:0 8px 8px 0;line-height:1}.week-mode-chip.paused+.week-mode-chip-toggle{opacity:.65}";
     this.shadowRoot.querySelector("main").style.display = "grid";
     this.shadowRoot.querySelector("main").style.gridTemplateColumns = "minmax(0,1fr)";
-    this.shadowRoot.querySelector("main").style.gridTemplateAreas = '"header" "notice" "modes" "schedules"';
+    this.shadowRoot.querySelector("main").style.gridTemplateAreas = '"header" "settings" "notice" "modes" "schedules"';
     this.shadowRoot.querySelector("main").style.gap = "16px";
     style.textContent += ".mode-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.mode-card-top h3{margin:0}.mode-toggle{padding:5px 8px;font-size:13px;line-height:1}.mode-card.disabled{opacity:.68}.mode-card .mode-meta{flex-wrap:wrap}.mode-priority{font-size:11px;margin-left:auto}.quick-mode-wrap{display:flex;align-items:stretch;min-width:178px;border:1px solid var(--divider-color);border-radius:10px;background:var(--secondary-background-color);overflow:hidden;transition:border-color .12s,box-shadow .12s,background .12s}.quick-mode-wrap.active{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 12%,var(--card-background-color));box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 18%,transparent)}.quick-mode-wrap.paused{opacity:.72}.quick-mode-wrap .quick-mode{min-width:0;flex:1;border:0;border-radius:0;background:transparent}.quick-mode-wrap .quick-mode:not(:disabled):hover{transform:none;border-color:transparent;box-shadow:none}.assignment-toggle{align-self:flex-start;padding:7px 8px;font-size:13px;line-height:1;color:var(--secondary-text-color);border:0;border-left:1px solid var(--divider-color);border-radius:0;background:transparent}.assignment-toggle:hover{color:var(--primary-text-color);border-color:var(--primary-color)}";
     style.textContent += ".assignment-tools{display:grid;align-self:stretch;border-left:1px solid var(--divider-color)}.assignment-toggle,.assignment-settings,.assignment-delete{display:flex;align-items:center;justify-content:center;min-width:30px;padding:5px 7px;font-size:13px;line-height:1;border:0;border-radius:0;background:transparent}.assignment-toggle{color:var(--secondary-text-color)}.assignment-toggle:hover,.assignment-settings:hover{color:var(--primary-text-color);background:color-mix(in srgb,var(--primary-color) 8%,transparent)}.assignment-settings{color:var(--primary-color)}.assignment-delete{border-top:1px solid var(--divider-color);color:var(--error-color,#db4437)}.assignment-delete:hover{background:color-mix(in srgb,var(--error-color,#db4437) 12%,transparent)}.assignment-settings ha-icon,.assignment-delete ha-icon{--mdc-icon-size:16px}";
@@ -196,16 +200,24 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".schedule-card.drop-target{cursor:copy;animation:schedule-drop-ready .75s ease-in-out infinite alternate}.schedule-card.drop-invalid{cursor:not-allowed;border:2px solid var(--error-color,#db4437);background:color-mix(in srgb,var(--error-color,#db4437) 10%,var(--card-background-color));box-shadow:0 0 0 3px color-mix(in srgb,var(--error-color,#db4437) 18%,transparent)}.mode-drag-cursor{position:fixed;z-index:10000;display:flex;align-items:center;gap:8px;max-width:240px;padding:8px 11px;border:1px solid var(--divider-color);border-radius:12px;background:color-mix(in srgb,var(--card-background-color) 94%,transparent);box-shadow:0 8px 24px rgba(0,0,0,.24);opacity:0;transform:translate(18px,18px) scale(.92);pointer-events:none;transition:opacity .12s,transform .12s,border-color .12s,background .12s}.mode-drag-cursor.visible{opacity:1;transform:translate(18px,18px) scale(1)}.mode-drag-cursor.allowed{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 12%,var(--card-background-color));animation:drag-cursor-float .7s ease-in-out infinite alternate}.mode-drag-cursor.blocked{border-color:var(--error-color,#db4437);color:var(--error-color,#db4437);background:color-mix(in srgb,var(--error-color,#db4437) 12%,var(--card-background-color))}.mode-drag-cursor ha-icon{--mdc-icon-size:24px;flex:none}.mode-drag-cursor.allowed ha-icon{animation:drag-cursor-icon .55s ease-in-out infinite alternate}.mode-drag-cursor-copy{display:grid;gap:1px;min-width:0}.mode-drag-cursor-copy strong,.mode-drag-cursor-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mode-drag-cursor-copy strong{font-size:12px}.mode-drag-cursor-copy small{font-size:11px;color:var(--secondary-text-color)}@keyframes schedule-drop-ready{from{box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 16%,transparent)}to{box-shadow:0 0 0 6px color-mix(in srgb,var(--primary-color) 28%,transparent)}}@keyframes drag-cursor-float{from{margin-top:0}to{margin-top:-5px}}@keyframes drag-cursor-icon{from{transform:translateY(-2px)}to{transform:translateY(2px)}}";
     style.textContent += ".mode-palette{position:static;max-height:none;overflow:visible}.mode-palette h2{margin:4px 0}.mode-palette #drag-hint{margin:0 0 8px;font-size:12px}.mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px}.mode-palette .mode-card{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:12px;row-gap:3px;min-height:58px;padding:10px 12px;cursor:grab}.mode-palette .mode-card-top{grid-column:1;grid-row:1}.mode-palette .mode-meta{grid-column:1;grid-row:2;min-width:0;flex-wrap:nowrap}.mode-palette .mode-priority{margin-left:0}.mode-palette .mode-card .actions{grid-column:2;grid-row:1/3;align-self:center;margin:0;flex-wrap:nowrap}.mode-palette .mode-card .actions button{padding:7px 9px;font-size:12px}main.overview-layout{height:100vh;overflow:hidden}main.overview-layout #schedules-section{display:flex;min-height:0;flex-direction:column}main.overview-layout #schedules-title{flex:none;margin:8px 0 10px}main.overview-layout #schedules{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:start;padding:2px 10px 12px 2px;scrollbar-gutter:stable}@media(max-width:1100px){main.overview-layout{display:grid!important}}@media(max-width:700px){main.overview-layout{height:auto;min-height:100vh;overflow:visible;grid-template-rows:auto!important}main.overview-layout #schedules{overflow:visible}.mode-palette .grid{grid-template-columns:1fr}.mode-palette .mode-meta{flex-wrap:wrap}}";
     style.textContent += ".mode-palette .grid,#schedules{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}@media(max-width:1100px){.mode-palette .grid,#schedules{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.mode-palette .grid,#schedules{grid-template-columns:1fr}}";
+    style.textContent += ".planner-settings{padding:12px 14px;border:1px solid var(--divider-color);border-radius:12px;background:var(--card-background-color)}.planner-settings h2{margin:0 0 3px;font-size:16px}.planner-settings p{margin:0 0 8px}.planner-settings-row{display:flex;align-items:end;gap:12px;flex-wrap:wrap}.planner-settings-form{flex:1 1 320px;min-width:240px}.planner-settings-form ha-form{display:block}.planner-settings-actions{margin:0}.planner-settings-actions button{white-space:nowrap}";
     this.shadowRoot.querySelector("header").style.gridArea = "header";
     this.$("notice").style.gridArea = "notice";
     summarySection.style.gridArea = "summary";
     schedulesSection.style.gridArea = "schedules";
     modesSection.style.gridArea = "modes";
     weekSection.style.gridArea = "week";
+    const settingsSection = document.createElement("section");
+    settingsSection.id = "planner-settings";
+    settingsSection.className = "planner-settings";
+    settingsSection.innerHTML = '<div class="planner-settings-row"><div class="planner-settings-form"><h2 id="window-settings-title"></h2><p id="window-settings-hint" class="muted"></p><div id="window-label-form"></div></div><div class="planner-settings-actions"><button id="save-window-label" class="primary" type="button"></button></div></div>';
+    this.$("notice").before(settingsSection);
+    settingsSection.style.gridArea = "settings";
     this.$("refresh").title = this.t.connected;
     this.$("refresh").onclick = () => this.load();
     this.$("add-mode").onclick = () => this.openModeDialog();
     this.$("add-schedule").onclick = () => this.openScheduleDialog();
+    this.$("save-window-label").onclick = () => this.saveWindowLabel();
     this.$("dialog").addEventListener("click", (event) => { if (event.target === this.$("dialog")) this.closeDialog(); });
   }
 
@@ -295,6 +307,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.notice(this.t.loading);
     try {
       this.data = await this._hass.callWS({ type: "climate_planner/data" });
+      if (!this.windowLabelDirty) this.windowLabelDraft = this.data.window_label || "";
       if (!this.data.schedules.some((schedule) => schedule.id === this.selectedSchedule)) {
         this.selectedSchedule = this.data.schedules[0]?.id || "";
       }
@@ -324,19 +337,74 @@ class ClimatePlannerPanel extends HTMLElement {
     }
   }
 
+  renderWindowSettings(admin) {
+    const section = this.$("planner-settings");
+    if (!section) return;
+    section.hidden = !admin;
+    if (!admin) return;
+    this.$("window-settings-title").textContent = this.t.windowSettings;
+    this.$("window-settings-hint").textContent = this.t.windowLabelHint;
+    this.$("save-window-label").textContent = this.t.saveWindowLabel;
+    this.$("save-window-label").disabled = !this.windowLabelDirty;
+    if (this.windowLabelForm) {
+      this.windowLabelForm.hass = this._hass;
+      if (!this.windowLabelDirty && this.windowLabelForm.data?.window_label !== this.windowLabelDraft) {
+        this.windowLabelForm.data = { window_label: this.windowLabelDraft };
+      }
+      return;
+    }
+    if (this.windowLabelFormLoading) return;
+    this.windowLabelFormLoading = true;
+    const createForm = () => {
+      this.windowLabelFormLoading = false;
+      if (!this.isConnected || this.windowLabelForm) return;
+      const form = document.createElement("ha-form");
+      form.hass = this._hass;
+      form.schema = [{ name: "window_label", selector: { label: {} } }];
+      form.data = { window_label: this.windowLabelDraft };
+      form.computeLabel = () => this.t.windowLabel;
+      form.addEventListener("value-changed", (event) => {
+        this.windowLabelDraft = event.detail?.value?.window_label || "";
+        this.windowLabelDirty = this.windowLabelDraft !== (this.data?.window_label || "");
+        this.$("save-window-label").disabled = !this.windowLabelDirty;
+      });
+      this.windowLabelForm = form;
+      this.$("window-label-form").replaceChildren(form);
+    };
+    if (customElements.get("ha-form")) createForm();
+    else customElements.whenDefined("ha-form").then(createForm);
+  }
+
+  async saveWindowLabel() {
+    if (!this._hass.user?.is_admin || !this.windowLabelDirty) return;
+    this.$("save-window-label").disabled = true;
+    try {
+      await this._hass.callWS({
+        type: "climate_planner/set_window_label",
+        label_id: this.windowLabelDraft,
+      });
+      this.windowLabelDirty = false;
+      await this.load();
+    } catch (error) {
+      this.$("save-window-label").disabled = false;
+      this.notice(error?.code === "unauthorized" ? this.t.invalid : this.t.saveError, true);
+    }
+  }
+
   render() {
     const admin = Boolean(this._hass.user?.is_admin);
     const detail = this.detailOpen;
     const main = this.shadowRoot.querySelector("main");
     main.classList.toggle("overview-layout", !detail);
-    main.style.gridTemplateAreas = detail ? '"header" "notice" "week"' : '"header" "notice" "modes" "schedules"';
-    main.style.gridTemplateRows = detail ? "auto auto auto" : "auto auto auto minmax(0,1fr)";
+    main.style.gridTemplateAreas = detail ? '"header" "notice" "week"' : '"header" "settings" "notice" "modes" "schedules"';
+    main.style.gridTemplateRows = detail ? "auto auto auto" : "auto auto auto auto minmax(0,1fr)";
     this.$("back-overview").hidden = !detail;
     this.$("back-overview").title = this.t.overview;
     this.$("summary-section").hidden = true;
     this.$("schedules-section").hidden = detail;
     this.$("modes-section").hidden = detail;
     this.$("week-section").hidden = !detail;
+    this.renderWindowSettings(admin && !detail);
     this.$("add-mode").textContent = this.t.addMode;
     this.$("add-mode").hidden = !admin;
     this.$("add-schedule").textContent = this.t.addSchedule;

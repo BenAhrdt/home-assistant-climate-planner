@@ -112,6 +112,34 @@ class PlannerRuntime:
         zone = dt_util.get_time_zone(self.hass.config.time_zone)
         return dt_util.now(zone) if zone else dt_util.now()
 
+    @property
+    def window_label(self) -> str:
+        """Return the integration-wide label used for window detection."""
+
+        return self._window_label
+
+    async def async_set_window_label(self, label_id: str) -> None:
+        """Persist and apply the integration-wide window label."""
+
+        if not isinstance(label_id, str):
+            raise InvalidData("invalid_window_label")
+        if self._config_entry is None:
+            raise InvalidData("options_unavailable")
+        normalized_label = label_id.strip()
+        if normalized_label == self._window_label:
+            return
+
+        self._window_label = normalized_label
+        await self._async_refresh_window_tracking()
+        await self.async_evaluate()
+
+        options = dict(self._config_entry.options)
+        if normalized_label:
+            options[CONF_WINDOW_LABEL] = normalized_label
+        else:
+            options.pop(CONF_WINDOW_LABEL, None)
+        self.hass.config_entries.async_update_entry(self._config_entry, options=options)
+
     async def async_start(self) -> None:
         raw = await self.store.async_load()
         self._migrate_legacy_window_label(raw)
@@ -366,6 +394,7 @@ class PlannerRuntime:
             "week_views": weeks,
             "timezone": self.hass.config.time_zone,
             "ready": self._started,
+            "window_label": self._window_label,
             "climate_entities": climate_entities,
             "window_status": window_status,
         }

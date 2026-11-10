@@ -65,8 +65,9 @@ erscheinen nur die tatsächlich ausgewählten Entitäten; die vollständige
 Entitätsliste mit Checkboxen wird nicht dauerhaft angezeigt. Beim Anlegen
 eines neuen Heizplans ist zunächst keine Entität vorausgewählt.
 
-In den Optionen des Climate-Planner-Config-Entries wird zentral ein
-Home-Assistant-Label für Fensterkontakte gewählt. Für jede ausgewählte
+Unter „Fenster-Erkennung“ direkt unter dem Titel des Climate-Planner-Panels
+wird zentral ein Home-Assistant-Label für Fensterkontakte gewählt. Die Auswahl
+ist zusätzlich weiterhin in den Optionen des Config Entries verfügbar. Für jede ausgewählte
 Climate-Entität werden nur Fenster mit diesem Label aus demselben
 Home-Assistant-Bereich berücksichtigt. Das ist auch bei einem Heizplan mit
 Climate-Entitäten aus mehreren Bereichen eindeutig: Ein offenes Fenster senkt
