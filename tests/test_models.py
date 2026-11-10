@@ -68,6 +68,18 @@ def test_legacy_global_mode_pause_is_migrated_to_assignments():
     assert normalized["schedules"][0]["assignments"][0]["enabled"] is False
 
 
+def test_assignment_auto_dates_are_preserved_without_order_validation():
+    value = planner()
+    value["schedules"][0]["assignments"][0].update(
+        {"auto_on_date": "2026-11-20", "auto_off_date": "2026-11-10"}
+    )
+
+    assignment_value = validate_planner(value)["schedules"][0]["assignments"][0]
+
+    assert assignment_value["auto_on_date"] == "2026-11-20"
+    assert assignment_value["auto_off_date"] == "2026-11-10"
+
+
 def test_multiple_climate_entities_are_preserved():
     value = planner()
     value["schedules"][0].pop("climate_entity_id")
@@ -112,6 +124,17 @@ def test_multiple_climate_entities_are_preserved():
             "missing_weekday",
         ),
         ({"modes": [mode(), mode()], "schedules": [schedule()]}, "duplicate_mode_id"),
+        (
+            {
+                "schedules": [
+                    {
+                        **schedule(),
+                        "assignments": [{**assignment(), "auto_on_date": "2026-02-30"}],
+                    }
+                ]
+            },
+            "invalid_auto_on_date",
+        ),
     ],
 )
 def test_invalid_data_is_rejected(change, code):

@@ -1,5 +1,7 @@
 from copy import deepcopy
+from datetime import datetime
 from types import SimpleNamespace
+from zoneinfo import ZoneInfo
 
 import pytest
 from homeassistant.const import UnitOfTemperature
@@ -11,6 +13,8 @@ from custom_components.climate_planner.const import (
     SERVICE_APPLY_MATCHED,
 )
 from custom_components.climate_planner.runtime import PlannerRuntime
+
+ZONE = ZoneInfo("Europe/Berlin")
 
 
 class FakeStore:
@@ -362,6 +366,37 @@ async def test_entity_enable_mutations_persist_per_plan(fake_runtime):
     assert runtime.data["schedules"][0]["assignments"][0]["enabled"] is False
     await runtime.async_set_schedule_enabled("schedule_living", False)
     assert runtime.data["schedules"][0]["enabled"] is False
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
+async def test_auto_dates_apply_in_order_and_manual_toggle_remains_independent(fake_runtime):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    payload = planner_payload()
+    payload["schedules"][0]["assignments"][0].update(
+        {"auto_off_date": "2026-11-10", "auto_on_date": "2026-11-20"}
+    )
+    runtime = PlannerRuntime(fake_runtime, "entry")
+    runtime._now = lambda: datetime(2026, 11, 15, 12, tzinfo=ZONE)
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+
+    assignment_value = runtime.data["schedules"][0]["assignments"][0]
+    assert assignment_value["enabled"] is False
+    assert runtime._auto_date_actions["assignment_home"] == "auto_off_date:2026-11-10"
+
+    await runtime.async_set_assignment_enabled("schedule_living", "assignment_home", True)
+    assert runtime.data["schedules"][0]["assignments"][0]["enabled"] is True
+
+    runtime._now = lambda: datetime(2026, 11, 21, 12, tzinfo=ZONE)
+    await runtime.async_evaluate()
+    assert runtime.data["schedules"][0]["assignments"][0]["enabled"] is True
+    assert runtime._auto_date_actions["assignment_home"] == "auto_on_date:2026-11-20"
+
+    await runtime.async_set_assignment_enabled("schedule_living", "assignment_home", False)
+    assert runtime.data["schedules"][0]["assignments"][0]["enabled"] is False
     await runtime.async_shutdown()
 
 

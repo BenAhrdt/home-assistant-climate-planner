@@ -45,6 +45,14 @@ zeitgesteuerten Auswahl verwendet. Die Priorität wird als ganze Zahl
 gespeichert. Bei gleichzeitig passenden Regeln gewinnt die höhere Priorität,
 danach die zuletzt aktivierte Regel.
 
+Über das Zahnrad rechts an einem verwendeten Mode lassen sich die Einstellungen
+dieser Mode-Zuordnung im Heizplan öffnen. Dort können ein **Auto-ein-Datum** und
+ein **Auto-aus-Datum** als reine Kalenderdaten hinterlegt werden. Das zuletzt
+erreichte Datum löst die jeweilige automatische Aktivierung oder Pause aus;
+Auto-aus darf daher vor Auto-ein liegen. Die manuellen Play-/Pause-Schalter
+bleiben unabhängig von den Datumswerten bedienbar. Die Uhrzeiten und Phasen des
+Modes bleiben weiterhin ausschließlich im jeweiligen Heizplan gespeichert.
+
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.
 Die Auswahl verwendet den normalen durchsuchbaren Home-Assistant-
@@ -202,6 +210,9 @@ manuell aktivieren.
 Die Wochenansicht zeigt für den ausgewählten Heizplan Montag bis Sonntag,
 Zeitbereiche bis zum nächsten Mode-Wechsel und eine Markierung der aktuellen
 Zeit. Pausierte Heizpläne behalten ihre konfigurierten Zeitblöcke in dieser
-Ansicht; die Pause unterbindet nur die automatische Ausführung. Die Ansicht ist
-für breite und schmale Ansichten ausgelegt.
+Ansicht; die Pause unterbindet nur die automatische Ausführung. Das Symbol zum
+Duplizieren erscheint nur am tatsächlichen Beginn einer Phase; bei einer über
+Mitternacht fortgesetzten Phase erscheint es nicht erneut. Beginnt eine Phase
+um 00:00, bleibt das Symbol am aktuellen Tag. Die Ansicht ist für breite und
+schmale Ansichten ausgelegt.
 

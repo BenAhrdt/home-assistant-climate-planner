@@ -37,7 +37,14 @@ from .const import (
     STORAGE_KEY,
     STORAGE_VERSION,
 )
-from .engine import ActiveMatch, next_activation, select_active_mode, week_view
+from .engine import (
+    ActiveMatch,
+    latest_auto_date_event,
+    next_activation,
+    next_auto_date,
+    select_active_mode,
+    week_view,
+)
 from .models import (
     InvalidData,
     RevisionConflict,
@@ -65,6 +72,7 @@ class PlannerRuntime:
         self.data: dict[str, Any] = empty_planner()
         self.active: dict[str, ActiveMatch | None] = {}
         self._manual_overrides: dict[str, dict[str, Any]] = {}
+        self._auto_date_actions: dict[str, str] = {}
         self._applied: dict[str, tuple[str, float, tuple[str, ...]] | None] = {}
         self._last_activated: dict[str, dict[str, Any]] = {}
         self._timer_unsub = None
@@ -90,6 +98,7 @@ class PlannerRuntime:
     async def async_shutdown(self) -> None:
         self._started = False
         self._manual_overrides.clear()
+        self._auto_date_actions.clear()
         self._last_activated.clear()
         self._clear_timer()
 
@@ -118,6 +127,19 @@ class PlannerRuntime:
         """Restore validated last-activation records without changing planner data."""
 
         raw = await self.runtime_store.async_load()
+        self._auto_date_actions = {}
+        assignment_ids = {
+            assignment["id"]
+            for schedule in self.data["schedules"]
+            for assignment in schedule["assignments"]
+        }
+        raw_auto_date_actions = raw.get("auto_date_actions") if isinstance(raw, dict) else None
+        if isinstance(raw_auto_date_actions, dict):
+            self._auto_date_actions = {
+                assignment_id: marker
+                for assignment_id, marker in raw_auto_date_actions.items()
+                if assignment_id in assignment_ids and isinstance(marker, str)
+            }
         records = raw.get("last_activated") if isinstance(raw, dict) else None
         if not isinstance(records, dict):
             self._last_activated = {}
@@ -168,7 +190,12 @@ class PlannerRuntime:
     async def _async_save_runtime_state(self) -> None:
         """Persist the small runtime record separately from planner configuration."""
 
-        await self.runtime_store.async_save({"last_activated": deepcopy(self._last_activated)})
+        await self.runtime_store.async_save(
+            {
+                "last_activated": deepcopy(self._last_activated),
+                "auto_date_actions": deepcopy(self._auto_date_actions),
+            }
+        )
 
     def _temperature_to_celsius(self, value: Any, source_unit: UnitOfTemperature) -> float | None:
         """Normalize a climate state temperature for the panel data contract."""
@@ -245,8 +272,16 @@ class PlannerRuntime:
                 if match
                 else None
             )
-            upcoming = next_activation(schedule, modes, now) if schedule["enabled"] else None
-            next_events[schedule["id"]] = upcoming.isoformat() if upcoming else None
+            upcoming_points = []
+            automatic_date = next_auto_date(schedule, now)
+            if automatic_date:
+                upcoming_points.append(automatic_date)
+            if schedule["enabled"]:
+                upcoming = next_activation(schedule, modes, now)
+                if upcoming:
+                    upcoming_points.append(upcoming)
+            next_event = min(upcoming_points) if upcoming_points else None
+            next_events[schedule["id"]] = next_event.isoformat() if next_event else None
             weeks[schedule["id"]] = week_view(schedule, modes, now)
         climate_entities = await self._async_climate_entities()
         return {
@@ -526,6 +561,52 @@ class PlannerRuntime:
             self._timer_unsub()
             self._timer_unsub = None
 
+    async def _async_apply_due_auto_dates(self, now: datetime) -> None:
+        """Apply each reached assignment auto-date event once."""
+
+        candidate = deepcopy(self.data)
+        next_auto_date_actions = dict(self._auto_date_actions)
+        assignment_ids: set[str] = set()
+        configuration_changed = False
+        runtime_state_changed = False
+        current_date = now.date()
+        for schedule in candidate["schedules"]:
+            for assignment in schedule["assignments"]:
+                assignment_id = assignment["id"]
+                assignment_ids.add(assignment_id)
+                event = latest_auto_date_event(assignment, current_date)
+                if event is None:
+                    if assignment_id in next_auto_date_actions:
+                        del next_auto_date_actions[assignment_id]
+                        runtime_state_changed = True
+                    continue
+                marker, enabled = event
+                if next_auto_date_actions.get(assignment_id) == marker:
+                    continue
+                next_auto_date_actions[assignment_id] = marker
+                runtime_state_changed = True
+                if assignment["enabled"] != enabled:
+                    assignment["enabled"] = enabled
+                    configuration_changed = True
+        for assignment_id in set(next_auto_date_actions) - assignment_ids:
+            del next_auto_date_actions[assignment_id]
+            runtime_state_changed = True
+
+        if configuration_changed:
+            normalized = validate_planner(candidate)
+            normalized["revision"] = self.data["revision"] + 1
+            await self.store.async_save(normalized)
+            self.data = normalized
+        if runtime_state_changed:
+            self._auto_date_actions = next_auto_date_actions
+            try:
+                await self._async_save_runtime_state()
+            except Exception:  # noqa: BLE001
+                _LOGGER.warning(
+                    "Climate Planner could not persist automatic mode-date state",
+                    exc_info=True,
+                )
+
     async def async_evaluate(self) -> None:
         """Apply only transitions and schedule the next relevant point."""
 
@@ -533,6 +614,7 @@ class PlannerRuntime:
             if not self._started:
                 return
             now = self._now()
+            await self._async_apply_due_auto_dates(now)
             modes = self.data["modes"]
             self.active = {}
             next_points = []
@@ -550,6 +632,9 @@ class PlannerRuntime:
                     self._manual_overrides.pop(schedule["id"], None)
                     match = select_active_mode(schedule, modes, now)
                 self.active[schedule["id"]] = match
+                automatic_date = next_auto_date(schedule, now)
+                if automatic_date:
+                    next_points.append(automatic_date)
                 if schedule["enabled"]:
                     upcoming = next_activation(schedule, modes, now)
                     if upcoming:

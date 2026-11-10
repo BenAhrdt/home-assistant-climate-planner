@@ -9,12 +9,14 @@ from __future__ import annotations
 import math
 import re
 from copy import deepcopy
+from datetime import date
 from uuid import uuid4
 
 from .const import STORAGE_VERSION, WEEKDAYS
 
 ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$")
 TIME_PATTERN = re.compile(r"^(?:[01]\d|2[0-3]):[0-5]\d$")
+DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ENTITY_PATTERN = re.compile(r"^climate\.[a-z0-9_]+$")
 COLOR_PATTERN = re.compile(r"^#[0-9a-fA-F]{6}$")
 ICON_PATTERN = re.compile(r"^mdi:[a-z0-9-]+$")
@@ -103,6 +105,18 @@ def _optional_text(value: object, code: str, *, pattern: re.Pattern[str]) -> str
     return result
 
 
+def _optional_date(value: object, code: str) -> str | None:
+    if value is None or value == "":
+        return None
+    if not isinstance(value, str) or not DATE_PATTERN.fullmatch(value):
+        raise InvalidData(code)
+    try:
+        date.fromisoformat(value)
+    except ValueError as err:
+        raise InvalidData(code) from err
+    return value
+
+
 def _normalize_weekday_rules(value: object, phase_ids: set[str]) -> dict[str, list[dict]]:
     if not isinstance(value, dict):
         raise InvalidData("invalid_weekday_rules")
@@ -188,7 +202,14 @@ def _normalize_assignment(
 ) -> dict:
     if not isinstance(raw, dict):
         raise InvalidData("invalid_assignment")
-    if set(raw) - {"id", "mode_id", "enabled", "weekday_rules"}:
+    if set(raw) - {
+        "id",
+        "mode_id",
+        "enabled",
+        "auto_on_date",
+        "auto_off_date",
+        "weekday_rules",
+    }:
         raise InvalidData("invalid_assignment")
     assignment_id = _id(raw.get("id"), "invalid_assignment_id")
     if assignment_id in seen:
@@ -197,12 +218,19 @@ def _normalize_assignment(
     mode_id = _id(raw.get("mode_id"), "invalid_assignment_mode")
     if mode_id not in mode_ids:
         raise InvalidData("unknown_mode_reference")
-    return {
+    result = {
         "id": assignment_id,
         "mode_id": mode_id,
         "enabled": _bool(raw.get("enabled"), "invalid_assignment_enabled"),
         "weekday_rules": _normalize_weekday_rules(raw.get("weekday_rules"), phase_ids),
     }
+    auto_on_date = _optional_date(raw.get("auto_on_date"), "invalid_auto_on_date")
+    auto_off_date = _optional_date(raw.get("auto_off_date"), "invalid_auto_off_date")
+    if auto_on_date:
+        result["auto_on_date"] = auto_on_date
+    if auto_off_date:
+        result["auto_off_date"] = auto_off_date
+    return result
 
 
 def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict:

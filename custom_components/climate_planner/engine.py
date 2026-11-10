@@ -39,6 +39,52 @@ def _phase_time(phase: dict | str) -> str:
     return phase["time"] if isinstance(phase, dict) else phase
 
 
+def latest_auto_date_event(
+    assignment: dict, current_date: date
+) -> tuple[str, bool] | None:
+    """Return the latest reached automatic enable/disable event.
+
+    The assignment's persisted ``enabled`` value remains the manual/current
+    state until an automatic date is reached.  If both dates are reached, the
+    later date wins; a disable event wins deterministically when both dates are
+    equal.
+    """
+
+    events = []
+    for field, enabled, tie_breaker in (
+        ("auto_on_date", True, 0),
+        ("auto_off_date", False, 1),
+    ):
+        date_text = assignment.get(field)
+        if not date_text:
+            continue
+        event_date = date.fromisoformat(date_text)
+        if event_date <= current_date:
+            events.append((event_date, tie_breaker, date_text, enabled, field))
+    if not events:
+        return None
+    _event_date, _tie_breaker, date_text, enabled, field = max(events)
+    return f"{field}:{date_text}", enabled
+
+
+def next_auto_date(schedule: dict, now: datetime) -> datetime | None:
+    """Return the next future automatic enable/disable date at local midnight."""
+
+    local_now = _local_now(now)
+    zone = local_now.tzinfo
+    assert zone is not None
+    upcoming: list[datetime] = []
+    for assignment in schedule["assignments"]:
+        for field in ("auto_on_date", "auto_off_date"):
+            date_text = assignment.get(field)
+            if not date_text:
+                continue
+            event_date = date.fromisoformat(date_text)
+            if event_date > local_now.date():
+                upcoming.append(_at_local(event_date, "00:00", zone))
+    return min(upcoming) if upcoming else None
+
+
 def _candidates(
     schedule: dict,
     modes: list[dict],

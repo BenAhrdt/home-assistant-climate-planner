@@ -1,8 +1,10 @@
-from datetime import datetime
+from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
 from custom_components.climate_planner.engine import (
+    latest_auto_date_event,
     next_activation,
+    next_auto_date,
     select_active_mode,
     week_view,
 )
@@ -157,3 +159,28 @@ def test_week_view_keeps_last_phase_until_day_end():
     monday = next(day for day in view["days"] if day["weekday"] == "monday")
     assert monday["segments"][-1]["start"] == 540
     assert monday["segments"][-1]["end"] == 1440
+
+
+def test_auto_date_event_uses_latest_date_without_order_validation():
+    value = {
+        "auto_on_date": "2026-11-20",
+        "auto_off_date": "2026-11-10",
+    }
+
+    assert latest_auto_date_event(value, date(2026, 11, 15)) == (
+        "auto_off_date:2026-11-10",
+        False,
+    )
+    assert latest_auto_date_event(value, date(2026, 11, 21)) == (
+        "auto_on_date:2026-11-20",
+        True,
+    )
+
+
+def test_next_auto_date_is_scheduled_at_local_midnight():
+    value = schedule([assignment("rule", "comfort", monday=["06:00"])])
+    value["assignments"][0]["auto_on_date"] = "2026-11-10"
+
+    assert next_auto_date(value, datetime(2026, 11, 9, 12, tzinfo=ZONE)) == datetime(
+        2026, 11, 10, tzinfo=ZONE
+    )
