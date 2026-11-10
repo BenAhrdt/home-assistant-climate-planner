@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Mapping
 from copy import deepcopy
 from datetime import datetime
 from typing import Any
 
 from homeassistant.components.climate import DOMAIN as CLIMATE_DOMAIN
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     ATTR_ENTITY_ID,
     ATTR_FRIENDLY_NAME,
@@ -33,6 +35,7 @@ from homeassistant.util import dt as dt_util
 from homeassistant.util.unit_conversion import TemperatureConverter
 
 from .const import (
+    CONF_WINDOW_LABEL,
     DEFAULT_WINDOW_OPEN_TEMPERATURE,
     EVENT_UPDATED,
     RUNTIME_STORAGE_KEY,
@@ -68,9 +71,18 @@ _LOGGER = logging.getLogger(__name__)
 class PlannerRuntime:
     """Own the authoritative planner document and its scheduled evaluation."""
 
-    def __init__(self, hass: HomeAssistant, entry_id: str) -> None:
+    def __init__(
+        self,
+        hass: HomeAssistant,
+        entry_id: str,
+        *,
+        options: Mapping[str, Any] | None = None,
+        config_entry: ConfigEntry | None = None,
+    ) -> None:
         self.hass = hass
         self.entry_id = entry_id
+        self._config_entry = config_entry
+        self._window_label = str((options or {}).get(CONF_WINDOW_LABEL) or "").strip()
         self.store: Store[dict[str, Any]] = Store(
             hass, STORAGE_VERSION, STORAGE_KEY, atomic_writes=True
         )
@@ -102,6 +114,7 @@ class PlannerRuntime:
 
     async def async_start(self) -> None:
         raw = await self.store.async_load()
+        self._migrate_legacy_window_label(raw)
         self.data = migrate_storage(raw)
         if raw is None or self.data != raw:
             await self.store.async_save(self.data)
@@ -110,6 +123,36 @@ class PlannerRuntime:
         self._setup_window_registry_listeners()
         await self._async_refresh_window_tracking()
         await self.async_evaluate()
+
+    def _migrate_legacy_window_label(self, raw: object) -> None:
+        """Move the former per-schedule label to the integration option once."""
+
+        if self._window_label or not isinstance(raw, dict):
+            return
+        raw_schedules = raw.get("schedules")
+        if not isinstance(raw_schedules, list):
+            return
+        labels = sorted(
+            {
+                item.get("window_label", "").strip()
+                for item in raw_schedules
+                if isinstance(item, dict)
+                and isinstance(item.get("window_label"), str)
+                and item["window_label"].strip()
+            }
+        )
+        if not labels:
+            return
+        self._window_label = labels[0]
+        if len(labels) > 1:
+            _LOGGER.warning(
+                "Multiple legacy window labels found; using %s as the central label",
+                self._window_label,
+            )
+        if self._config_entry is not None:
+            options = dict(self._config_entry.options)
+            options[CONF_WINDOW_LABEL] = self._window_label
+            self.hass.config_entries.async_update_entry(self._config_entry, options=options)
 
     async def async_shutdown(self) -> None:
         self._started = False
@@ -305,7 +348,6 @@ class PlannerRuntime:
             next_events[schedule["id"]] = next_event.isoformat() if next_event else None
             weeks[schedule["id"]] = week_view(schedule, modes, now)
         climate_entities = await self._async_climate_entities()
-        window_labels = await self._async_window_labels()
         window_status = {
             schedule["id"]: {
                 "open_entity_ids": sorted(
@@ -325,7 +367,6 @@ class PlannerRuntime:
             "timezone": self.hass.config.time_zone,
             "ready": self._started,
             "climate_entities": climate_entities,
-            "window_labels": window_labels,
             "window_status": window_status,
         }
 
@@ -713,27 +754,6 @@ class PlannerRuntime:
             return False
         return None
 
-    async def _async_window_labels(self) -> list[dict[str, str]]:
-        """Return available Home Assistant labels for the panel selector."""
-
-        try:
-            registry = lr.async_get(self.hass)
-            entries = registry.async_list_labels()
-        except Exception:  # noqa: BLE001
-            _LOGGER.debug("Could not load Home Assistant labels", exc_info=True)
-            return []
-        return sorted(
-            (
-                {
-                    "id": entry.label_id,
-                    "name": entry.name,
-                }
-                for entry in entries
-                if getattr(entry, "label_id", None) and getattr(entry, "name", None)
-            ),
-            key=lambda item: (item["name"].casefold(), item["id"]),
-        )
-
     async def _async_refresh_window_tracking(self) -> None:
         """Resolve labelled windows to climate entities by Home Assistant area."""
 
@@ -763,7 +783,7 @@ class PlannerRuntime:
         for schedule in self.data["schedules"]:
             schedule_id = schedule["id"]
             schedule_overrides: dict[str, bool] = {}
-            label_id = schedule.get("window_label")
+            label_id = self._window_label
             if not label_id:
                 self._window_overrides[schedule_id] = schedule_overrides
                 continue

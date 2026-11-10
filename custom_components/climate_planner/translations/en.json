@@ -17,7 +17,10 @@
     "step": {
       "init": {
         "title": "Climate Planner",
-        "description": "Planner data is managed in the Climate Planner panel."
+        "description": "Choose the central Home Assistant label for window-open detection. It applies to all heating plans; the setback temperature is configured per plan.",
+        "data": {
+          "window_label": "Window label"
+        }
       }
     }
   }

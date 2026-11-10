@@ -130,6 +130,12 @@ async def _async_register_services(hass: HomeAssistant) -> None:
     )
 
 
+async def _async_options_updated(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload the runtime when integration-wide options change."""
+
+    await hass.config_entries.async_reload(entry.entry_id)
+
+
 async def _async_setup_panel(hass: HomeAssistant, data: dict) -> None:
     """Register the sidebar panel when it is not currently present."""
 
@@ -174,10 +180,16 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await _async_setup_panel(hass, hass.data[DOMAIN])
     await _async_register_services(hass)
-    runtime = PlannerRuntime(hass, entry.entry_id)
+    runtime = PlannerRuntime(
+        hass,
+        entry.entry_id,
+        options=entry.options,
+        config_entry=entry,
+    )
     await runtime.async_start()
     entry.runtime_data = runtime
     hass.data[DOMAIN]["runtime"] = runtime
+    entry.async_on_unload(entry.add_update_listener(_async_options_updated))
     _remove_legacy_planner_device(hass, entry.entry_id)
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     return True

@@ -20,7 +20,6 @@ DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ENTITY_PATTERN = re.compile(r"^climate\.[a-z0-9_]+$")
 COLOR_PATTERN = re.compile(r"^#[0-9a-fA-F]{6}$")
 ICON_PATTERN = re.compile(r"^mdi:[a-z0-9-]+$")
-LABEL_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$")
 
 
 class InvalidData(ValueError):
@@ -273,9 +272,9 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
         raise InvalidData("invalid_assignments")
     assignment_ids: set[str] = set()
     phase_ids: set[str] = set()
-    window_label = _optional_text(
-        raw.get("window_label"), "invalid_window_label", pattern=LABEL_PATTERN
-    )
+    # `window_label` was briefly stored per schedule. Keep accepting this
+    # legacy key so existing snapshots can be normalized and rewritten, but
+    # use the integration-wide config-entry option instead.
     window_open_temperature = _temperature(
         raw.get("window_open_temperature", DEFAULT_WINDOW_OPEN_TEMPERATURE)
     )
@@ -289,8 +288,6 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
             _normalize_assignment(item, mode_ids, assignment_ids, phase_ids) for item in assignments
         ],
     }
-    if window_label:
-        result["window_label"] = window_label
     return result
 
 

@@ -65,13 +65,14 @@ erscheinen nur die tatsächlich ausgewählten Entitäten; die vollständige
 Entitätsliste mit Checkboxen wird nicht dauerhaft angezeigt. Beim Anlegen
 eines neuen Heizplans ist zunächst keine Entität vorausgewählt.
 
-Optional kann im Heizplan ein Home-Assistant-Label für Fensterkontakte gewählt
-werden. Für jede ausgewählte Climate-Entität werden nur Fenster mit diesem Label
-aus demselben Home-Assistant-Bereich berücksichtigt. Das ist auch bei einem
-Heizplan mit Climate-Entitäten aus mehreren Bereichen eindeutig: Ein offenes
-Fenster senkt nur die Climate-Entitäten desselben Bereichs ab. Die
-Absenktemperatur steht ebenfalls in den Heizplan-Grundeinstellungen und ist
-standardmäßig auf 18,5 °C gesetzt.
+In den Optionen des Climate-Planner-Config-Entries wird zentral ein
+Home-Assistant-Label für Fensterkontakte gewählt. Für jede ausgewählte
+Climate-Entität werden nur Fenster mit diesem Label aus demselben
+Home-Assistant-Bereich berücksichtigt. Das ist auch bei einem Heizplan mit
+Climate-Entitäten aus mehreren Bereichen eindeutig: Ein offenes Fenster senkt
+nur die Climate-Entitäten desselben Bereichs ab. Die Absenktemperatur wird je
+Heizplan eingestellt und ist standardmäßig auf 18,5 °C gesetzt. Ohne zentrales
+Fenster-Label ist die Fensterabsenkung deaktiviert.
 
 Mindestens ein sicher offenes Fenster löst nach fünf Sekunden die Absenkung aus.
 Sind alle zugeordneten Fenster sicher geschlossen, wird nach zehn Sekunden die

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 DOMAIN = "climate_planner"
 NAME = "Climate Planner"
-VERSION = "0.1.40"
+VERSION = "0.1.41"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = f"{DOMAIN}.planner"
@@ -12,6 +12,7 @@ RUNTIME_STORAGE_KEY = f"{DOMAIN}.runtime"
 DEFAULT_WINDOW_OPEN_TEMPERATURE = 18.5
 WINDOW_OPEN_DELAY_SECONDS = 5
 WINDOW_CLOSE_DELAY_SECONDS = 10
+CONF_WINDOW_LABEL = "window_label"
 PANEL_PATH = f"/{DOMAIN}-static"
 PANEL_NAME = "climate-planner"
 PANEL_ELEMENT = "climate-planner-panel"

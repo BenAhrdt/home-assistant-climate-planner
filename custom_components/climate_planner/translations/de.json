@@ -17,7 +17,10 @@
     "step": {
       "init": {
         "title": "Climate Planner",
-        "description": "Die Planner-Daten werden im Climate-Planner-Panel verwaltet."
+        "description": "Wähle das zentrale Home-Assistant-Label für die Fenster-offen-Erkennung. Es gilt für alle Heizpläne; die Absenktemperatur wird je Heizplan eingestellt.",
+        "data": {
+          "window_label": "Fenster-Label"
+        }
       }
     }
   }

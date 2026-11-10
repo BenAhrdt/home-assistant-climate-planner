@@ -8,6 +8,7 @@ from homeassistant.const import UnitOfTemperature
 
 import custom_components.climate_planner.runtime as runtime_module
 from custom_components.climate_planner.const import (
+    CONF_WINDOW_LABEL,
     SERVICE_APPLY_ENABLED_MATCHING,
     SERVICE_APPLY_ENABLED_MODE_MATCHING,
     SERVICE_APPLY_MATCHED,
@@ -171,12 +172,11 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
     payload["schedules"][0].update(
         {
             "climate_entity_ids": ["climate.living", "climate.bedroom"],
-            "window_label": "fenster",
             "window_open_temperature": 18.5,
         }
     )
     payload["schedules"][0].pop("climate_entity_id")
-    runtime = PlannerRuntime(fake_runtime, "entry")
+    runtime = PlannerRuntime(fake_runtime, "entry", options={CONF_WINDOW_LABEL: "fenster"})
     await runtime.async_start()
     await runtime.async_replace(
         {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]

@@ -60,13 +60,13 @@ def test_legacy_single_climate_entity_is_migrated_to_list():
     assert normalized["modes"][0]["priority"] == 0
 
 
-def test_window_settings_use_a_default_and_are_preserved():
+def test_window_setback_temperature_is_preserved_and_legacy_label_is_removed():
     value = planner()
     value["schedules"][0].update({"window_label": "fenster", "window_open_temperature": 18.5})
 
     normalized = validate_planner(value)
 
-    assert normalized["schedules"][0]["window_label"] == "fenster"
+    assert "window_label" not in normalized["schedules"][0]
     assert normalized["schedules"][0]["window_open_temperature"] == 18.5
     assert validate_planner(planner())["schedules"][0]["window_open_temperature"] == 18.5
 
