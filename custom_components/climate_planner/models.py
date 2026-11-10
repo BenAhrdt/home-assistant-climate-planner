@@ -12,7 +12,7 @@ from copy import deepcopy
 from datetime import date
 from uuid import uuid4
 
-from .const import STORAGE_VERSION, WEEKDAYS
+from .const import DEFAULT_WINDOW_OPEN_TEMPERATURE, STORAGE_VERSION, WEEKDAYS
 
 ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$")
 TIME_PATTERN = re.compile(r"^(?:[01]\d|2[0-3]):[0-5]\d$")
@@ -20,6 +20,7 @@ DATE_PATTERN = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 ENTITY_PATTERN = re.compile(r"^climate\.[a-z0-9_]+$")
 COLOR_PATTERN = re.compile(r"^#[0-9a-fA-F]{6}$")
 ICON_PATTERN = re.compile(r"^mdi:[a-z0-9-]+$")
+LABEL_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$")
 
 
 class InvalidData(ValueError):
@@ -241,6 +242,8 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
         "name",
         "climate_entity_id",
         "climate_entity_ids",
+        "window_label",
+        "window_open_temperature",
         "enabled",
         "assignments",
     }:
@@ -270,15 +273,25 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
         raise InvalidData("invalid_assignments")
     assignment_ids: set[str] = set()
     phase_ids: set[str] = set()
-    return {
+    window_label = _optional_text(
+        raw.get("window_label"), "invalid_window_label", pattern=LABEL_PATTERN
+    )
+    window_open_temperature = _temperature(
+        raw.get("window_open_temperature", DEFAULT_WINDOW_OPEN_TEMPERATURE)
+    )
+    result = {
         "id": schedule_id,
         "name": _string(raw.get("name"), "invalid_schedule_name"),
         "climate_entity_ids": entity_ids,
+        "window_open_temperature": window_open_temperature,
         "enabled": _bool(raw.get("enabled"), "invalid_schedule_enabled"),
         "assignments": [
             _normalize_assignment(item, mode_ids, assignment_ids, phase_ids) for item in assignments
         ],
     }
+    if window_label:
+        result["window_label"] = window_label
+    return result
 
 
 def validate_planner(raw: object) -> dict:

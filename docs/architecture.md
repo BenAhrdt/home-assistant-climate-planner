@@ -58,6 +58,8 @@ Planner
     ├── id
     ├── name
     ├── climate_entity_ids[]    # eine oder mehrere climate.<object_id>
+    ├── window_label?           # HA-Label für Fensterkontakte
+    ├── window_open_temperature # Absenktemperatur bei offenem Fenster in °C
     ├── enabled
     └── assignments[]
         ├── id
@@ -174,6 +176,19 @@ Beim Übergang eines Heizplans von pausiert zu aktiviert wird ein vorhandener
 manueller Override beendet, der zu diesem Zeitpunkt passende Zeitplan-Mode
 sofort ausgewertet und dessen Sollwert erneut angewendet. Dies gilt für das
 Panel und den Home-Assistant-Switch gleichermaßen.
+
+Für die Fensterabsenkung wählt ein Heizplan optional ein Home-Assistant-Label
+für die zu berücksichtigenden Fensterkontakte und eine Absenktemperatur
+(Standard: 18,5 °C). Ein Fensterkontakt wird nur dann einer Climate-Entität
+zugeordnet, wenn beide im selben Home-Assistant-Bereich liegen. Dadurch können
+Climate-Entitäten aus mehreren Bereichen im selben Heizplan unabhängig
+behandelt werden. Mindestens ein sicher offener Kontakt im Bereich löst nach
+fünf Sekunden die Absenkung aus; erst wenn alle Kontakte sicher geschlossen
+sind, wird nach zehn Sekunden die Temperatur des aktuell aktiven Modes wieder
+angewendet. Unbekannte oder nicht verfügbare Kontakte lösen keine neue
+Umschaltung aus und halten den bisherigen effektiven Zustand. Ein Modewechsel
+ändert die Absenkung nicht, aktualisiert aber den Mode, dessen Temperatur beim
+Schließen wiederhergestellt wird.
 
 Sommer- und Winterzeit werden durch die lokale Home-Assistant-Zeitzone und
 aware `datetime`-Werte berücksichtigt. Ein ungültiger oder nicht vorhandener

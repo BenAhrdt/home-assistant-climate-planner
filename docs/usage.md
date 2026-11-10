@@ -65,6 +65,22 @@ erscheinen nur die tatsächlich ausgewählten Entitäten; die vollständige
 Entitätsliste mit Checkboxen wird nicht dauerhaft angezeigt. Beim Anlegen
 eines neuen Heizplans ist zunächst keine Entität vorausgewählt.
 
+Optional kann im Heizplan ein Home-Assistant-Label für Fensterkontakte gewählt
+werden. Für jede ausgewählte Climate-Entität werden nur Fenster mit diesem Label
+aus demselben Home-Assistant-Bereich berücksichtigt. Das ist auch bei einem
+Heizplan mit Climate-Entitäten aus mehreren Bereichen eindeutig: Ein offenes
+Fenster senkt nur die Climate-Entitäten desselben Bereichs ab. Die
+Absenktemperatur steht ebenfalls in den Heizplan-Grundeinstellungen und ist
+standardmäßig auf 18,5 °C gesetzt.
+
+Mindestens ein sicher offenes Fenster löst nach fünf Sekunden die Absenkung aus.
+Sind alle zugeordneten Fenster sicher geschlossen, wird nach zehn Sekunden die
+Temperatur des aktuell aktiven Modes wiederhergestellt. Unbekannte oder nicht
+verfügbare Fensterzustände lösen keine neue Umschaltung aus; der bisherige
+effektive Zustand bleibt erhalten. Ein Modewechsel während eines offenen
+Fensters hält die Absenkung aufrecht und wird beim späteren Schließen
+berücksichtigt.
+
 Mit dem Duplizieren-Symbol rechts oben, direkt unter Play/Pause, wird ein
 vollständiger Heizplan einschließlich Klima-Entitäten, Mode-Zuordnungen,
 Wochenphasen und lokalen Temperaturwerten kopiert. Heizplan, Zuordnungen und

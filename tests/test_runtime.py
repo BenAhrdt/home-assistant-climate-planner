@@ -132,6 +132,85 @@ async def test_initial_evaluation_applies_temperature_once(fake_runtime):
 
 
 @pytest.mark.asyncio
+async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, monkeypatch):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    fake_runtime.states.values["climate.bedroom"] = SimpleNamespace(state="heat")
+    fake_runtime.states.values["binary_sensor.living_window"] = SimpleNamespace(
+        entity_id="binary_sensor.living_window", state="off"
+    )
+    entries = {
+        "climate.living": SimpleNamespace(area_id="living", device_id=None, labels=set()),
+        "climate.bedroom": SimpleNamespace(area_id="bedroom", device_id=None, labels=set()),
+        "binary_sensor.living_window": SimpleNamespace(
+            area_id="living", device_id=None, labels={"fenster"}
+        ),
+    }
+    monkeypatch.setattr(
+        runtime_module.er,
+        "async_get",
+        lambda _hass: SimpleNamespace(async_get=entries.get),
+    )
+    monkeypatch.setattr(
+        runtime_module.dr,
+        "async_get",
+        lambda _hass: SimpleNamespace(async_get=lambda _device_id: None),
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "async_track_state_change_event",
+        lambda *_args, **_kwargs: lambda: None,
+    )
+    delayed = []
+
+    def fake_call_later(_hass, delay, callback):
+        delayed.append((delay, callback))
+        return lambda: None
+
+    monkeypatch.setattr(runtime_module, "async_call_later", fake_call_later)
+    payload = planner_payload()
+    payload["schedules"][0].update(
+        {
+            "climate_entity_ids": ["climate.living", "climate.bedroom"],
+            "window_label": "fenster",
+            "window_open_temperature": 18.5,
+        }
+    )
+    payload["schedules"][0].pop("climate_entity_id")
+    runtime = PlannerRuntime(fake_runtime, "entry")
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
+
+    fake_runtime.states.values["binary_sensor.living_window"].state = "on"
+    await runtime._async_window_state_changed(
+        SimpleNamespace(data={"entity_id": "binary_sensor.living_window"})
+    )
+    assert delayed[-1][0] == 5
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
+    await delayed[-1][1](datetime.now(tz=ZONE))
+    assert {call[2]["temperature"] for call in fake_runtime.services.calls[-2:]} == {18.5, 21.0}
+    assert runtime._window_overrides["schedule_living"]["climate.living"] is True
+    assert "climate.bedroom" not in runtime._window_overrides["schedule_living"]
+
+    fake_runtime.states.values["binary_sensor.living_window"].state = "unavailable"
+    await runtime._async_window_state_changed(
+        SimpleNamespace(data={"entity_id": "binary_sensor.living_window"})
+    )
+    assert runtime._window_overrides["schedule_living"]["climate.living"] is True
+
+    fake_runtime.states.values["binary_sensor.living_window"].state = "off"
+    await runtime._async_window_state_changed(
+        SimpleNamespace(data={"entity_id": "binary_sensor.living_window"})
+    )
+    assert delayed[-1][0] == 10
+    await delayed[-1][1](datetime.now(tz=ZONE))
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
 async def test_service_temperature_uses_home_assistant_unit(fake_runtime):
     fake_runtime.config.units.temperature_unit = UnitOfTemperature.FAHRENHEIT
     fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")

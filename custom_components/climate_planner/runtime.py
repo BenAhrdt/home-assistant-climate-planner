@@ -21,13 +21,19 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import area_registry as ar
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
-from homeassistant.helpers.event import async_track_point_in_time
+from homeassistant.helpers import label_registry as lr
+from homeassistant.helpers.event import (
+    async_call_later,
+    async_track_point_in_time,
+    async_track_state_change_event,
+)
 from homeassistant.helpers.storage import Store
 from homeassistant.loader import async_get_integrations
 from homeassistant.util import dt as dt_util
 from homeassistant.util.unit_conversion import TemperatureConverter
 
 from .const import (
+    DEFAULT_WINDOW_OPEN_TEMPERATURE,
     EVENT_UPDATED,
     RUNTIME_STORAGE_KEY,
     SERVICE_APPLY_ENABLED_MATCHING,
@@ -36,6 +42,8 @@ from .const import (
     SERVICE_SET_TEMPERATURE,
     STORAGE_KEY,
     STORAGE_VERSION,
+    WINDOW_CLOSE_DELAY_SECONDS,
+    WINDOW_OPEN_DELAY_SECONDS,
 )
 from .engine import (
     ActiveMatch,
@@ -73,9 +81,15 @@ class PlannerRuntime:
         self.active: dict[str, ActiveMatch | None] = {}
         self._manual_overrides: dict[str, dict[str, Any]] = {}
         self._auto_date_actions: dict[str, str] = {}
-        self._applied: dict[str, tuple[str, float, tuple[str, ...]] | None] = {}
+        self._applied: dict[str, tuple | None] = {}
         self._last_activated: dict[str, dict[str, Any]] = {}
         self._timer_unsub = None
+        self._window_unsub = None
+        self._window_registry_unsubs = []
+        self._window_entity_targets: dict[str, set[tuple[str, str]]] = {}
+        self._window_target_entities: dict[tuple[str, str], set[str]] = {}
+        self._window_overrides: dict[str, dict[str, bool]] = {}
+        self._window_pending: dict[tuple[str, str], tuple[bool, Any]] = {}
         self._data_lock = asyncio.Lock()
         self._evaluation_lock = asyncio.Lock()
         self._started = False
@@ -93,6 +107,8 @@ class PlannerRuntime:
             await self.store.async_save(self.data)
         await self._async_restore_runtime_state()
         self._started = True
+        self._setup_window_registry_listeners()
+        await self._async_refresh_window_tracking()
         await self.async_evaluate()
 
     async def async_shutdown(self) -> None:
@@ -101,6 +117,11 @@ class PlannerRuntime:
         self._auto_date_actions.clear()
         self._last_activated.clear()
         self._clear_timer()
+        self._clear_window_tracking()
+        self._window_overrides.clear()
+        for unsubscribe in self._window_registry_unsubs:
+            unsubscribe()
+        self._window_registry_unsubs.clear()
 
     def _assignment_for_mode(
         self,
@@ -284,6 +305,17 @@ class PlannerRuntime:
             next_events[schedule["id"]] = next_event.isoformat() if next_event else None
             weeks[schedule["id"]] = week_view(schedule, modes, now)
         climate_entities = await self._async_climate_entities()
+        window_labels = await self._async_window_labels()
+        window_status = {
+            schedule["id"]: {
+                "open_entity_ids": sorted(
+                    entity_id
+                    for entity_id, is_open in self._window_overrides.get(schedule["id"], {}).items()
+                    if is_open
+                )
+            }
+            for schedule in schedules
+        }
         return {
             **clone_planner(self.data),
             "active": active,
@@ -293,6 +325,8 @@ class PlannerRuntime:
             "timezone": self.hass.config.time_zone,
             "ready": self._started,
             "climate_entities": climate_entities,
+            "window_labels": window_labels,
+            "window_status": window_status,
         }
 
     async def async_activate_mode(
@@ -375,6 +409,42 @@ class PlannerRuntime:
             self.data = normalized
         await self.async_evaluate()
 
+    @staticmethod
+    def _match_temperature(match: ActiveMatch) -> float:
+        """Return the mode or phase temperature before window adjustment."""
+
+        return float(
+            match.phase.get("target_temperature", match.mode["target_temperature"])
+            if isinstance(match.phase, dict)
+            else match.mode["target_temperature"]
+        )
+
+    def _effective_temperatures(self, schedule: dict, match: ActiveMatch) -> dict[str, float]:
+        """Return one effective target per climate entity in a heating plan."""
+
+        target_temperature = self._match_temperature(match)
+        window_temperature = float(
+            schedule.get("window_open_temperature", DEFAULT_WINDOW_OPEN_TEMPERATURE)
+        )
+        overrides = self._window_overrides.get(schedule["id"], {})
+        return {
+            entity_id: window_temperature if overrides.get(entity_id, False) else target_temperature
+            for entity_id in schedule["climate_entity_ids"]
+        }
+
+    @staticmethod
+    def _applied_signature(
+        match: ActiveMatch, schedule: dict, effective_temperatures: dict[str, float]
+    ) -> tuple:
+        """Build the transition signature including per-room window overrides."""
+
+        return (
+            match.mode["id"],
+            PlannerRuntime._match_temperature(match),
+            tuple(schedule["climate_entity_ids"]),
+            tuple(sorted(effective_temperatures.items())),
+        )
+
     async def async_apply_matching(self, action: str, schedule_id: str | None = None) -> int:
         """Explicitly apply the currently matching configured mode.
 
@@ -414,11 +484,7 @@ class PlannerRuntime:
                     respect_assignment_enabled=flags[1],
                 )
                 if match:
-                    target_temperature = (
-                        match.phase.get("target_temperature", match.mode["target_temperature"])
-                        if isinstance(match.phase, dict)
-                        else match.mode["target_temperature"]
-                    )
+                    target_temperature = self._match_temperature(match)
                     self._manual_overrides[schedule["id"]] = {
                         "mode_id": match.mode["id"],
                         "assignment_id": match.assignment["id"],
@@ -427,12 +493,13 @@ class PlannerRuntime:
                         "target_temperature": float(target_temperature),
                     }
                     self.active[schedule["id"]] = match
-                    if await self._apply_temperature(schedule, match):
+                    effective_temperatures = self._effective_temperatures(schedule, match)
+                    if await self._apply_temperature(
+                        schedule, match, effective_temperatures, record_activation=True
+                    ):
                         applied += 1
-                        self._applied[schedule["id"]] = (
-                            match.mode["id"],
-                            float(target_temperature),
-                            tuple(schedule["climate_entity_ids"]),
+                        self._applied[schedule["id"]] = self._applied_signature(
+                            match, schedule, effective_temperatures
                         )
                     else:
                         self._applied[schedule["id"]] = None
@@ -553,6 +620,7 @@ class PlannerRuntime:
                 if schedule["enabled"] and previous_enabled.get(schedule["id"]) is False:
                     self._manual_overrides.pop(schedule["id"], None)
                     self._applied[schedule["id"]] = None
+        await self._async_refresh_window_tracking()
         await self.async_evaluate()
         return self.data["revision"]
 
@@ -560,6 +628,218 @@ class PlannerRuntime:
         if self._timer_unsub:
             self._timer_unsub()
             self._timer_unsub = None
+
+    def _clear_window_tracking(self) -> None:
+        """Cancel window listeners and delayed open/close transitions."""
+
+        if self._window_unsub:
+            self._window_unsub()
+            self._window_unsub = None
+        for _desired, unsubscribe in self._window_pending.values():
+            unsubscribe()
+        self._window_pending.clear()
+        self._window_entity_targets.clear()
+        self._window_target_entities.clear()
+
+    def _setup_window_registry_listeners(self) -> None:
+        """Refresh area and label matching when Home Assistant registries change."""
+
+        if self._window_registry_unsubs:
+            return
+        for event_type in (
+            er.EVENT_ENTITY_REGISTRY_UPDATED,
+            dr.EVENT_DEVICE_REGISTRY_UPDATED,
+            lr.EVENT_LABEL_REGISTRY_UPDATED,
+        ):
+            try:
+                self._window_registry_unsubs.append(
+                    self.hass.bus.async_listen(event_type, self._async_window_registry_changed)
+                )
+            except Exception:  # noqa: BLE001
+                _LOGGER.debug("Could not listen for Home Assistant registry updates", exc_info=True)
+
+    async def _async_window_registry_changed(self, _event) -> None:
+        """Rebuild window matching after an area, device, or label change."""
+
+        await self._async_refresh_window_tracking()
+        await self.async_evaluate()
+
+    @staticmethod
+    def _registry_area_id(entity_id: str, entity_registry, device_registry) -> str | None:
+        """Resolve an entity's explicit or device area without assuming either exists."""
+
+        try:
+            entry = entity_registry.async_get(entity_id)
+        except Exception:  # noqa: BLE001
+            entry = None
+        area_id = getattr(entry, "area_id", None) if entry else None
+        device_id = getattr(entry, "device_id", None) if entry else None
+        if not area_id and device_id:
+            try:
+                device = device_registry.async_get(device_id)
+            except Exception:  # noqa: BLE001
+                device = None
+            area_id = getattr(device, "area_id", None) if device else None
+        return area_id
+
+    @staticmethod
+    def _registry_labels(entity_id: str, entity_registry, device_registry) -> set[str]:
+        """Return labels assigned directly to an entity or to its device."""
+
+        try:
+            entry = entity_registry.async_get(entity_id)
+        except Exception:  # noqa: BLE001
+            entry = None
+        labels = set(getattr(entry, "labels", ()) or ()) if entry else set()
+        device_id = getattr(entry, "device_id", None) if entry else None
+        if device_id:
+            try:
+                device = device_registry.async_get(device_id)
+            except Exception:  # noqa: BLE001
+                device = None
+            if device:
+                labels.update(getattr(device, "labels", ()) or ())
+        return labels
+
+    def _window_aggregate_state(self, entity_ids: set[str]) -> bool | None:
+        """Return open, closed, or unknown for all window sensors of one climate."""
+
+        if not entity_ids:
+            return False
+        states = [self.hass.states.get(entity_id) for entity_id in entity_ids]
+        if any(getattr(state, "state", None) == "on" for state in states):
+            return True
+        if all(getattr(state, "state", None) == "off" for state in states):
+            return False
+        return None
+
+    async def _async_window_labels(self) -> list[dict[str, str]]:
+        """Return available Home Assistant labels for the panel selector."""
+
+        try:
+            registry = lr.async_get(self.hass)
+            entries = registry.async_list_labels()
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("Could not load Home Assistant labels", exc_info=True)
+            return []
+        return sorted(
+            (
+                {
+                    "id": entry.label_id,
+                    "name": entry.name,
+                }
+                for entry in entries
+                if getattr(entry, "label_id", None) and getattr(entry, "name", None)
+            ),
+            key=lambda item: (item["name"].casefold(), item["id"]),
+        )
+
+    async def _async_refresh_window_tracking(self) -> None:
+        """Resolve labelled windows to climate entities by Home Assistant area."""
+
+        previous_overrides = self._window_overrides
+        self._clear_window_tracking()
+        self._window_overrides = {}
+        try:
+            entity_registry = er.async_get(self.hass)
+            device_registry = dr.async_get(self.hass)
+            window_states = self.hass.states.async_all("binary_sensor")
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("Could not initialize window tracking", exc_info=True)
+            return
+
+        window_metadata = {}
+        for state in window_states:
+            entity_id = getattr(state, "entity_id", None)
+            if not entity_id:
+                continue
+            area_id = self._registry_area_id(entity_id, entity_registry, device_registry)
+            if area_id:
+                window_metadata[entity_id] = (
+                    area_id,
+                    self._registry_labels(entity_id, entity_registry, device_registry),
+                )
+
+        for schedule in self.data["schedules"]:
+            schedule_id = schedule["id"]
+            schedule_overrides: dict[str, bool] = {}
+            label_id = schedule.get("window_label")
+            if not label_id:
+                self._window_overrides[schedule_id] = schedule_overrides
+                continue
+            for climate_entity_id in schedule["climate_entity_ids"]:
+                climate_area_id = self._registry_area_id(
+                    climate_entity_id, entity_registry, device_registry
+                )
+                if not climate_area_id:
+                    continue
+                matching_windows = {
+                    entity_id
+                    for entity_id, (area_id, labels) in window_metadata.items()
+                    if area_id == climate_area_id and label_id in labels
+                }
+                if not matching_windows:
+                    continue
+                target = (schedule_id, climate_entity_id)
+                self._window_target_entities[target] = matching_windows
+                for window_entity_id in matching_windows:
+                    self._window_entity_targets.setdefault(window_entity_id, set()).add(target)
+                aggregate = self._window_aggregate_state(matching_windows)
+                schedule_overrides[climate_entity_id] = (
+                    previous_overrides.get(schedule_id, {}).get(climate_entity_id, False)
+                    if aggregate is None
+                    else aggregate
+                )
+            self._window_overrides[schedule_id] = schedule_overrides
+
+        if self._window_entity_targets:
+            self._window_unsub = async_track_state_change_event(
+                self.hass,
+                list(self._window_entity_targets),
+                self._async_window_state_changed,
+            )
+
+    async def _async_window_state_changed(self, event) -> None:
+        """Debounce a changed labelled window before reapplying temperatures."""
+
+        entity_id = event.data.get("entity_id")
+        for target in self._window_entity_targets.get(entity_id, set()):
+            self._schedule_window_transition(target)
+
+    def _schedule_window_transition(self, target: tuple[str, str]) -> None:
+        """Schedule a delayed aggregate open/close change for one climate entity."""
+
+        schedule_id, climate_entity_id = target
+        matching_windows = self._window_target_entities.get(target, set())
+        desired = self._window_aggregate_state(matching_windows)
+        current = self._window_overrides.get(schedule_id, {}).get(climate_entity_id, False)
+        pending = self._window_pending.get(target)
+        if desired is None or desired == current:
+            if pending:
+                pending[1]()
+                self._window_pending.pop(target, None)
+            return
+        if pending and pending[0] == desired:
+            return
+        if pending:
+            pending[1]()
+        delay = WINDOW_OPEN_DELAY_SECONDS if desired else WINDOW_CLOSE_DELAY_SECONDS
+
+        async def apply_transition(_when) -> None:
+            active_pending = self._window_pending.get(target)
+            if not active_pending or active_pending[0] != desired:
+                return
+            self._window_pending.pop(target, None)
+            if (
+                self._window_aggregate_state(self._window_target_entities.get(target, set()))
+                != desired
+            ):
+                return
+            self._window_overrides.setdefault(schedule_id, {})[climate_entity_id] = desired
+            await self.async_evaluate()
+
+        unsubscribe = async_call_later(self.hass, delay, apply_transition)
+        self._window_pending[target] = (desired, unsubscribe)
 
     async def _async_apply_due_auto_dates(self, now: datetime) -> None:
         """Apply each reached assignment auto-date event once."""
@@ -641,19 +921,18 @@ class PlannerRuntime:
                         next_points.append(upcoming)
                 desired = None
                 if match and (schedule["enabled"] or override):
-                    target_temperature = (
-                        match.phase.get("target_temperature", match.mode["target_temperature"])
-                        if isinstance(match.phase, dict)
-                        else match.mode["target_temperature"]
-                    )
-                    desired = (
-                        match.mode["id"],
-                        float(target_temperature),
-                        tuple(schedule["climate_entity_ids"]),
-                    )
+                    effective_temperatures = self._effective_temperatures(schedule, match)
+                    desired = self._applied_signature(match, schedule, effective_temperatures)
                 if desired != self._applied.get(schedule["id"]):
                     if desired:
-                        await self._apply_temperature(schedule, match)
+                        previous = self._applied.get(schedule["id"])
+                        record_activation = previous is None or previous[:3] != desired[:3]
+                        await self._apply_temperature(
+                            schedule,
+                            match,
+                            effective_temperatures,
+                            record_activation=record_activation,
+                        )
                     self._applied[schedule["id"]] = desired
             configured_ids = {schedule["id"] for schedule in self.data["schedules"]}
             for schedule_id in set(self._applied) - configured_ids:
@@ -688,7 +967,14 @@ class PlannerRuntime:
         self._timer_unsub = None
         await self.async_evaluate()
 
-    async def _apply_temperature(self, schedule: dict, match: ActiveMatch) -> bool:
+    async def _apply_temperature(
+        self,
+        schedule: dict,
+        match: ActiveMatch,
+        effective_temperatures: dict[str, float],
+        *,
+        record_activation: bool,
+    ) -> bool:
         entity_ids = schedule["climate_entity_ids"]
         available_entity_ids = [
             entity_id
@@ -709,41 +995,43 @@ class PlannerRuntime:
                 "temperature_unit",
                 UnitOfTemperature.CELSIUS,
             )
-            target_temperature = (
-                match.phase.get("target_temperature", match.mode["target_temperature"])
-                if isinstance(match.phase, dict)
-                else match.mode["target_temperature"]
-            )
-            service_temperature = TemperatureConverter.convert(
-                float(target_temperature),
-                UnitOfTemperature.CELSIUS,
-                target_unit,
-            )
-            await self.hass.services.async_call(
-                CLIMATE_DOMAIN,
-                SERVICE_SET_TEMPERATURE,
-                {ATTR_TEMPERATURE: service_temperature},
-                target={
-                    ATTR_ENTITY_ID: (
-                        available_entity_ids[0]
-                        if len(available_entity_ids) == 1
-                        else available_entity_ids
-                    )
-                },
-                blocking=True,
-            )
-            self._last_activated[schedule["id"]] = {
-                "mode_id": match.mode["id"],
-                "mode_name": match.mode["name"],
-                "assignment_id": match.assignment["id"],
-                "phase_id": match.phase.get("id") if isinstance(match.phase, dict) else None,
-                "target_temperature": float(target_temperature),
-                "activated_at": self._now().isoformat(),
-            }
-            try:
-                await self._async_save_runtime_state()
-            except Exception:  # noqa: BLE001
-                _LOGGER.warning("Climate Planner could not persist runtime state", exc_info=True)
+            grouped_entity_ids: dict[float, list[str]] = {}
+            for entity_id in available_entity_ids:
+                target_temperature = float(effective_temperatures[entity_id])
+                grouped_entity_ids.setdefault(target_temperature, []).append(entity_id)
+            for target_temperature, target_entity_ids in grouped_entity_ids.items():
+                service_temperature = TemperatureConverter.convert(
+                    target_temperature,
+                    UnitOfTemperature.CELSIUS,
+                    target_unit,
+                )
+                await self.hass.services.async_call(
+                    CLIMATE_DOMAIN,
+                    SERVICE_SET_TEMPERATURE,
+                    {ATTR_TEMPERATURE: service_temperature},
+                    target={
+                        ATTR_ENTITY_ID: (
+                            target_entity_ids[0]
+                            if len(target_entity_ids) == 1
+                            else target_entity_ids
+                        )
+                    },
+                    blocking=True,
+                )
+            if record_activation:
+                target_temperature = self._match_temperature(match)
+                self._last_activated[schedule["id"]] = {
+                    "mode_id": match.mode["id"],
+                    "mode_name": match.mode["name"],
+                    "assignment_id": match.assignment["id"],
+                    "phase_id": match.phase.get("id") if isinstance(match.phase, dict) else None,
+                    "target_temperature": target_temperature,
+                    "activated_at": self._now().isoformat(),
+                }
+                try:
+                    await self._async_save_runtime_state()
+                except Exception:  # noqa: BLE001
+                    _LOGGER.warning("Climate Planner could not persist runtime state", exc_info=True)
             return True
         except Exception:
             _LOGGER.exception(
