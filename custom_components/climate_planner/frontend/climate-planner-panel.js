@@ -18,7 +18,7 @@ const labels = {
     addAssignment: "Mode hinzufügen", editAssignment: "Mode bearbeiten", editPhase: "Phase bearbeiten", usedModes: "Verwendete Modes", details: "Details öffnen", edit: "Bearbeiten", remove: "Löschen", save: "Speichern",
     cancel: "Abbrechen", name: "Name", temperature: "Zieltemperatur", priority: "Priorität", color: "Farbe (optional)",
     icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", enabled: "Aktiviert",
-    sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage", autoOnDate: "Auto ein (Datum)", autoOffDate: "Auto aus (Datum)",
+    sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage", addTime: "Weitere Zeit", autoOnDate: "Auto ein (Datum)", autoOffDate: "Auto aus (Datum)",
     time: "Uhrzeit", bulkTime: "Uhrzeit für ausgewählte Tage", weekday: "Wochentag", transition: "Übergang verschieben", phase: "Phase", duplicate: "Duplizieren", placeDuplicate: "Duplikat platzieren", duplicateTimeOccupied: "Eine Stunde vor diesem Mode liegt bereits ein Wechsel. Bitte eine andere Uhrzeit wählen.", duplicateNoRoom: "Vor diesem Mode ist nicht genug Platz für die Duplikatdauer. Der vorherige Mode behält mindestens eine Stunde.", selectAllDays: "Alle anwählen", clearAllDays: "Alle abwählen", copySuffix: "Kopie", defaultDuration: "Richtwert: 8 Stunden · letzter Block bis 24:00", drop: "Mode auf die Heizplankachel ziehen", dropTimeline: "Mode auf einen Tag und eine Uhrzeit ziehen · Richtwert 8 h · letzter Block bis 24:00 · Alt/Strg/Cmd = kopieren", chooseMode: "Mode direkt aktivieren", noModes: "Noch keine Modes angelegt.",
     noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode aktivieren", pauseMode: "Mode pausieren", targetRequestShort: "Soll", targetRequest: "Vom Climate Planner gesetzter Sollwert", currentShort: "Ist", next: "Nächster Wechsel",
     none: "Noch kein Mode aktiviert", connected: "Bereit", loading: "Wird geladen …",
@@ -35,7 +35,7 @@ const labels = {
     addMode: "Add mode", addSchedule: "Add heating plan", addAssignment: "Add mode", editAssignment: "Edit mode", editPhase: "Edit phase", usedModes: "Used modes", details: "Open details", edit: "Edit", remove: "Delete",
     save: "Save", cancel: "Cancel", name: "Name", temperature: "Target temperature", priority: "Priority", color: "Color (optional)",
     icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", enabled: "Enabled",
-    sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", autoOnDate: "Auto on (date)", autoOffDate: "Auto off (date)", time: "Time", bulkTime: "Time for selected days", weekday: "Weekday", transition: "Move transition", phase: "Phase", duplicate: "Duplicate", placeDuplicate: "Place duplicate", duplicateTimeOccupied: "There is already a change one hour before this mode. Choose another time.", duplicateNoRoom: "There is not enough room for the duplicate duration. The previous mode keeps at least one hour.", selectAllDays: "Select all", clearAllDays: "Clear all", copySuffix: "Copy", defaultDuration: "Guideline: 8 hours · last block until 24:00", dropTimeline: "Drag a mode onto a day and time · guideline 8 h · last block until 24:00 · Alt/Ctrl/Cmd = copy",
+    sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", addTime: "Add another time", autoOnDate: "Auto on (date)", autoOffDate: "Auto off (date)", time: "Time", bulkTime: "Time for selected days", weekday: "Weekday", transition: "Move transition", phase: "Phase", duplicate: "Duplicate", placeDuplicate: "Place duplicate", duplicateTimeOccupied: "There is already a change one hour before this mode. Choose another time.", duplicateNoRoom: "There is not enough room for the duplicate duration. The previous mode keeps at least one hour.", selectAllDays: "Select all", clearAllDays: "Clear all", copySuffix: "Copy", defaultDuration: "Guideline: 8 hours · last block until 24:00", dropTimeline: "Drag a mode onto a day and time · guideline 8 h · last block until 24:00 · Alt/Ctrl/Cmd = copy",
     drop: "Drop mode on the heating plan", chooseMode: "Activate mode directly", noModes: "No modes have been created yet.", noSchedules: "No heating plans have been created yet.",
     active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode", pauseMode: "Pause mode", targetRequestShort: "Target", targetRequest: "Target set by Climate Planner", currentShort: "Current", next: "Next change", none: "No mode activated yet", connected: "Ready", loading: "Loading …",
     saveError: "Save failed", conflict: "The data changed. Reloading the view.", invalid: "Please check the input.", localTemperature: "Override temperature for this phase", inherited: "Mode temperature",
@@ -176,6 +176,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.$("refresh").before(backButton);
     style.textContent += ".input-with-unit{display:flex;position:relative}.input-with-unit input{padding-right:42px}.unit-suffix{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--secondary-text-color);pointer-events:none}.color-controls{display:flex;align-items:center;gap:8px}.color-controls input[type=color]{width:48px;height:40px;padding:3px}.color-controls input[name=color_hex]{flex:1}.full ha-icon-picker{display:block;min-height:40px}.full input[name=icon_text]{margin-top:8px}.mode-icon{--mdc-icon-size:20px;flex:none}.climate-select{min-height:160px}.climate-select option{padding:5px}.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.summary-card{background:var(--card-background-color);border:1px solid var(--divider-color);border-radius:12px;padding:14px}.summary-card strong{display:block;font-size:24px;margin-top:4px}.schedule-card{cursor:pointer}.schedule-card.selected{border-color:var(--primary-color);box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 22%,transparent)}.phase-list{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}.phase-chip{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--divider-color);border-radius:999px;padding:5px 8px;background:var(--secondary-background-color);font-size:12px}.timeline-hint{margin:0 0 10px}.mode-palette{position:sticky;top:12px}.mode-palette .grid{grid-template-columns:1fr}.week-toolbar{display:flex;align-items:end;justify-content:space-between;gap:12px;flex-wrap:wrap}.week-toolbar label{min-width:260px}.segment{cursor:grab;transition:filter .15s,transform .15s}.segment:hover{filter:brightness(.97);transform:translateY(-1px)}.segment.dragging{opacity:.45}.day-track.drop-target{outline:3px dashed var(--primary-color);outline-offset:-4px;background-color:color-mix(in srgb,var(--primary-color) 8%,var(--card-background-color))}.segment .segment-icon{--mdc-icon-size:16px;vertical-align:middle;margin-right:3px}.climate-select option{white-space:normal}@media(max-width:1100px){main{display:block!important}.mode-palette{position:static}.summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.summary-grid{grid-template-columns:1fr}.form-grid,.time-fields{grid-template-columns:1fr}.days{grid-template-columns:repeat(2,1fr)}.full{grid-column:auto}}";
     style.textContent += ".week-toolbar{margin-bottom:16px}";
+    style.textContent += ".auto-date-grid{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.mode-day-add-time{width:100%;padding:5px 8px;border:1px dashed var(--divider-color);color:var(--secondary-text-color);background:transparent;font-size:12px;line-height:1}.mode-day-add-time:not(:disabled):hover{border-color:var(--primary-color);color:var(--primary-text-color);background:color-mix(in srgb,var(--primary-color) 8%,transparent)}.mode-day-add-time:disabled{cursor:not-allowed}@media(max-width:700px){.auto-date-grid{grid-template-columns:1fr}}";
     style.textContent += ".week-mode-chip[draggable=true]{cursor:grab}.week-mode-chip[draggable=true].dragging{opacity:.55}.mode-day-actions{display:flex;gap:7px;flex-wrap:wrap;margin:0 0 8px}.mode-day-actions button{padding:6px 9px;font-size:12px}";
     style.textContent += ".week-mode-chip-wrap{display:inline-flex;align-items:stretch}.week-mode-chip-wrap .week-mode-chip{border-radius:8px 0 0 8px}.week-mode-chip-toggle{padding:6px 8px;border-left:0;border-radius:0 8px 8px 0;line-height:1}.week-mode-chip.paused+.week-mode-chip-toggle{opacity:.65}";
     this.shadowRoot.querySelector("main").style.display = "grid";
@@ -457,7 +458,7 @@ class ClimatePlannerPanel extends HTMLElement {
         const toggle = admin ? `<button type="button" class="assignment-toggle" data-action="toggle-schedule-mode" data-schedule="${escapeHTML(schedule.id)}" data-id="${escapeHTML(mode.id)}" aria-pressed="${enabled}" aria-label="${escapeHTML(enabled ? this.t.pauseMode : this.t.activateMode)}" title="${escapeHTML(enabled ? this.t.pauseMode : this.t.activateMode)}">${enabled ? "⏸" : "▶"}</button>` : "";
         const settings = admin && assignmentId ? `<button type="button" class="assignment-settings" data-action="edit-assignment" data-schedule="${escapeHTML(schedule.id)}" data-id="${escapeHTML(assignmentId)}" aria-label="${escapeHTML(this.t.editAssignment)}" title="${escapeHTML(this.t.editAssignment)}"><ha-icon icon="mdi:cog-outline" aria-hidden="true"></ha-icon></button>` : "";
         const remove = admin && assignmentId ? `<button type="button" class="assignment-delete" data-action="delete-assignment" data-schedule="${escapeHTML(schedule.id)}" data-id="${escapeHTML(assignmentId)}" aria-label="${escapeHTML(this.t.deleteAssignment)}" title="${escapeHTML(this.t.remove)}"><ha-icon icon="mdi:trash-can-outline" aria-hidden="true"></ha-icon></button>` : "";
-        const tools = toggle || settings || remove ? `<div class="assignment-tools">${settings}${toggle}${remove}</div>` : "";
+        const tools = toggle || settings || remove ? `<div class="assignment-tools">${toggle}${settings}${remove}</div>` : "";
         return `<div class="quick-mode-wrap ${selected ? "active" : ""} ${enabled ? "" : "paused"}"><button type="button" class="quick-mode" data-action="activate-mode" data-schedule="${escapeHTML(schedule.id)}" data-id="${escapeHTML(mode.id)}" ${admin ? "" : "disabled"}>${dot}${icon}<span class="quick-mode-copy"><strong>${escapeHTML(mode.name)}</strong><small>${escapeHTML(this.temperatureText(mode.target_temperature))}</small></span>${check}</button>${tools}</div>`;
       }).join("");
       const modeButtons = availableModes.length ? `<div class="quick-mode-title"><span>${this.t.chooseMode}</span></div><div class="quick-modes" aria-label="${escapeHTML(this.t.chooseMode)}">${modeButtonMarkup}</div>` : "";
@@ -1016,19 +1017,51 @@ class ClimatePlannerPanel extends HTMLElement {
       const checked = dayEntries.length > 0 || (!assignment && (!initialDay || day === initialDay));
       const timeEntries = dayEntries.length ? dayEntries : [{ phase: null }];
       const timeLabel = `${this.t[day]} ${this.t.time}`;
-      return `<div class="mode-day-card" data-mode-day="${escapeHTML(day)}"><label><input type="checkbox" data-day-enabled ${checked ? "checked" : ""}>${escapeHTML(this.t[day])}</label><div class="mode-day-times" data-day-times ${checked ? "" : "hidden"}>${timeEntries.map((entry) => `<input type="time" step="900" required data-day-time data-phase-id="${escapeHTML(entry.phase ? this.phaseId(entry.phase) : "")}" value="${escapeHTML(entry.phase ? this.phaseTime(entry.phase) : firstTime)}" aria-label="${escapeHTML(timeLabel)}" ${checked ? "" : "disabled"}>`).join("")}</div></div>`;
+      return `<div class="mode-day-card" data-mode-day="${escapeHTML(day)}"><label><input type="checkbox" data-day-enabled ${checked ? "checked" : ""}>${escapeHTML(this.t[day])}</label><div class="mode-day-times" data-day-times ${checked ? "" : "hidden"}>${timeEntries.map((entry) => `<input type="time" step="900" required data-day-time data-phase-id="${escapeHTML(entry.phase ? this.phaseId(entry.phase) : "")}" value="${escapeHTML(entry.phase ? this.phaseTime(entry.phase) : firstTime)}" aria-label="${escapeHTML(timeLabel)}" ${checked ? "" : "disabled"}>`).join("")}</div><button type="button" class="mode-day-add-time" data-add-day-time ${checked ? "" : "disabled"} aria-label="${escapeHTML(this.t.addTime)}" title="${escapeHTML(this.t.addTime)}">＋</button></div>`;
     }).join("");
     const dialog = this.$("dialog"); this.dialogKind = "assignment"; this.dialogContext = { scheduleId, assignmentId };
-    dialog.innerHTML = `<form method="dialog" class="dialog-form"><h2>${assignment ? this.t.editAssignment : this.t.addAssignment}</h2><div class="form-grid"><label>${this.t.modes}<select name="mode_id">${selectableModes.map((item) => `<option value="${escapeHTML(item.id)}" ${item.id === selectedMode.id ? "selected" : ""}>${escapeHTML(item.name)} · ${escapeHTML(this.temperatureText(item.target_temperature))}</option>`).join("")}</select></label><label>${this.t.bulkTime}<input name="bulk_time" type="time" required step="900" value="${escapeHTML(firstTime)}"><small class="muted">${this.t.defaultDuration}</small></label><label>${this.t.temperature}<input name="target_temperature" type="number" step="0.1" value="${sharedOverride == null ? "" : escapeHTML(this.displayTemperature(sharedOverride))}" placeholder="${escapeHTML(this.temperatureText(selectedMode.target_temperature))}"><small class="muted">${this.t.localTemperature}</small></label><label>${this.t.autoOnDate}<input name="auto_on_date" type="date" value="${escapeHTML(autoOnDate)}"></label><label>${this.t.autoOffDate}<input name="auto_off_date" type="date" value="${escapeHTML(autoOffDate)}"></label><fieldset class="full"><legend>${this.t.weekdays}</legend><div class="mode-day-actions"><button type="button" data-select-days="all">${escapeHTML(this.t.selectAllDays)}</button><button type="button" data-select-days="none">${escapeHTML(this.t.clearAllDays)}</button></div><div class="mode-day-grid">${dayMarkup}</div></fieldset></div><div class="dialog-actions"><button type="button" data-cancel>${this.t.cancel}</button><button class="primary" type="submit">${this.t.save}</button></div></form>`;
+    dialog.innerHTML = `<form method="dialog" class="dialog-form"><h2>${assignment ? this.t.editAssignment : this.t.addAssignment}</h2><div class="form-grid"><label>${this.t.modes}<select name="mode_id">${selectableModes.map((item) => `<option value="${escapeHTML(item.id)}" ${item.id === selectedMode.id ? "selected" : ""}>${escapeHTML(item.name)} · ${escapeHTML(this.temperatureText(item.target_temperature))}</option>`).join("")}</select></label><label>${this.t.bulkTime}<input name="bulk_time" type="time" required step="900" value="${escapeHTML(firstTime)}"><small class="muted">${this.t.defaultDuration}</small></label><label>${this.t.temperature}<input name="target_temperature" type="number" step="0.1" value="${sharedOverride == null ? "" : escapeHTML(this.displayTemperature(sharedOverride))}" placeholder="${escapeHTML(this.temperatureText(selectedMode.target_temperature))}"><small class="muted">${this.t.localTemperature}</small></label><div class="auto-date-grid"><label>${this.t.autoOnDate}<input name="auto_on_date" type="date" value="${escapeHTML(autoOnDate)}"></label><label>${this.t.autoOffDate}<input name="auto_off_date" type="date" value="${escapeHTML(autoOffDate)}"></label></div><fieldset class="full"><legend>${this.t.weekdays}</legend><div class="mode-day-actions"><button type="button" data-select-days="all">${escapeHTML(this.t.selectAllDays)}</button><button type="button" data-select-days="none">${escapeHTML(this.t.clearAllDays)}</button></div><div class="mode-day-grid">${dayMarkup}</div></fieldset></div><div class="dialog-actions"><button type="button" data-cancel>${this.t.cancel}</button><button class="primary" type="submit">${this.t.save}</button></div></form>`;
     const form = dialog.querySelector("form");
     const bulkTime = form.elements.bulk_time;
     const temperature = form.elements.target_temperature;
     let temperatureTouched = false;
+    const bindDayTimeInput = (input) => input.addEventListener("input", () => input.setCustomValidity(""));
+    const nextDayTime = (card) => {
+      const inputs = [...card.querySelectorAll("[data-day-time]")];
+      const used = new Set(inputs.map((input) => input.value).filter((value) => TIME_PATTERN.test(value)));
+      const values = [...used].map((value) => this.phaseMinutes({ time: value }));
+      const base = values.length ? Math.max(...values) + 60 : this.phaseMinutes({ time: bulkTime.value });
+      for (let offset = 0; offset < 96; offset += 1) {
+        const minutes = (base + offset * 15) % 1440;
+        const value = this.timeFromMinutes(minutes);
+        if (!used.has(value)) return value;
+      }
+      return "";
+    };
+    const addDayTime = (card) => {
+      if (!card?.querySelector("[data-day-enabled]")?.checked) return;
+      const value = nextDayTime(card);
+      if (!value) return;
+      const times = card.querySelector("[data-day-times]");
+      const input = document.createElement("input");
+      input.type = "time";
+      input.step = "900";
+      input.required = true;
+      input.dataset.dayTime = "";
+      input.dataset.phaseId = "";
+      input.value = value;
+      input.setAttribute("aria-label", `${this.t[card.dataset.modeDay]} ${this.t.time}`);
+      times.append(input);
+      bindDayTimeInput(input);
+      input.focus();
+    };
     const updateDayCard = (card, copyBulkTime = false) => {
       const checked = card.querySelector("[data-day-enabled]").checked;
       const times = card.querySelector("[data-day-times]");
+      const addButton = card.querySelector("[data-add-day-time]");
       const inputs = [...times.querySelectorAll("[data-day-time]")];
       times.hidden = !checked;
+      addButton.disabled = !checked;
       inputs.forEach((input, index) => {
         input.disabled = !checked;
         if (checked && copyBulkTime && index === 0) input.value = bulkTime.value;
@@ -1037,7 +1070,10 @@ class ClimatePlannerPanel extends HTMLElement {
     };
     dialog.querySelectorAll("[data-mode-day]").forEach((card) => {
       card.querySelector("[data-day-enabled]").addEventListener("change", () => updateDayCard(card));
-      card.querySelectorAll("[data-day-time]").forEach((input) => input.addEventListener("input", () => input.setCustomValidity("")));
+      card.querySelectorAll("[data-day-time]").forEach(bindDayTimeInput);
+    });
+    dialog.querySelectorAll("[data-add-day-time]").forEach((button) => {
+      button.addEventListener("click", () => addDayTime(button.closest("[data-mode-day]")));
     });
     dialog.querySelectorAll("[data-select-days]").forEach((button) => {
       button.addEventListener("click", () => {
