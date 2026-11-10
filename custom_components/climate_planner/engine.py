@@ -39,9 +39,7 @@ def _phase_time(phase: dict | str) -> str:
     return phase["time"] if isinstance(phase, dict) else phase
 
 
-def latest_auto_date_event(
-    assignment: dict, current_date: date
-) -> tuple[str, bool] | None:
+def latest_auto_date_event(assignment: dict, current_date: date) -> tuple[str, bool] | None:
     """Return the latest reached automatic enable/disable event.
 
     The assignment's persisted ``enabled`` value remains the manual/current
