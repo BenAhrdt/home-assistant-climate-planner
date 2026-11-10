@@ -89,7 +89,10 @@ ausgewählten Tage; später erneut ausgewählte Tage behalten ihre zuvor
 eingetragene Zeit. Bereits vorhandene mehrere Zeiten desselben Modes an einem
 Tag bleiben als getrennte Felder erhalten. Das Plus-Symbol unter den Zeiten
 eines Tages fügt eine weitere Zeit desselben Modes hinzu; beim Speichern wird
-sie als zusätzliche Phase dieses Wochentags angelegt. Wird eine bestehende Startzeit
+sie als zusätzliche Phase dieses Wochentags angelegt. Über das Papierkorb-Symbol
+können zusätzliche Zeiten wieder entfernt werden. Wird die letzte Zeit eines
+Tages entfernt, wird der Wochentag automatisch deaktiviert; beim erneuten
+Aktivieren wird wieder eine Zeit mit der Sammelzeit angelegt. Wird eine bestehende Startzeit
 verschoben, bleibt die bisherige Blockdauer erhalten und der unmittelbar
 folgende Wechsel wird entsprechend mitverschoben. Die verwendeten Modes neben
 der Heizplanauswahl sind ebenfalls ziehbar: Beim Ablegen auf einen Tag und eine
