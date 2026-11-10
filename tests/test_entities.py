@@ -2,7 +2,9 @@ from types import SimpleNamespace
 
 import pytest
 
+import custom_components.climate_planner.entity as entity_module
 from custom_components.climate_planner.button import ActivateAssignmentButton, ApplyMatchingButton
+from custom_components.climate_planner.entity import PlannerEntityManager
 from custom_components.climate_planner.models import validate_planner
 from custom_components.climate_planner.switch import (
     AssignmentEnabledSwitch,
@@ -96,6 +98,65 @@ def test_duplicate_assignments_get_distinct_concise_names():
 
     assert first_switch.name == "Home 1 automatic"
     assert second_button.name == "Home 2 activate"
+
+
+@pytest.mark.asyncio
+async def test_manager_removes_stale_schedule_entities_and_devices(monkeypatch):
+    registry_entries = [
+        SimpleNamespace(
+            domain="switch",
+            platform="climate_planner",
+            unique_id="entry_schedule_deleted_enabled",
+            entity_id="switch.deleted_automatic",
+        )
+    ]
+    removed_entities = []
+
+    class FakeEntityItems:
+        def get_entries_for_config_entry_id(self, _entry_id):
+            return registry_entries
+
+        def get_entries_for_device_id(self, _device_id, include_disabled_entities=False):
+            return []
+
+    class FakeEntityRegistry:
+        entities = FakeEntityItems()
+
+        def async_remove(self, entity_id):
+            removed_entities.append(entity_id)
+
+    schedule_device = SimpleNamespace(
+        id="device-deleted",
+        identifiers={("climate_planner", "entry_schedule_deleted")},
+    )
+    planner_device = SimpleNamespace(
+        id="device-planner",
+        identifiers={("climate_planner", "entry")},
+    )
+    removed_devices = []
+
+    class FakeDeviceItems:
+        def get_devices_for_config_entry_id(self, _entry_id):
+            return [schedule_device, planner_device]
+
+    class FakeDeviceRegistry:
+        devices = FakeDeviceItems()
+
+        def async_remove_device(self, device_id):
+            removed_devices.append(device_id)
+
+    monkeypatch.setattr(entity_module.er, "async_get", lambda _hass: FakeEntityRegistry())
+    monkeypatch.setattr(entity_module.dr, "async_get", lambda _hass: FakeDeviceRegistry())
+
+    manager = PlannerEntityManager(
+        SimpleNamespace(), SimpleNamespace(), "entry", "switch", lambda _entities: None
+    )
+    manager._known.add("entry_schedule_deleted_enabled")
+    await manager._async_remove_stale(set())
+
+    assert removed_entities == ["switch.deleted_automatic"]
+    assert removed_devices == ["device-deleted"]
+    assert not manager._known
 
 
 @pytest.mark.asyncio

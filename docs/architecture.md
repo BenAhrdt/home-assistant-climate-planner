@@ -16,7 +16,9 @@ Feedback-Regelkreise sind nicht Bestandteil dieser Integration.
 - Die zentrale Config Entry erzeugt ein separates Home-Assistant-Gerät pro
   Heizplan. Modes bleiben gemeinsame Planner-Daten; Heizplan- und
   Zuordnungsentitäten werden ausschließlich dem jeweiligen Heizplan-Gerät
-  zugeordnet.
+  zugeordnet. Beim Löschen eines Heizplans entfernt der dynamische
+  Entitätsmanager die zugehörigen Entitäten und das leere Heizplan-Gerät auch
+  aus den Home-Assistant-Registern.
 - `homeassistant.helpers.storage.Store` speichert den vollständigen Planner als
   versioniertes JSON-Dokument mit atomaren Schreibvorgängen.
 - Das Backend validiert jeden vollständigen Snapshot, prüft eine Revision gegen
