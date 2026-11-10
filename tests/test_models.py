@@ -62,9 +62,7 @@ def test_legacy_single_climate_entity_is_migrated_to_list():
 
 def test_window_settings_use_a_default_and_are_preserved():
     value = planner()
-    value["schedules"][0].update(
-        {"window_label": "fenster", "window_open_temperature": 18.5}
-    )
+    value["schedules"][0].update({"window_label": "fenster", "window_open_temperature": 18.5})
 
     normalized = validate_planner(value)
 

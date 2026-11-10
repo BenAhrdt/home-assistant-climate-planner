@@ -1031,7 +1031,9 @@ class PlannerRuntime:
                 try:
                     await self._async_save_runtime_state()
                 except Exception:  # noqa: BLE001
-                    _LOGGER.warning("Climate Planner could not persist runtime state", exc_info=True)
+                    _LOGGER.warning(
+                        "Climate Planner could not persist runtime state", exc_info=True
+                    )
             return True
         except Exception:
             _LOGGER.exception(
