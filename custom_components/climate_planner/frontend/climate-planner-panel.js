@@ -351,6 +351,7 @@ class ClimatePlannerPanel extends HTMLElement {
       if (!this.windowLabelDirty && this.windowLabelForm.data?.window_label !== this.windowLabelDraft) {
         this.windowLabelForm.data = { window_label: this.windowLabelDraft };
       }
+      this.refreshWindowLabelPicker();
       return;
     }
     if (this.windowLabelFormLoading) return;
@@ -370,9 +371,37 @@ class ClimatePlannerPanel extends HTMLElement {
       });
       this.windowLabelForm = form;
       this.$("window-label-form").replaceChildren(form);
+      this.refreshWindowLabelPicker();
     };
     if (customElements.get("ha-form")) createForm();
     else customElements.whenDefined("ha-form").then(createForm);
+  }
+
+  refreshWindowLabelPicker(attempt = 0) {
+    const form = this.windowLabelForm;
+    const value = this.windowLabelDraft;
+    if (!form || !value || this.windowLabelDirty) return;
+
+    // ha-generic-picker calculates its unknown-value state when the value
+    // changes, but not when the asynchronously provided label registry arrives.
+    // Re-run that calculation once the selected label is present in the picker.
+    const selector = form.shadowRoot?.querySelector("ha-selector");
+    const labelSelector = selector?.shadowRoot?.querySelector("ha-selector-label");
+    const labelPicker = labelSelector?.shadowRoot?.querySelector("ha-label-picker");
+    const picker = labelPicker?.shadowRoot?.querySelector("ha-generic-picker");
+    const items = picker?.getItems?.();
+    if (picker && Array.isArray(items) && items.some((item) => item?.id === value)) {
+      picker.noUnknownState = true;
+      requestAnimationFrame(() => {
+        if (this.windowLabelForm !== form || this.windowLabelDraft !== value) return;
+        picker.noUnknownState = false;
+      });
+      return;
+    }
+
+    if (attempt < 20) {
+      setTimeout(() => this.refreshWindowLabelPicker(attempt + 1), 100);
+    }
   }
 
   async saveWindowLabel() {
