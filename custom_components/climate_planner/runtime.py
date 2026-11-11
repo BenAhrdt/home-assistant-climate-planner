@@ -306,6 +306,28 @@ class PlannerRuntime:
         except (TypeError, ValueError):
             return None
 
+    def _window_label_options(self) -> list[dict[str, str]]:
+        """Return label registry IDs and names for the panel selector."""
+
+        try:
+            registry = lr.async_get(self.hass)
+            entries_method = getattr(registry, "async_entries", None)
+            entries = entries_method() if callable(entries_method) else None
+            if entries is None:
+                entries = getattr(registry, "labels", {}).values()
+        except Exception:  # noqa: BLE001
+            _LOGGER.debug("Could not read the Home Assistant label registry", exc_info=True)
+            return []
+
+        result = []
+        for entry in entries:
+            label_id = getattr(entry, "label_id", None) or getattr(entry, "id", None)
+            name = getattr(entry, "name", None)
+            if not isinstance(label_id, str) or not label_id or not isinstance(name, str):
+                continue
+            result.append({"id": label_id, "name": name})
+        return sorted(result, key=lambda item: (item["name"].casefold(), item["id"]))
+
     def _manual_match(
         self, schedule: dict, modes: list[dict], override: dict[str, Any], now: datetime
     ) -> ActiveMatch | None:
@@ -376,6 +398,11 @@ class PlannerRuntime:
             next_events[schedule["id"]] = next_event.isoformat() if next_event else None
             weeks[schedule["id"]] = week_view(schedule, modes, now)
         climate_entities = await self._async_climate_entities()
+        window_labels = self._window_label_options()
+        window_label_name = next(
+            (item["name"] for item in window_labels if item["id"] == self._window_label),
+            "",
+        )
         window_status = {
             schedule["id"]: {
                 "open_entity_ids": sorted(
@@ -395,6 +422,8 @@ class PlannerRuntime:
             "timezone": self.hass.config.time_zone,
             "ready": self._started,
             "window_label": self._window_label,
+            "window_label_name": window_label_name,
+            "window_labels": window_labels,
             "climate_entities": climate_entities,
             "window_status": window_status,
         }

@@ -699,5 +699,33 @@ async def test_snapshot_includes_integration_area_and_device_labels(fake_runtime
     await runtime.async_shutdown()
 
 
+@pytest.mark.asyncio
+async def test_snapshot_includes_window_label_names(fake_runtime, monkeypatch):
+    monkeypatch.setattr(
+        runtime_module.lr,
+        "async_get",
+        lambda _hass: SimpleNamespace(
+            async_entries=lambda: [
+                SimpleNamespace(label_id="window_contacts", name="Fensterkontakte")
+            ]
+        ),
+    )
+    runtime = PlannerRuntime(
+        fake_runtime,
+        "entry",
+        options={CONF_WINDOW_LABEL: "window_contacts"},
+    )
+    await runtime.async_start()
+
+    snapshot = await runtime.snapshot()
+
+    assert snapshot["window_label"] == "window_contacts"
+    assert snapshot["window_label_name"] == "Fensterkontakte"
+    assert snapshot["window_labels"] == [
+        {"id": "window_contacts", "name": "Fensterkontakte"}
+    ]
+    await runtime.async_shutdown()
+
+
 async def _integration_result():
     return {"demo": SimpleNamespace(manifest={"name": "Demo Integration"})}

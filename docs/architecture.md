@@ -181,6 +181,9 @@ Panel und den Home-Assistant-Switch gleichermaßen.
 Für die Fensterabsenkung wird das Home-Assistant-Label zentral im Panel unter
 „Fenster-Erkennung“ oder in den Optionen des Config Entries ausgewählt; die
 Absenktemperatur wird je Heizplan mit dem Standardwert 18,5 °C gespeichert.
+Das Panel zeigt dabei den Namen aus der Label-Registry, während die
+Konfiguration die stabile Label-ID speichert. Eine Umbenennung des Labels
+ändert die ID nicht; nur Löschen und Neuerstellen erzeugt eine neue ID.
 Ein Fensterkontakt wird nur dann einer
 Climate-Entität zugeordnet, wenn beide im selben Home-Assistant-Bereich liegen.
 Dadurch können Climate-Entitäten aus mehreren Bereichen im selben Heizplan

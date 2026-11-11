@@ -75,6 +75,11 @@ nur die Climate-Entitäten desselben Bereichs ab. Die Absenktemperatur wird je
 Heizplan eingestellt und ist standardmäßig auf 18,5 °C gesetzt. Ohne zentrales
 Fenster-Label ist die Fensterabsenkung deaktiviert.
 
+Die Auswahl zeigt den Label-Namen an; gespeichert wird weiterhin die stabile
+Label-ID. Wird ein Label in Home Assistant umbenannt, bleibt diese ID erhalten
+und es muss nichts neu angelegt oder ausgewählt werden. Nur beim Löschen und
+anschließenden Neuerstellen entsteht eine neue ID.
+
 Mindestens ein sicher offenes Fenster löst nach fünf Sekunden die Absenkung aus.
 Sind alle zugeordneten Fenster sicher geschlossen, wird nach zehn Sekunden die
 Temperatur des aktuell aktiven Modes wiederhergestellt. Unbekannte oder nicht

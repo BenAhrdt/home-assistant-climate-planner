@@ -17,7 +17,7 @@ const labels = {
     week: "Wochenansicht", addMode: "Mode anlegen", addSchedule: "Heizplan anlegen",
     addAssignment: "Mode hinzufügen", editAssignment: "Mode bearbeiten", editPhase: "Phase bearbeiten", usedModes: "Verwendete Modes", details: "Details öffnen", edit: "Bearbeiten", remove: "Löschen", save: "Speichern",
     cancel: "Abbrechen", name: "Name", temperature: "Zieltemperatur", priority: "Priorität", color: "Farbe (optional)",
-    icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", enabled: "Aktiviert", windowSettings: "Fenster-Erkennung", windowLabel: "Fenster-Label", windowLabelHint: "Zentrale Auswahl für Fensterkontakte in allen Heizplänen.", saveWindowLabel: "Speichern", windowOpenTemperature: "Absenktemperatur bei offenem Fenster", windowOpenTemperatureHint: "Standard: 18,5 °C; gilt für Fenster mit dem zentral ausgewählten Label im selben Raum wie die Climate-Entität.", windowOpen: "Fenster offen – Absenkung aktiv",
+    icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", enabled: "Aktiviert", windowSettings: "Fenster-Erkennung", windowLabel: "Fenster-Label", noWindowLabel: "Kein Label", windowLabelHint: "Zentrale Auswahl für Fensterkontakte in allen Heizplänen.", saveWindowLabel: "Speichern", windowOpenTemperature: "Absenktemperatur bei offenem Fenster", windowOpenTemperatureHint: "Standard: 18,5 °C; gilt für Fenster mit dem zentral ausgewählten Label im selben Raum wie die Climate-Entität.", windowOpen: "Fenster offen – Absenkung aktiv",
     sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage", addTime: "Weitere Zeit", removeTime: "Zeit entfernen", autoOnDate: "Auto ein (Datum)", autoOffDate: "Auto aus (Datum)",
     time: "Uhrzeit", bulkTime: "Uhrzeit für ausgewählte Tage", weekday: "Wochentag", transition: "Übergang verschieben", phase: "Phase", duplicate: "Duplizieren", placeDuplicate: "Duplikat platzieren", duplicateTimeOccupied: "Eine Stunde vor diesem Mode liegt bereits ein Wechsel. Bitte eine andere Uhrzeit wählen.", duplicateNoRoom: "Vor diesem Mode ist nicht genug Platz für die Duplikatdauer. Der vorherige Mode behält mindestens eine Stunde.", selectAllDays: "Alle anwählen", clearAllDays: "Alle abwählen", copySuffix: "Kopie", defaultDuration: "Richtwert: 8 Stunden · letzter Block bis 24:00", drop: "Mode auf die Heizplankachel ziehen", dropTimeline: "Mode auf einen Tag und eine Uhrzeit ziehen · Richtwert 8 h · letzter Block bis 24:00 · Alt/Strg/Cmd = kopieren", chooseMode: "Mode direkt aktivieren", noModes: "Noch keine Modes angelegt.",
     noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode aktivieren", pauseMode: "Mode pausieren", targetRequestShort: "Soll", targetRequest: "Vom Climate Planner gesetzter Sollwert", currentShort: "Ist", next: "Nächster Wechsel",
@@ -34,7 +34,7 @@ const labels = {
     title: "Time-based heating plans", overview: "Overview", modes: "Mode library", schedules: "Heating plans", week: "Week view",
     addMode: "Add mode", addSchedule: "Add heating plan", addAssignment: "Add mode", editAssignment: "Edit mode", editPhase: "Edit phase", usedModes: "Used modes", details: "Open details", edit: "Edit", remove: "Delete",
     save: "Save", cancel: "Cancel", name: "Name", temperature: "Target temperature", priority: "Priority", color: "Color (optional)",
-    icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", enabled: "Enabled", windowSettings: "Window detection", windowLabel: "Window label", windowLabelHint: "Central selection for window contacts in all heating plans.", saveWindowLabel: "Save", windowOpenTemperature: "Setback temperature with window open", windowOpenTemperatureHint: "Default: 18.5 °C; applies to windows with the centrally selected label in the same area as the climate entity.", windowOpen: "Window open – setback active",
+    icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", enabled: "Enabled", windowSettings: "Window detection", windowLabel: "Window label", noWindowLabel: "No label", windowLabelHint: "Central selection for window contacts in all heating plans.", saveWindowLabel: "Save", windowOpenTemperature: "Setback temperature with window open", windowOpenTemperatureHint: "Default: 18.5 °C; applies to windows with the centrally selected label in the same area as the climate entity.", windowOpen: "Window open – setback active",
     sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", addTime: "Add another time", removeTime: "Remove time", autoOnDate: "Auto on (date)", autoOffDate: "Auto off (date)", time: "Time", bulkTime: "Time for selected days", weekday: "Weekday", transition: "Move transition", phase: "Phase", duplicate: "Duplicate", placeDuplicate: "Place duplicate", duplicateTimeOccupied: "There is already a change one hour before this mode. Choose another time.", duplicateNoRoom: "There is not enough room for the duplicate duration. The previous mode keeps at least one hour.", selectAllDays: "Select all", clearAllDays: "Clear all", copySuffix: "Copy", defaultDuration: "Guideline: 8 hours · last block until 24:00", dropTimeline: "Drag a mode onto a day and time · guideline 8 h · last block until 24:00 · Alt/Ctrl/Cmd = copy",
     drop: "Drop mode on the heating plan", chooseMode: "Activate mode directly", noModes: "No modes have been created yet.", noSchedules: "No heating plans have been created yet.",
     active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode", pauseMode: "Pause mode", targetRequestShort: "Target", targetRequest: "Target set by Climate Planner", currentShort: "Current", next: "Next change", none: "No mode activated yet", connected: "Ready", loading: "Loading …",
@@ -66,8 +66,6 @@ class ClimatePlannerPanel extends HTMLElement {
     this.scheduleRenderPending = false;
     this.windowLabelDraft = "";
     this.windowLabelDirty = false;
-    this.windowLabelForm = null;
-    this.windowLabelFormLoading = false;
   }
 
   set hass(value) {
@@ -200,7 +198,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".schedule-card.drop-target{cursor:copy;animation:schedule-drop-ready .75s ease-in-out infinite alternate}.schedule-card.drop-invalid{cursor:not-allowed;border:2px solid var(--error-color,#db4437);background:color-mix(in srgb,var(--error-color,#db4437) 10%,var(--card-background-color));box-shadow:0 0 0 3px color-mix(in srgb,var(--error-color,#db4437) 18%,transparent)}.mode-drag-cursor{position:fixed;z-index:10000;display:flex;align-items:center;gap:8px;max-width:240px;padding:8px 11px;border:1px solid var(--divider-color);border-radius:12px;background:color-mix(in srgb,var(--card-background-color) 94%,transparent);box-shadow:0 8px 24px rgba(0,0,0,.24);opacity:0;transform:translate(18px,18px) scale(.92);pointer-events:none;transition:opacity .12s,transform .12s,border-color .12s,background .12s}.mode-drag-cursor.visible{opacity:1;transform:translate(18px,18px) scale(1)}.mode-drag-cursor.allowed{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 12%,var(--card-background-color));animation:drag-cursor-float .7s ease-in-out infinite alternate}.mode-drag-cursor.blocked{border-color:var(--error-color,#db4437);color:var(--error-color,#db4437);background:color-mix(in srgb,var(--error-color,#db4437) 12%,var(--card-background-color))}.mode-drag-cursor ha-icon{--mdc-icon-size:24px;flex:none}.mode-drag-cursor.allowed ha-icon{animation:drag-cursor-icon .55s ease-in-out infinite alternate}.mode-drag-cursor-copy{display:grid;gap:1px;min-width:0}.mode-drag-cursor-copy strong,.mode-drag-cursor-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mode-drag-cursor-copy strong{font-size:12px}.mode-drag-cursor-copy small{font-size:11px;color:var(--secondary-text-color)}@keyframes schedule-drop-ready{from{box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 16%,transparent)}to{box-shadow:0 0 0 6px color-mix(in srgb,var(--primary-color) 28%,transparent)}}@keyframes drag-cursor-float{from{margin-top:0}to{margin-top:-5px}}@keyframes drag-cursor-icon{from{transform:translateY(-2px)}to{transform:translateY(2px)}}";
     style.textContent += ".mode-palette{position:static;max-height:none;overflow:visible}.mode-palette h2{margin:4px 0}.mode-palette #drag-hint{margin:0 0 8px;font-size:12px}.mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px}.mode-palette .mode-card{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:12px;row-gap:3px;min-height:58px;padding:10px 12px;cursor:grab}.mode-palette .mode-card-top{grid-column:1;grid-row:1}.mode-palette .mode-meta{grid-column:1;grid-row:2;min-width:0;flex-wrap:nowrap}.mode-palette .mode-priority{margin-left:0}.mode-palette .mode-card .actions{grid-column:2;grid-row:1/3;align-self:center;margin:0;flex-wrap:nowrap}.mode-palette .mode-card .actions button{padding:7px 9px;font-size:12px}main.overview-layout{height:100vh;overflow:hidden}main.overview-layout #schedules-section{display:flex;min-height:0;flex-direction:column}main.overview-layout #schedules-title{flex:none;margin:8px 0 10px}main.overview-layout #schedules{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:start;padding:2px 10px 12px 2px;scrollbar-gutter:stable}@media(max-width:1100px){main.overview-layout{display:grid!important}}@media(max-width:700px){main.overview-layout{height:auto;min-height:100vh;overflow:visible;grid-template-rows:auto!important}main.overview-layout #schedules{overflow:visible}.mode-palette .grid{grid-template-columns:1fr}.mode-palette .mode-meta{flex-wrap:wrap}}";
     style.textContent += ".mode-palette .grid,#schedules{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}@media(max-width:1100px){.mode-palette .grid,#schedules{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.mode-palette .grid,#schedules{grid-template-columns:1fr}}";
-    style.textContent += ".planner-settings{padding:12px 14px;border:1px solid var(--divider-color);border-radius:12px;background:var(--card-background-color)}.planner-settings h2{margin:0 0 3px;font-size:16px}.planner-settings p{margin:0 0 8px}.planner-settings-row{display:flex;align-items:end;gap:12px;flex-wrap:wrap}.planner-settings-form{flex:1 1 320px;min-width:240px}.planner-settings-form ha-form{display:block}.planner-settings-actions{margin:0}.planner-settings-actions button{white-space:nowrap}";
+    style.textContent += ".planner-settings{width:fit-content;max-width:100%;padding:10px 12px;border:1px solid var(--divider-color);border-radius:10px;background:var(--card-background-color)}.planner-settings h2{margin:0 0 2px;font-size:15px}.planner-settings p{margin:0 0 6px}.planner-settings-row{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.planner-settings-form{flex:0 1 520px;min-width:min(240px,100%)}.planner-settings-form label{min-width:0}.planner-settings-actions{margin:0}.planner-settings-actions button{white-space:nowrap}.window-label-select{min-width:0}";
     this.shadowRoot.querySelector("header").style.gridArea = "header";
     this.$("notice").style.gridArea = "notice";
     summarySection.style.gridArea = "summary";
@@ -210,7 +208,7 @@ class ClimatePlannerPanel extends HTMLElement {
     const settingsSection = document.createElement("section");
     settingsSection.id = "planner-settings";
     settingsSection.className = "planner-settings";
-    settingsSection.innerHTML = '<div class="planner-settings-row"><div class="planner-settings-form"><h2 id="window-settings-title"></h2><p id="window-settings-hint" class="muted"></p><div id="window-label-form"></div></div><div class="planner-settings-actions"><button id="save-window-label" class="primary" type="button"></button></div></div>';
+    settingsSection.innerHTML = '<div class="planner-settings-row"><div class="planner-settings-form"><h2 id="window-settings-title"></h2><p id="window-settings-hint" class="muted"></p><label><span id="window-label-label"></span><select id="window-label-select" class="window-label-select"></select></label></div><div class="planner-settings-actions"><button id="save-window-label" class="primary" type="button"></button></div></div>';
     this.$("notice").before(settingsSection);
     settingsSection.style.gridArea = "settings";
     this.$("refresh").title = this.t.connected;
@@ -344,64 +342,22 @@ class ClimatePlannerPanel extends HTMLElement {
     if (!admin) return;
     this.$("window-settings-title").textContent = this.t.windowSettings;
     this.$("window-settings-hint").textContent = this.t.windowLabelHint;
+    this.$("window-label-label").textContent = this.t.windowLabel;
     this.$("save-window-label").textContent = this.t.saveWindowLabel;
     this.$("save-window-label").disabled = !this.windowLabelDirty;
-    if (this.windowLabelForm) {
-      this.windowLabelForm.hass = this._hass;
-      if (!this.windowLabelDirty && this.windowLabelForm.data?.window_label !== this.windowLabelDraft) {
-        this.windowLabelForm.data = { window_label: this.windowLabelDraft };
-      }
-      this.refreshWindowLabelPicker();
-      return;
-    }
-    if (this.windowLabelFormLoading) return;
-    this.windowLabelFormLoading = true;
-    const createForm = () => {
-      this.windowLabelFormLoading = false;
-      if (!this.isConnected || this.windowLabelForm) return;
-      const form = document.createElement("ha-form");
-      form.hass = this._hass;
-      form.schema = [{ name: "window_label", selector: { label: {} } }];
-      form.data = { window_label: this.windowLabelDraft };
-      form.computeLabel = () => this.t.windowLabel;
-      form.addEventListener("value-changed", (event) => {
-        this.windowLabelDraft = event.detail?.value?.window_label || "";
-        this.windowLabelDirty = this.windowLabelDraft !== (this.data?.window_label || "");
-        this.$("save-window-label").disabled = !this.windowLabelDirty;
-      });
-      this.windowLabelForm = form;
-      this.$("window-label-form").replaceChildren(form);
-      this.refreshWindowLabelPicker();
+    const select = this.$("window-label-select");
+    const options = Array.isArray(this.data?.window_labels) ? this.data.window_labels : [];
+    const selectedOption = options.find((item) => item.id === this.windowLabelDraft);
+    const currentOption = this.windowLabelDraft && !selectedOption
+      ? [{ id: this.windowLabelDraft, name: this.data?.window_label_name || this.windowLabelDraft }]
+      : [];
+    select.innerHTML = `<option value="">${escapeHTML(this.t.noWindowLabel)}</option>${[...currentOption, ...options].map((item) => `<option value="${escapeHTML(item.id)}">${escapeHTML(item.name)}</option>`).join("")}`;
+    select.value = this.windowLabelDraft;
+    select.onchange = () => {
+      this.windowLabelDraft = select.value;
+      this.windowLabelDirty = this.windowLabelDraft !== (this.data?.window_label || "");
+      this.$("save-window-label").disabled = !this.windowLabelDirty;
     };
-    if (customElements.get("ha-form")) createForm();
-    else customElements.whenDefined("ha-form").then(createForm);
-  }
-
-  refreshWindowLabelPicker(attempt = 0) {
-    const form = this.windowLabelForm;
-    const value = this.windowLabelDraft;
-    if (!form || !value || this.windowLabelDirty) return;
-
-    // ha-generic-picker calculates its unknown-value state when the value
-    // changes, but not when the asynchronously provided label registry arrives.
-    // Re-run that calculation once the selected label is present in the picker.
-    const selector = form.shadowRoot?.querySelector("ha-selector");
-    const labelSelector = selector?.shadowRoot?.querySelector("ha-selector-label");
-    const labelPicker = labelSelector?.shadowRoot?.querySelector("ha-label-picker");
-    const picker = labelPicker?.shadowRoot?.querySelector("ha-generic-picker");
-    const items = picker?.getItems?.();
-    if (picker && Array.isArray(items) && items.some((item) => item?.id === value)) {
-      picker.noUnknownState = true;
-      requestAnimationFrame(() => {
-        if (this.windowLabelForm !== form || this.windowLabelDraft !== value) return;
-        picker.noUnknownState = false;
-      });
-      return;
-    }
-
-    if (attempt < 20) {
-      setTimeout(() => this.refreshWindowLabelPicker(attempt + 1), 100);
-    }
   }
 
   async saveWindowLabel() {
