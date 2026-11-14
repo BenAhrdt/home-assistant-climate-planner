@@ -69,6 +69,7 @@ class FakeHass:
             time_zone="Europe/Berlin",
             units=SimpleNamespace(temperature_unit=UnitOfTemperature.CELSIUS),
         )
+        self.data = {}
         self.states = FakeStates()
         self.services = FakeServices()
         self.bus = FakeBus()
