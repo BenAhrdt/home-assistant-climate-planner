@@ -703,6 +703,21 @@ async def test_snapshot_includes_integration_area_and_device_labels(fake_runtime
 @pytest.mark.asyncio
 async def test_snapshot_includes_window_label_names(fake_runtime, monkeypatch):
     monkeypatch.setattr(
+        runtime_module.er,
+        "async_get",
+        lambda _hass: SimpleNamespace(async_get=lambda _entity_id: None),
+    )
+    monkeypatch.setattr(
+        runtime_module.dr,
+        "async_get",
+        lambda _hass: SimpleNamespace(async_get=lambda _device_id: None),
+    )
+    monkeypatch.setattr(
+        runtime_module.ar,
+        "async_get",
+        lambda _hass: SimpleNamespace(async_get_area=lambda _area_id: None),
+    )
+    monkeypatch.setattr(
         runtime_module.lr,
         "async_get",
         lambda _hass: SimpleNamespace(
