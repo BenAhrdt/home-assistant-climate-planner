@@ -721,9 +721,7 @@ async def test_snapshot_includes_window_label_names(fake_runtime, monkeypatch):
 
     assert snapshot["window_label"] == "window_contacts"
     assert snapshot["window_label_name"] == "Fensterkontakte"
-    assert snapshot["window_labels"] == [
-        {"id": "window_contacts", "name": "Fensterkontakte"}
-    ]
+    assert snapshot["window_labels"] == [{"id": "window_contacts", "name": "Fensterkontakte"}]
     await runtime.async_shutdown()
 
 
