@@ -21,8 +21,10 @@ entities and uses centrally managed modes with target temperatures.
   the climate readback differs
 - external-target indication and persistence of the last activation across
   integration restarts
-- direct mode selection on a heating-plan card with a temporary manual override,
-  including while automatic schedule evaluation is paused
+- mode assignment editing directly from a heating-plan card; manual mode
+  activation uses the play icon at the upper left of the mode tile and creates
+  a temporary manual override, including while automatic schedule evaluation
+  is paused
 - multiple phases per weekday with drag-and-drop and local temperature
   overrides
 - new mode assignments select all weekdays by default, with quick select-all

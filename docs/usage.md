@@ -138,13 +138,14 @@ Wochentags-Checkboxen, sodass die Bearbeitung keine weiteren Phasen erzeugt.
 Der globale Mode bleibt dabei unverändert.
 
 Zusätzlich zeigt jede Heizplan-Kachel die dort zugeordneten Modes mit ihrer
-Zieltemperatur. Ein Klick auf einen dieser Modes aktiviert ihn sofort als
-manuelle Auswahl für die zugeordneten Klima-Entitäten. Die manuelle Auswahl
-hat Vorrang bis zum nächsten geplanten Wechsel; danach übernimmt der
-Zeitplan wieder automatisch. Die Kachel bleibt dabei bewusst kompakt und zeigt
-den zuletzt erfolgreich vom Climate Planner aktivierten Mode. Das gilt auch,
-wenn eine Automation einen Climate-Planner-Dienst oder Aktivierungs-Button
-verwendet.
+Zieltemperatur. Ein Klick auf einen dieser Modes öffnet **Mode bearbeiten**.
+Die manuelle Aktivierung erfolgt über das Play-Symbol links oben in der
+Mode-Kachel. Sie aktiviert den Mode sofort als manuelle Auswahl für die
+zugeordneten Klima-Entitäten. Die manuelle Auswahl hat Vorrang bis zum
+nächsten geplanten Wechsel; danach übernimmt der Zeitplan wieder automatisch.
+Die Kachel bleibt dabei bewusst kompakt und zeigt den zuletzt erfolgreich vom
+Climate Planner aktivierten Mode. Das gilt auch, wenn eine Automation einen
+Climate-Planner-Dienst oder Aktivierungs-Button verwendet.
 
 Für jede Klima-Entität stehen **Soll** und **Ist** nebeneinander. **Soll** ist
 der zuletzt erfolgreich vom Climate Planner an `climate.set_temperature`
