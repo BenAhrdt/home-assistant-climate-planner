@@ -68,6 +68,12 @@ Planner
         ├── enabled
         ├── auto_on_date?        # ISO-Kalenderdatum für automatische Aktivierung
         ├── auto_off_date?       # ISO-Kalenderdatum für automatische Deaktivierung
+        ├── auto_rules[]?        # beliebig viele automatische Ein-/Aus-Regeln
+        │   ├── id
+        │   ├── action             # on oder off
+        │   ├── kind               # date, birthday, holiday, easter, advent, christmas
+        │   ├── date?              # ISO-Datum für date/birthday
+        │   └── holiday?           # unterstützter Feiertag für kind=holiday
         └── weekday_rules        # weekday -> Liste von Phasen
             ├── id
             ├── time              # HH:mm
@@ -99,15 +105,15 @@ abwärtskompatibel in `assignments[].enabled` des jeweiligen Heizplans
 überführt; neue Daten führen den Aktivierungszustand ausschließlich an der
 Mode-Zuordnung.
 
-`auto_on_date` und `auto_off_date` gehören ebenfalls ausschließlich zur
-Mode-Zuordnung im Heizplan. Sie enthalten nur Kalenderdaten, keine Uhrzeiten.
-Das zuletzt erreichte Datum löst das jeweilige automatische Play-/Pause-Ereignis
-aus; die Datumswerte dürfen deshalb auch in einer Reihenfolge stehen, die einen
-automatischen Stopp und einen späteren automatischen Start abbildet. Manuelle
-Änderungen des Play-/Pause-Zustands bleiben unabhängig davon möglich. Die
-Laufzeit merkt sich getrennt, welches Ereignis bereits angewendet wurde, damit
-ein manueller Zustand nicht bei jeder Auswertung sofort wieder überschrieben
-wird.
+`auto_on_date` und `auto_off_date` gehören ausschließlich zur Mode-Zuordnung und
+bleiben als Legacy-Felder lesbar. Neue Daten verwenden `auto_rules[]`, sodass
+mehrere Auto-ein-/Auto-aus-Ereignisse pro Zuordnung möglich sind. Einmalige
+Datumsregeln werden nur am angegebenen Tag ausgelöst; Geburtstage und die
+berechneten Anlässe wiederholen sich jährlich. Das zuletzt erreichte Ereignis
+bestimmt den Zustand; bei gleichem Datum gewinnt Auto aus. Manuelle Änderungen
+des Play-/Pause-Zustands bleiben unabhängig davon möglich. Die Laufzeit merkt
+sich getrennt, welches Ereignis bereits angewendet wurde, damit ein manueller
+Zustand nicht bei jeder Auswertung sofort wieder überschrieben wird.
 
 Das Panel erzeugt pro Heizplan und Mode höchstens eine Zuordnung und verwendet
 sie für weitere Phasen wieder. Bereits vorhandene Mehrfachzuordnungen bleiben

@@ -46,12 +46,20 @@ gespeichert. Bei gleichzeitig passenden Regeln gewinnt die höhere Priorität,
 danach die zuletzt aktivierte Regel.
 
 Über das Zahnrad rechts an einem verwendeten Mode lassen sich die Einstellungen
-dieser Mode-Zuordnung im Heizplan öffnen. Dort können ein **Auto-ein-Datum** und
-ein **Auto-aus-Datum** als reine Kalenderdaten hinterlegt werden. Das zuletzt
-erreichte Datum löst die jeweilige automatische Aktivierung oder Pause aus;
-Auto-aus darf daher vor Auto-ein liegen. Die manuellen Play-/Pause-Schalter
-bleiben unabhängig von den Datumswerten bedienbar. Die Uhrzeiten und Phasen des
-Modes bleiben weiterhin ausschließlich im jeweiligen Heizplan gespeichert.
+dieser Mode-Zuordnung im Heizplan öffnen. Unter **Automatische Regeln** können
+beliebig viele Regeln für **Auto ein** und **Auto aus** angelegt werden. Nach
+jedem ausgefüllten Eintrag erscheint darunter automatisch eine neue leere Zeile;
+unvollständige Zeilen werden nicht gespeichert.
+
+Als Anlass stehen ein einmaliges Datum, ein jährlich wiederkehrender Geburtstag,
+ausgewählte Feiertage sowie Ostern, der 1. Advent und Weihnachten zur Verfügung.
+Die beweglichen Termine werden lokal berechnet. Die Feiertagsauswahl enthält die
+gängigen deutschen festen und beweglichen Feiertage; eine landesspezifische
+Feiertagskonfiguration gibt es derzeit nicht. Das zuletzt erreichte Ereignis
+bestimmt den Aktivierungszustand, wobei bei gleichem Datum **Auto aus** Vorrang
+hat. Die manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar.
+Alte einzelne Auto-ein-/Auto-aus-Daten werden weiterhin gelesen und beim
+Bearbeiten in die neue Regelliste übernommen.
 
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.

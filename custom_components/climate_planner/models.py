@@ -12,7 +12,13 @@ from copy import deepcopy
 from datetime import date
 from uuid import uuid4
 
-from .const import DEFAULT_WINDOW_OPEN_TEMPERATURE, STORAGE_VERSION, WEEKDAYS
+from .const import (
+    AUTO_RULE_HOLIDAYS,
+    AUTO_RULE_KINDS,
+    DEFAULT_WINDOW_OPEN_TEMPERATURE,
+    STORAGE_VERSION,
+    WEEKDAYS,
+)
 
 ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$")
 TIME_PATTERN = re.compile(r"^(?:[01]\d|2[0-3]):[0-5]\d$")
@@ -182,6 +188,44 @@ def _normalize_weekday_rules(value: object, phase_ids: set[str]) -> dict[str, li
     return result
 
 
+def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
+    """Normalize repeated automatic assignment enable/disable rules."""
+
+    if value is None:
+        return []
+    if not isinstance(value, list) or len(value) > 100:
+        raise InvalidData("invalid_auto_rules")
+    result: list[dict] = []
+    for raw_rule in value:
+        if not isinstance(raw_rule, dict):
+            raise InvalidData("invalid_auto_rule")
+        if set(raw_rule) - {"id", "action", "kind", "date", "holiday"}:
+            raise InvalidData("invalid_auto_rule")
+        rule_id = _id(raw_rule.get("id") or new_id("auto_rule"), "invalid_auto_rule_id")
+        if rule_id in seen:
+            raise InvalidData("duplicate_auto_rule_id")
+        seen.add(rule_id)
+        action = raw_rule.get("action")
+        if action not in {"on", "off"}:
+            raise InvalidData("invalid_auto_rule_action")
+        kind = raw_rule.get("kind")
+        if kind not in AUTO_RULE_KINDS:
+            raise InvalidData("invalid_auto_rule_kind")
+        normalized = {"id": rule_id, "action": action, "kind": kind}
+        if kind in {"date", "birthday"}:
+            date_text = _optional_date(raw_rule.get("date"), "invalid_auto_rule_date")
+            if not date_text:
+                raise InvalidData("missing_auto_rule_date")
+            normalized["date"] = date_text
+        elif kind == "holiday":
+            holiday = raw_rule.get("holiday")
+            if holiday not in AUTO_RULE_HOLIDAYS:
+                raise InvalidData("invalid_auto_rule_holiday")
+            normalized["holiday"] = holiday
+        result.append(normalized)
+    return result
+
+
 def _normalize_mode(raw: object, seen: set[str]) -> dict:
     if not isinstance(raw, dict):
         raise InvalidData("invalid_mode")
@@ -229,6 +273,7 @@ def _normalize_assignment(
         "enabled",
         "auto_on_date",
         "auto_off_date",
+        "auto_rules",
         "weekday_rules",
     }:
         raise InvalidData("invalid_assignment")
@@ -245,6 +290,9 @@ def _normalize_assignment(
         "enabled": _bool(raw.get("enabled"), "invalid_assignment_enabled"),
         "weekday_rules": _normalize_weekday_rules(raw.get("weekday_rules"), phase_ids),
     }
+    auto_rules = _normalize_auto_rules(raw.get("auto_rules"), phase_ids)
+    if auto_rules:
+        result["auto_rules"] = auto_rules
     auto_on_date = _optional_date(raw.get("auto_on_date"), "invalid_auto_on_date")
     auto_off_date = _optional_date(raw.get("auto_off_date"), "invalid_auto_off_date")
     if auto_on_date:

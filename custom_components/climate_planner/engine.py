@@ -39,6 +39,131 @@ def _phase_time(phase: dict | str) -> str:
     return phase["time"] if isinstance(phase, dict) else phase
 
 
+def _easter_sunday(year: int) -> date:
+    """Return the Gregorian Easter Sunday for a year."""
+
+    # Anonymous Gregorian algorithm, valid for the Home Assistant date range.
+    a = year % 19
+    b = year // 100
+    c = year % 100
+    d = b // 4
+    e = b % 4
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19 * a + b - d - g + 15) % 30
+    i = c // 4
+    k = c % 4
+    l_value = (32 + 2 * e + 2 * i - h - k) % 7
+    m = (a + 11 * h + 22 * l_value) // 451
+    month = (h + l_value - 7 * m + 114) // 31
+    day = (h + l_value - 7 * m + 114) % 31 + 1
+    return date(year, month, day)
+
+
+def _holiday_date(holiday: str, year: int) -> date | None:
+    """Return a supported holiday date without relying on an external service."""
+
+    fixed = {
+        "new_year": (1, 1),
+        "epiphany": (1, 6),
+        "labour_day": (5, 1),
+        "german_unity": (10, 3),
+        "reformation_day": (10, 31),
+        "all_saints_day": (11, 1),
+        "christmas_eve": (12, 24),
+        "christmas_day": (12, 25),
+        "boxing_day": (12, 26),
+        "new_years_eve": (12, 31),
+    }
+    if holiday in fixed:
+        month, day = fixed[holiday]
+        return date(year, month, day)
+    easter = _easter_sunday(year)
+    movable_offsets = {
+        "good_friday": -2,
+        "easter_monday": 1,
+        "ascension": 39,
+        "whit_monday": 50,
+        "corpus_christi": 60,
+    }
+    offset = movable_offsets.get(holiday)
+    return easter + timedelta(days=offset) if offset is not None else None
+
+
+def _auto_rule_date(rule: dict, year: int) -> date | None:
+    """Resolve a recurring rule for one calendar year."""
+
+    kind = rule.get("kind")
+    if kind == "date":
+        event_date = date.fromisoformat(rule["date"])
+        return event_date if event_date.year == year else None
+    if kind == "birthday":
+        source_date = date.fromisoformat(rule["date"])
+        try:
+            return date(year, source_date.month, source_date.day)
+        except ValueError:
+            # A 29 February birthday has no occurrence in a non-leap year.
+            return None
+    if kind == "holiday":
+        return _holiday_date(rule["holiday"], year)
+    if kind == "easter":
+        return _easter_sunday(year)
+    if kind == "advent":
+        christmas = date(year, 12, 25)
+        last_sunday = christmas - timedelta(days=(christmas.weekday() + 1) % 7)
+        return last_sunday - timedelta(days=21)
+    if kind == "christmas":
+        return date(year, 12, 25)
+    return None
+
+
+def _auto_rule_events(
+    assignment: dict, current_date: date, *, future_only: bool = False
+) -> list[tuple[date, int, int, str, bool]]:
+    """Return legacy and repeated automatic events relevant to ``current_date``."""
+
+    events: list[tuple[date, int, int, str, bool]] = []
+    for field, enabled, tie_breaker in (
+        ("auto_on_date", True, 0),
+        ("auto_off_date", False, 1),
+    ):
+        date_text = assignment.get(field)
+        if not date_text:
+            continue
+        event_date = date.fromisoformat(date_text)
+        matches = event_date > current_date if future_only else event_date <= current_date
+        if matches:
+            events.append((event_date, tie_breaker, 0, f"{field}:{date_text}", enabled))
+
+    rules = assignment.get("auto_rules", [])
+    if not isinstance(rules, list):
+        return events
+    years = range(current_date.year, current_date.year + 2) if future_only else range(
+        current_date.year - 1, current_date.year + 1
+    )
+    for index, rule in enumerate(rules):
+        if not isinstance(rule, dict):
+            continue
+        enabled = rule.get("action") == "on"
+        tie_breaker = 0 if enabled else 1
+        if rule.get("kind") == "date":
+            event_date = date.fromisoformat(rule["date"])
+            matches = event_date > current_date if future_only else event_date <= current_date
+            if matches:
+                marker = f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{event_date}"
+                events.append((event_date, tie_breaker, index + 1, marker, enabled))
+            continue
+        for year in years:
+            event_date = _auto_rule_date(rule, year)
+            if event_date is None:
+                continue
+            matches = event_date > current_date if future_only else event_date <= current_date
+            if matches:
+                marker = f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{event_date}"
+                events.append((event_date, tie_breaker, index + 1, marker, enabled))
+    return events
+
+
 def latest_auto_date_event(assignment: dict, current_date: date) -> tuple[str, bool] | None:
     """Return the latest reached automatic enable/disable event.
 
@@ -48,21 +173,11 @@ def latest_auto_date_event(assignment: dict, current_date: date) -> tuple[str, b
     equal.
     """
 
-    events = []
-    for field, enabled, tie_breaker in (
-        ("auto_on_date", True, 0),
-        ("auto_off_date", False, 1),
-    ):
-        date_text = assignment.get(field)
-        if not date_text:
-            continue
-        event_date = date.fromisoformat(date_text)
-        if event_date <= current_date:
-            events.append((event_date, tie_breaker, date_text, enabled, field))
+    events = _auto_rule_events(assignment, current_date)
     if not events:
         return None
-    _event_date, _tie_breaker, date_text, enabled, field = max(events)
-    return f"{field}:{date_text}", enabled
+    _event_date, _tie_breaker, _index, marker, enabled = max(events)
+    return marker, enabled
 
 
 def next_auto_date(schedule: dict, now: datetime) -> datetime | None:
@@ -73,13 +188,10 @@ def next_auto_date(schedule: dict, now: datetime) -> datetime | None:
     assert zone is not None
     upcoming: list[datetime] = []
     for assignment in schedule["assignments"]:
-        for field in ("auto_on_date", "auto_off_date"):
-            date_text = assignment.get(field)
-            if not date_text:
-                continue
-            event_date = date.fromisoformat(date_text)
-            if event_date > local_now.date():
-                upcoming.append(_at_local(event_date, "00:00", zone))
+        for event_date, _tie_breaker, _index, _marker, _enabled in _auto_rule_events(
+            assignment, local_now.date(), future_only=True
+        ):
+            upcoming.append(_at_local(event_date, "00:00", zone))
     return min(upcoming) if upcoming else None
 
 

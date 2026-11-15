@@ -91,6 +91,29 @@ def test_assignment_auto_dates_are_preserved_without_order_validation():
     assert assignment_value["auto_off_date"] == "2026-11-10"
 
 
+def test_repeated_auto_rules_are_normalized():
+    value = planner()
+    value["schedules"][0]["assignments"][0]["auto_rules"] = [
+        {"id": "rule_on", "action": "on", "kind": "birthday", "date": "1990-02-14"},
+        {"id": "rule_off", "action": "off", "kind": "holiday", "holiday": "christmas_eve"},
+        {"id": "rule_on_easter", "action": "on", "kind": "easter"},
+    ]
+
+    rules = validate_planner(value)["schedules"][0]["assignments"][0]["auto_rules"]
+
+    assert rules == value["schedules"][0]["assignments"][0]["auto_rules"]
+
+
+def test_repeated_auto_rules_require_their_value():
+    value = planner()
+    value["schedules"][0]["assignments"][0]["auto_rules"] = [
+        {"id": "rule", "action": "on", "kind": "holiday"}
+    ]
+
+    with pytest.raises(InvalidData, match="invalid_auto_rule_holiday"):
+        validate_planner(value)
+
+
 def test_multiple_climate_entities_are_preserved():
     value = planner()
     value["schedules"][0].pop("climate_entity_id")

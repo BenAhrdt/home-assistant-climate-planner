@@ -184,3 +184,46 @@ def test_next_auto_date_is_scheduled_at_local_midnight():
     assert next_auto_date(value, datetime(2026, 11, 9, 12, tzinfo=ZONE)) == datetime(
         2026, 11, 10, tzinfo=ZONE
     )
+
+
+def test_repeated_auto_rules_support_birthdays_and_calculated_occasions():
+    value = {
+        "auto_rules": [
+            {"id": "birthday", "action": "off", "kind": "birthday", "date": "1990-11-10"},
+            {"id": "easter", "action": "on", "kind": "easter"},
+        ]
+    }
+
+    assert latest_auto_date_event(value, date(2026, 11, 15)) == (
+        "auto_rule:birthday:off:2026-11-10",
+        False,
+    )
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = value["auto_rules"]
+    assert next_auto_date(
+        schedule([configured]), datetime(2026, 11, 15, 12, tzinfo=ZONE)
+    ) == datetime(2027, 3, 28, tzinfo=ZONE)
+
+
+def test_repeated_auto_rule_holiday_and_first_advent_are_resolved():
+    value = {
+        "auto_rules": [
+            {"id": "good-friday", "action": "off", "kind": "holiday", "holiday": "good_friday"},
+            {"id": "advent", "action": "on", "kind": "advent"},
+        ]
+    }
+
+    assert latest_auto_date_event(value, date(2026, 12, 1)) == (
+        "auto_rule:advent:on:2026-11-29",
+        True,
+    )
+
+
+def test_repeated_one_time_date_is_not_limited_to_the_next_year():
+    rule = {"id": "future", "action": "on", "kind": "date", "date": "2030-06-01"}
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = [rule]
+
+    assert next_auto_date(
+        schedule([configured]), datetime(2026, 11, 15, 12, tzinfo=ZONE)
+    ) == datetime(2030, 6, 1, tzinfo=ZONE)
