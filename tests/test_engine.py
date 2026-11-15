@@ -24,8 +24,10 @@ def test_holiday_region_filters_state_specific_holidays():
     assert "reformation_day" not in nationwide
     assert "reformation_day" in saxony
     assert "repentance_day" in saxony
+    assert "easter_saturday" in nationwide
+    assert "easter_sunday" in nationwide
     assert "easter_sunday" in brandenburg
-    assert "easter_sunday" not in saxony
+    assert "easter_sunday" in saxony
 
 
 ZONE = ZoneInfo("Europe/Berlin")
@@ -207,6 +209,52 @@ def test_next_auto_date_is_scheduled_at_local_midnight():
     assert next_auto_date(value, datetime(2026, 11, 9, 12, tzinfo=ZONE)) == datetime(
         2026, 11, 10, tzinfo=ZONE
     )
+
+
+def test_grouped_holiday_rule_uses_action_times():
+    value = {
+        "auto_rules": [
+            {
+                "id": "easter-monday",
+                "kind": "holiday",
+                "holiday": "easter_monday",
+                "actions": {"on": {"time": "09:00"}, "off": {"time": "21:00"}},
+            }
+        ]
+    }
+
+    assert latest_auto_event(value, datetime(2026, 4, 6, 12, tzinfo=ZONE)) == (
+        "auto_rule:easter-monday:on:2026-04-06",
+        True,
+    )
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = value["auto_rules"]
+    assert next_auto_date(
+        schedule([configured]), datetime(2026, 4, 5, 12, tzinfo=ZONE)
+    ) == datetime(2026, 4, 6, 9, tzinfo=ZONE)
+
+
+def test_grouped_cycle_rule_uses_independent_action_dates_and_times():
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = [
+        {
+            "id": "wednesday",
+            "kind": "cycle",
+            "recurrence": "weekly",
+            "actions": {
+                "on": {
+                    "start_date": "2027-01-01",
+                    "end_date": "2027-02-01",
+                    "time": "09:00",
+                },
+                "off": {"start_date": "2027-01-01", "time": "22:00"},
+            },
+        }
+    ]
+
+    assert next_auto_date(
+        schedule([configured]), datetime(2026, 12, 31, 12, tzinfo=ZONE)
+    ) == datetime(2027, 1, 1, 9, tzinfo=ZONE)
 
 
 def test_repeated_one_time_date_is_not_limited_to_the_next_year():

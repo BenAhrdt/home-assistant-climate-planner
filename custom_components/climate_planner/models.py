@@ -190,7 +190,12 @@ def _normalize_weekday_rules(value: object, phase_ids: set[str]) -> dict[str, li
 
 
 def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
-    """Normalize repeated automatic assignment enable/disable rules."""
+    """Normalize grouped automatic assignment enable/disable rules.
+
+    The current shape stores one rule with a shared occasion and optional
+    ``actions.on``/``actions.off`` configurations.  The former one-action
+    shape remains accepted so existing planner documents keep working.
+    """
 
     if value is None:
         return []
@@ -204,6 +209,7 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
             "id",
             "name",
             "action",
+            "actions",
             "kind",
             "date",
             "holiday",
@@ -217,13 +223,10 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
         if rule_id in seen:
             raise InvalidData("duplicate_auto_rule_id")
         seen.add(rule_id)
-        action = raw_rule.get("action")
-        if action not in {"on", "off"}:
-            raise InvalidData("invalid_auto_rule_action")
         kind = raw_rule.get("kind")
         if kind not in AUTO_RULE_KINDS:
             raise InvalidData("invalid_auto_rule_kind")
-        normalized = {"id": rule_id, "action": action, "kind": kind}
+        normalized = {"id": rule_id, "kind": kind}
         rule_name = raw_rule.get("name")
         if rule_name is not None and rule_name != "":
             if not isinstance(rule_name, str):
@@ -247,18 +250,76 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
             recurrence = raw_rule.get("recurrence")
             if recurrence not in AUTO_RULE_RECURRENCES:
                 raise InvalidData("invalid_auto_rule_recurrence")
-            start_date = _optional_date(raw_rule.get("start_date"), "invalid_auto_rule_start_date")
-            start_time = raw_rule.get("start_time")
-            if not isinstance(start_time, str) or not TIME_PATTERN.fullmatch(start_time):
-                raise InvalidData("invalid_auto_rule_start_time")
-            normalized.update({"recurrence": recurrence, "start_time": start_time})
-            if start_date:
-                normalized["start_date"] = start_date
-            end_date = _optional_date(raw_rule.get("end_date"), "invalid_auto_rule_end_date")
-            if end_date and start_date and end_date < start_date:
-                raise InvalidData("invalid_auto_rule_end_date")
-            if end_date:
-                normalized["end_date"] = end_date
+            normalized["recurrence"] = recurrence
+            if "actions" not in raw_rule:
+                start_date = _optional_date(
+                    raw_rule.get("start_date"), "invalid_auto_rule_start_date"
+                )
+                start_time = raw_rule.get("start_time")
+                if not isinstance(start_time, str) or not TIME_PATTERN.fullmatch(start_time):
+                    raise InvalidData("invalid_auto_rule_start_time")
+                normalized["start_time"] = start_time
+                if start_date:
+                    normalized["start_date"] = start_date
+                end_date = _optional_date(
+                    raw_rule.get("end_date"), "invalid_auto_rule_end_date"
+                )
+                if end_date and start_date and end_date < start_date:
+                    raise InvalidData("invalid_auto_rule_end_date")
+                if end_date:
+                    normalized["end_date"] = end_date
+        if "actions" in raw_rule:
+            if "name" not in normalized:
+                raise InvalidData("invalid_auto_rule_name")
+            if any(
+                key in raw_rule
+                for key in ("action", "start_date", "start_time", "end_date")
+            ):
+                raise InvalidData("invalid_auto_rule")
+            raw_actions = raw_rule.get("actions")
+            if (
+                not isinstance(raw_actions, dict)
+                or set(raw_actions) - {"on", "off"}
+                or not any(action in raw_actions for action in ("on", "off"))
+            ):
+                raise InvalidData("invalid_auto_rule_actions")
+            actions = {}
+            for action in ("on", "off"):
+                if action not in raw_actions:
+                    continue
+                raw_action = raw_actions[action]
+                if not isinstance(raw_action, dict) or set(raw_action) - {
+                    "time",
+                    "start_date",
+                    "end_date",
+                }:
+                    raise InvalidData("invalid_auto_rule_action")
+                time_text = raw_action.get("time")
+                if not isinstance(time_text, str) or not TIME_PATTERN.fullmatch(time_text):
+                    raise InvalidData("invalid_auto_rule_time")
+                action_value = {"time": time_text}
+                if kind == "cycle":
+                    start_date = _optional_date(
+                        raw_action.get("start_date"), "invalid_auto_rule_start_date"
+                    )
+                    end_date = _optional_date(
+                        raw_action.get("end_date"), "invalid_auto_rule_end_date"
+                    )
+                    if end_date and start_date and end_date < start_date:
+                        raise InvalidData("invalid_auto_rule_end_date")
+                    if start_date:
+                        action_value["start_date"] = start_date
+                    if end_date:
+                        action_value["end_date"] = end_date
+                elif raw_action.get("start_date") or raw_action.get("end_date"):
+                    raise InvalidData("invalid_auto_rule_action")
+                actions[action] = action_value
+            normalized["actions"] = actions
+        else:
+            action = raw_rule.get("action")
+            if action not in {"on", "off"}:
+                raise InvalidData("invalid_auto_rule_action")
+            normalized["action"] = action
         result.append(normalized)
     return result
 

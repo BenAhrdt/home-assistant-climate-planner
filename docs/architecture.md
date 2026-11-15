@@ -67,17 +67,19 @@ Planner
         ├── id
         ├── mode_id              # stabile Referenz in modes[]
         ├── enabled
-        ├── auto_rules[]?        # beliebig viele automatische Ein-/Aus-Regeln
+        ├── auto_rules[]?        # beliebig viele automatische Regelgruppen
         │   ├── id
-        │   ├── name?             # optionale Bezeichnung der Regel
-        │   ├── action             # on oder off
-        │   ├── kind               # date, holiday oder cycle
-        │   ├── date?              # ISO-Datum für kind=date
-        │   ├── holiday?           # unterstützter Feiertag für kind=holiday
+        │   ├── name              # Bezeichnung der Regel
+        │   ├── kind              # date, holiday oder cycle
+        │   ├── date?             # ISO-Datum für kind=date
+        │   ├── holiday?          # unterstützter Feiertag für kind=holiday
         │   ├── recurrence?       # hourly, daily, weekly, monthly, quarterly, yearly
-        │   ├── start_date?       # ISO-Ankerdatum für kind=cycle
-        │   ├── start_time?       # HH:mm für kind=cycle
-        │   └── end_date?         # inklusives ISO-Enddatum für kind=cycle
+        │   └── actions           # mindestens on oder off
+        │       ├── on?
+        │       │   ├── time       # HH:mm
+        │       │   ├── start_date? # ISO-Startdatum für kind=cycle
+        │       │   └── end_date?   # inklusives ISO-Enddatum für kind=cycle
+        │       └── off?           # gleiche Struktur wie on
         └── weekday_rules        # weekday -> Liste von Phasen
             ├── id
             ├── time              # HH:mm
@@ -183,13 +185,14 @@ erfolgreichen Serviceaufruf den zuletzt aktivierten Mode im Panel; der Override
 wird nicht dauerhaft gespeichert. Der Button-State zeigt separat, wie viele
 Temperatur-Serviceaufrufe erfolgreich waren.
 
-Das Panel stellt den zuletzt erfolgreich vom Climate Planner gesetzten Wert als
-`Soll` und die aktuelle Temperatur als `Ist` dar. Der Rückgabewert der
-Climate-Entität aus `temperature` wird ausschließlich mit der letzten
-Planner-Vorgabe verglichen. Weicht er unter Berücksichtigung der
-Thermostat-Schrittweite ab, wird der zuletzt aktivierte Mode als `extern`
-markiert. Das ist reine Zustandsdarstellung: Es gibt weder Polling noch
-automatische Nachregelung.
+Das Panel stellt den aktuellen Sollwert der Climate-Entität aus `temperature`
+als `Soll` und die aktuelle Temperatur als `Ist` dar. Der Sollwert wird mit der
+letzten Planner-Vorgabe verglichen. Weicht er unter Berücksichtigung der
+Thermostat-Schrittweite ab, erscheint der wertlose Hinweis `extern`; der zuletzt
+aktivierte Mode bleibt davon getrennt als Verlauf erhalten. Während einer
+Fenster-Absenkung wird der tatsächliche Absenk-Sollwert angezeigt, ohne den
+Hinweis `extern` zu setzen. Das ist reine Zustandsdarstellung: Es gibt weder
+Polling noch automatische Nachregelung.
 
 Beim Übergang eines Heizplans von pausiert zu aktiviert wird ein vorhandener
 manueller Override beendet, der zu diesem Zeitpunkt passende Zeitplan-Mode

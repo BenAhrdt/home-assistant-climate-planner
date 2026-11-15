@@ -23,10 +23,10 @@ const labels = {
     addAssignment: "Mode hinzufügen", editAssignment: "Mode bearbeiten", editPhase: "Phase bearbeiten", usedModes: "Verwendete Modes", details: "Details öffnen", edit: "Bearbeiten", remove: "Löschen", save: "Speichern",
     cancel: "Abbrechen", name: "Name", temperature: "Zieltemperatur", priority: "Priorität", color: "Farbe (optional)",
     icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", entityDisplayName: "Anzeigename (optional)", entityDisplayNamePlaceholder: "Name in diesem Heizplan", enabled: "Aktiviert", generalSettings: "Allgemeine Einstellungen", windowSettings: "Fenster-Erkennung", windowLabel: "Fenster-Label", noWindowLabel: "Kein Label", windowLabelHint: "Zentrale Auswahl für Fensterkontakte in allen Heizplänen.", saveWindowLabel: "Speichern", holidayRegion: "Feiertagsregion (Deutschland)", holidayRegionHint: "Filtert regionale gesetzliche Feiertage. Lokale Sonderfälle werden nicht berücksichtigt.", holidayRegionNational: "Nur bundesweite Feiertage", unavailableRegion: "in dieser Region nicht aktiv", regionBw: "Baden-Württemberg", regionBy: "Bayern", regionBe: "Berlin", regionBb: "Brandenburg", regionHb: "Bremen", regionHh: "Hamburg", regionHe: "Hessen", regionMv: "Mecklenburg-Vorpommern", regionNi: "Niedersachsen", regionNw: "Nordrhein-Westfalen", regionRp: "Rheinland-Pfalz", regionSl: "Saarland", regionSn: "Sachsen", regionSt: "Sachsen-Anhalt", regionSh: "Schleswig-Holstein", regionTh: "Thüringen", windowDetection: "Fensteröffnung berücksichtigen", windowDetectionOff: "Fenstererkennung deaktiviert", enableWindowDetection: "Fenstererkennung aktivieren", disableWindowDetection: "Fenstererkennung deaktivieren", windowOpenTemperature: "Absenktemperatur bei offenem Fenster", windowOpenTemperatureHint: "Standard: 18,5 °C; gilt für Fenster mit dem zentral ausgewählten Label im selben Raum wie die Climate-Entität.", windowOpen: "Fenster offen – Absenkung aktiv",
-    sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage", addTime: "Weitere Zeit", removeTime: "Zeit entfernen", autoRules: "Automatische Regeln", addAutoRule: "Weitere Regel", removeAutoRule: "Regel entfernen", autoAction: "Aktion", autoActionEmpty: "Aktion auswählen", autoOn: "Auto ein", autoOff: "Auto aus", autoKind: "Anlass", autoKindEmpty: "Anlass auswählen", autoKindDate: "Einmaliges Datum", autoKindHoliday: "Feiertag", autoKindCycle: "Zyklisch", autoRuleName: "Bezeichnung (optional)", autoRuleNamePlaceholder: "z. B. morgens einschalten", autoDrag: "Regel verschieben", autoRuleIncomplete: "Bitte Aktion und Anlass auswählen.", autoRuleEndBeforeStart: "Das Enddatum darf nicht vor dem Startdatum liegen.", autoRecurrence: "Wiederholung", recurrenceHourly: "Stündlich", recurrenceDaily: "Täglich", recurrenceWeekly: "Wöchentlich", recurrenceMonthly: "Monatlich", recurrenceQuarterly: "Quartalsweise", recurrenceYearly: "Jährlich", autoStartDate: "Startdatum (optional)", autoEndDate: "Enddatum (optional)", autoStartTime: "Startzeit", autoCycleHint: "Ohne Startdatum wird der aktuelle Tag als Anker verwendet.", autoDate: "Datum", autoHoliday: "Feiertag", autoRecurringHint: "Wiederholt sich jährlich.", autoCalculatedHint: "Wird automatisch berechnet.", autoHolidayNewYear: "Neujahr", autoHolidayEpiphany: "Heilige Drei Könige", autoHolidayInternationalWomensDay: "Internationaler Frauentag", autoHolidayGoodFriday: "Karfreitag", autoHolidayEasterMonday: "Ostermontag", autoHolidayEasterSunday: "Ostersonntag", autoHolidayWhitSunday: "Pfingstsonntag", autoHolidayLabourDay: "Tag der Arbeit", autoHolidayAscension: "Christi Himmelfahrt", autoHolidayWhitMonday: "Pfingstmontag", autoHolidayCorpusChristi: "Fronleichnam", autoHolidayMariaHimmelfahrt: "Mariä Himmelfahrt", autoHolidayWorldChildrenDay: "Weltkindertag", autoHolidayGermanUnity: "Tag der Deutschen Einheit", autoHolidayReformationDay: "Reformationstag", autoHolidayAllSaintsDay: "Allerheiligen", autoHolidayRepentanceDay: "Buß- und Bettag", autoHolidayAdvent1: "1. Advent", autoHolidayAdvent2: "2. Advent", autoHolidayAdvent3: "3. Advent", autoHolidayAdvent4: "4. Advent", autoHolidayAllAdvent: "Alle Adventssonntage", autoHolidayEasterPeriod: "Ostern (Karfreitag–Ostermontag)", autoHolidayChristmasEve: "Heiligabend", autoHolidayChristmasDay: "1. Weihnachtsfeiertag", autoHolidayBoxingDay: "2. Weihnachtsfeiertag", autoHolidayChristmasPeriod: "Weihnachten (24.–26. Dezember)", autoHolidayNewYearsEve: "Silvester",
+    sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage", addTime: "Weitere Zeit", removeTime: "Zeit entfernen", autoRules: "Automatische Regeln", addAutoRule: "Weitere Regel", removeAutoRule: "Regel entfernen", autoAction: "Aktion", autoActionEmpty: "Aktion auswählen", autoOn: "Auto ein", autoOff: "Auto aus", autoKind: "Anlass", autoKindEmpty: "Anlass auswählen", autoKindDate: "Einmaliges Datum", autoKindHoliday: "Feiertag", autoKindCycle: "Zyklisch", autoRuleName: "Name", autoRuleNamePlaceholder: "z. B. Mittwochs lang", autoDrag: "Regel verschieben", autoRuleIncomplete: "Bitte Name, Anlass und mindestens Auto ein oder Auto aus ausfüllen.", autoRuleCollapse: "Einklappen", autoRuleEndBeforeStart: "Das Enddatum darf nicht vor dem Startdatum liegen.", autoRecurrence: "Wiederholung", recurrenceHourly: "Stündlich", recurrenceDaily: "Täglich", recurrenceWeekly: "Wöchentlich", recurrenceMonthly: "Monatlich", recurrenceQuarterly: "Quartalsweise", recurrenceYearly: "Jährlich", autoStartDate: "Startdatum (optional)", autoEndDate: "Enddatum (optional)", autoStartTime: "Startzeit", autoOnTime: "Uhrzeit Auto ein", autoOffTime: "Uhrzeit Auto aus", autoOnStartDate: "Startdatum Auto ein", autoOnEndDate: "Enddatum Auto ein", autoOffStartDate: "Startdatum Auto aus", autoOffEndDate: "Enddatum Auto aus", autoCycleHint: "Ohne Startdatum wird der aktuelle Tag als Anker verwendet.", autoDate: "Datum", autoHoliday: "Feiertag", autoRecurringHint: "Wiederholt sich jährlich.", autoCalculatedHint: "Wird automatisch berechnet.", autoHolidayNewYear: "Neujahr", autoHolidayEpiphany: "Heilige Drei Könige", autoHolidayInternationalWomensDay: "Internationaler Frauentag", autoHolidayGoodFriday: "Karfreitag", autoHolidayEasterSaturday: "Ostersamstag", autoHolidayEasterMonday: "Ostermontag", autoHolidayEasterSunday: "Ostersonntag", autoHolidayWhitSunday: "Pfingstsonntag", autoHolidayLabourDay: "Tag der Arbeit", autoHolidayAscension: "Christi Himmelfahrt", autoHolidayWhitMonday: "Pfingstmontag", autoHolidayCorpusChristi: "Fronleichnam", autoHolidayMariaHimmelfahrt: "Mariä Himmelfahrt", autoHolidayWorldChildrenDay: "Weltkindertag", autoHolidayGermanUnity: "Tag der Deutschen Einheit", autoHolidayReformationDay: "Reformationstag", autoHolidayAllSaintsDay: "Allerheiligen", autoHolidayRepentanceDay: "Buß- und Bettag", autoHolidayAdvent1: "1. Advent", autoHolidayAdvent2: "2. Advent", autoHolidayAdvent3: "3. Advent", autoHolidayAdvent4: "4. Advent", autoHolidayAllAdvent: "Alle Adventssonntage", autoHolidayEasterPeriod: "Ostern (Karfreitag–Ostermontag)", autoHolidayChristmasEve: "Heiligabend", autoHolidayChristmasDay: "1. Weihnachtsfeiertag", autoHolidayBoxingDay: "2. Weihnachtsfeiertag", autoHolidayChristmasPeriod: "Weihnachten (24.–26. Dezember)", autoHolidayNewYearsEve: "Silvester",
     time: "Uhrzeit", bulkTime: "Uhrzeit für ausgewählte Tage", weekday: "Wochentag", transition: "Übergang verschieben", phase: "Phase", duplicate: "Duplizieren", placeDuplicate: "Duplikat platzieren", duplicateTimeOccupied: "Eine Stunde vor diesem Mode liegt bereits ein Wechsel. Bitte eine andere Uhrzeit wählen.", duplicateNoRoom: "Vor diesem Mode ist nicht genug Platz für die Duplikatdauer. Der vorherige Mode behält mindestens eine Stunde.", selectAllDays: "Alle anwählen", clearAllDays: "Alle abwählen", copySuffix: "Kopie", defaultDuration: "Richtwert: 8 Stunden · letzter Block bis 24:00", drop: "Mode auf die Heizplankachel ziehen", dropTimeline: "Mode auf einen Tag und eine Uhrzeit ziehen · Richtwert 8 h · letzter Block bis 24:00 · Alt/Strg/Cmd = kopieren", chooseMode: "Mode direkt aktivieren", noModes: "Noch keine Modes angelegt.",
-    noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode aktivieren", pauseMode: "Mode pausieren", targetRequestShort: "Soll", targetRequest: "Vom Climate Planner gesetzter Sollwert", currentShort: "Ist", next: "Nächster Wechsel",
-    none: "Noch kein Mode aktiviert", connected: "Bereit", loading: "Wird geladen …",
+    noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode aktivieren", pauseMode: "Mode pausieren", targetRequestShort: "Soll", targetRequest: "Aktueller Sollwert der Klima-Entität", currentShort: "Ist", next: "Nächster Wechsel",
+    none: "Noch kein Mode aktiviert", refresh: "Aktualisieren", loading: "Wird geladen …",
     saveError: "Speichern fehlgeschlagen", conflict: "Die Daten wurden geändert. Ansicht wird neu geladen.",
     invalid: "Bitte prüfe die Eingaben.", localTemperature: "Temperatur für diese Phase überschreiben", inherited: "Mode-Temperatur", deleteMode: "Mode wirklich löschen? Zugehörige Zuordnungen werden entfernt.", deletePhase: "Phase wirklich löschen?",
     deleteSchedule: "Heizplan wirklich löschen?", deleteAssignment: "Mode aus diesem Heizplan entfernen? Alle zugehörigen Phasen werden gelöscht.", modeAlreadyAssigned: "Dieser Mode ist bereits in diesem Heizplan enthalten.",
@@ -40,9 +40,9 @@ const labels = {
     addMode: "Add mode", addSchedule: "Add heating plan", addAssignment: "Add mode", editAssignment: "Edit mode", editPhase: "Edit phase", usedModes: "Used modes", details: "Open details", edit: "Edit", remove: "Delete",
     save: "Save", cancel: "Cancel", name: "Name", temperature: "Target temperature", priority: "Priority", color: "Color (optional)",
     icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", entityDisplayName: "Display name (optional)", entityDisplayNamePlaceholder: "Name in this heating plan", enabled: "Enabled", generalSettings: "General settings", windowSettings: "Window detection", windowLabel: "Window label", noWindowLabel: "No label", windowLabelHint: "Central selection for window contacts in all heating plans.", saveWindowLabel: "Save", holidayRegion: "Holiday region (Germany)", holidayRegionHint: "Filters regional public holidays. Local exceptions are not included.", holidayRegionNational: "Nationwide holidays only", unavailableRegion: "not active in this region", regionBw: "Baden-Württemberg", regionBy: "Bavaria", regionBe: "Berlin", regionBb: "Brandenburg", regionHb: "Bremen", regionHh: "Hamburg", regionHe: "Hesse", regionMv: "Mecklenburg-Western Pomerania", regionNi: "Lower Saxony", regionNw: "North Rhine-Westphalia", regionRp: "Rhineland-Palatinate", regionSl: "Saarland", regionSn: "Saxony", regionSt: "Saxony-Anhalt", regionSh: "Schleswig-Holstein", regionTh: "Thuringia", windowDetection: "Use window detection", windowDetectionOff: "Window detection disabled", enableWindowDetection: "Enable window detection", disableWindowDetection: "Disable window detection", windowOpenTemperature: "Setback temperature with window open", windowOpenTemperatureHint: "Default: 18.5 °C; applies to windows with the centrally selected label in the same area as the climate entity.", windowOpen: "Window open – setback active",
-    sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", addTime: "Add another time", removeTime: "Remove time", autoRules: "Automatic rules", addAutoRule: "Add another rule", removeAutoRule: "Remove rule", autoAction: "Action", autoActionEmpty: "Select action", autoOn: "Auto on", autoOff: "Auto off", autoKind: "Occasion", autoKindEmpty: "Select occasion", autoKindDate: "One-time date", autoKindHoliday: "Holiday", autoKindCycle: "Cyclic", autoRuleName: "Name (optional)", autoRuleNamePlaceholder: "e.g. turn on in the morning", autoDrag: "Move rule", autoRuleIncomplete: "Please select an action and an occasion.", autoRuleEndBeforeStart: "The end date must not be before the start date.", autoRecurrence: "Repeat", recurrenceHourly: "Hourly", recurrenceDaily: "Daily", recurrenceWeekly: "Weekly", recurrenceMonthly: "Monthly", recurrenceQuarterly: "Quarterly", recurrenceYearly: "Yearly", autoStartDate: "Start date (optional)", autoEndDate: "End date (optional)", autoStartTime: "Start time", autoCycleHint: "Without a start date, the current day is used as the anchor.", autoDate: "Date", autoHoliday: "Holiday", autoRecurringHint: "Repeats every year.", autoCalculatedHint: "Calculated automatically.", autoHolidayNewYear: "New Year's Day", autoHolidayEpiphany: "Epiphany", autoHolidayInternationalWomensDay: "International Women's Day", autoHolidayGoodFriday: "Good Friday", autoHolidayEasterMonday: "Easter Monday", autoHolidayEasterSunday: "Easter Sunday", autoHolidayWhitSunday: "Whit Sunday", autoHolidayLabourDay: "Labour Day", autoHolidayAscension: "Ascension Day", autoHolidayWhitMonday: "Whit Monday", autoHolidayCorpusChristi: "Corpus Christi", autoHolidayMariaHimmelfahrt: "Assumption Day", autoHolidayWorldChildrenDay: "World Children's Day", autoHolidayGermanUnity: "German Unity Day", autoHolidayReformationDay: "Reformation Day", autoHolidayAllSaintsDay: "All Saints' Day", autoHolidayRepentanceDay: "Day of Prayer and Repentance", autoHolidayAdvent1: "1st Advent", autoHolidayAdvent2: "2nd Advent", autoHolidayAdvent3: "3rd Advent", autoHolidayAdvent4: "4th Advent", autoHolidayAllAdvent: "All Advent Sundays", autoHolidayEasterPeriod: "Easter (Good Friday–Easter Monday)", autoHolidayChristmasEve: "Christmas Eve", autoHolidayChristmasDay: "Christmas Day", autoHolidayBoxingDay: "Boxing Day", autoHolidayChristmasPeriod: "Christmas (24–26 December)", autoHolidayNewYearsEve: "New Year's Eve",
+    sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", addTime: "Add another time", removeTime: "Remove time", autoRules: "Automatic rules", addAutoRule: "Add another rule", removeAutoRule: "Remove rule", autoAction: "Action", autoActionEmpty: "Select action", autoOn: "Auto on", autoOff: "Auto off", autoKind: "Occasion", autoKindEmpty: "Select occasion", autoKindDate: "One-time date", autoKindHoliday: "Holiday", autoKindCycle: "Cyclic", autoRuleName: "Name", autoRuleNamePlaceholder: "e.g. Wednesday long", autoDrag: "Move rule", autoRuleIncomplete: "Please enter a name, occasion, and at least Auto on or Auto off.", autoRuleCollapse: "Collapse", autoRuleEndBeforeStart: "The end date must not be before the start date.", autoRecurrence: "Repeat", recurrenceHourly: "Hourly", recurrenceDaily: "Daily", recurrenceWeekly: "Weekly", recurrenceMonthly: "Monthly", recurrenceQuarterly: "Quarterly", recurrenceYearly: "Yearly", autoStartDate: "Start date (optional)", autoEndDate: "End date (optional)", autoStartTime: "Start time", autoOnTime: "Auto on time", autoOffTime: "Auto off time", autoOnStartDate: "Auto on start date", autoOnEndDate: "Auto on end date", autoOffStartDate: "Auto off start date", autoOffEndDate: "Auto off end date", autoCycleHint: "Without a start date, the current day is used as the anchor.", autoDate: "Date", autoHoliday: "Holiday", autoRecurringHint: "Repeats every year.", autoCalculatedHint: "Calculated automatically.", autoHolidayNewYear: "New Year's Day", autoHolidayEpiphany: "Epiphany", autoHolidayInternationalWomensDay: "International Women's Day", autoHolidayGoodFriday: "Good Friday", autoHolidayEasterSaturday: "Holy Saturday", autoHolidayEasterMonday: "Easter Monday", autoHolidayEasterSunday: "Easter Sunday", autoHolidayWhitSunday: "Whit Sunday", autoHolidayLabourDay: "Labour Day", autoHolidayAscension: "Ascension Day", autoHolidayWhitMonday: "Whit Monday", autoHolidayCorpusChristi: "Corpus Christi", autoHolidayMariaHimmelfahrt: "Assumption Day", autoHolidayWorldChildrenDay: "World Children's Day", autoHolidayGermanUnity: "German Unity Day", autoHolidayReformationDay: "Reformation Day", autoHolidayAllSaintsDay: "All Saints' Day", autoHolidayRepentanceDay: "Day of Prayer and Repentance", autoHolidayAdvent1: "1st Advent", autoHolidayAdvent2: "2nd Advent", autoHolidayAdvent3: "3rd Advent", autoHolidayAdvent4: "4th Advent", autoHolidayAllAdvent: "All Advent Sundays", autoHolidayEasterPeriod: "Easter (Good Friday–Easter Monday)", autoHolidayChristmasEve: "Christmas Eve", autoHolidayChristmasDay: "Christmas Day", autoHolidayBoxingDay: "Boxing Day", autoHolidayChristmasPeriod: "Christmas (24–26 December)", autoHolidayNewYearsEve: "New Year's Eve",
     drop: "Drop mode on the heating plan", chooseMode: "Activate mode directly", noModes: "No modes have been created yet.", noSchedules: "No heating plans have been created yet.",
-    active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode", pauseMode: "Pause mode", targetRequestShort: "Target", targetRequest: "Target set by Climate Planner", currentShort: "Current", next: "Next change", none: "No mode activated yet", connected: "Ready", loading: "Loading …",
+    active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode", pauseMode: "Pause mode", targetRequestShort: "Target", targetRequest: "Current target temperature of the climate entity", currentShort: "Current", next: "Next change", none: "No mode activated yet", refresh: "Refresh", loading: "Loading …",
     saveError: "Save failed", conflict: "The data changed. Reloading the view.", invalid: "Please check the input.", localTemperature: "Override temperature for this phase", inherited: "Mode temperature",
     deleteMode: "Delete this mode? Its assignments will be removed.", deleteSchedule: "Delete this heating plan?",
     deleteAssignment: "Remove this mode from the heating plan? All of its phases will be deleted.", modeAlreadyAssigned: "This mode is already part of this heating plan.", deletePhase: "Delete this phase?", missingDay: "Select at least one weekday.",
@@ -221,13 +221,15 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += "#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.compact-mode-row{display:flex;align-items:center;gap:7px;min-height:42px;padding:7px 8px;cursor:grab}.compact-mode-row:focus-visible{cursor:grab}.compact-mode-leading{display:flex;align-items:center;gap:5px;flex:none}.compact-mode-leading .mode-color{margin:0}.compact-mode-leading .mode-icon{--mdc-icon-size:18px}.compact-mode-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.compact-mode-temperature,.compact-mode-priority{white-space:nowrap;font-size:11px}.compact-mode-priority{color:var(--secondary-text-color)}.compact-mode-delete{display:flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;padding:3px;border:0;border-radius:6px;background:transparent;color:var(--error-color,#db4437)}.compact-mode-delete:hover{background:color-mix(in srgb,var(--error-color,#db4437) 12%,transparent)}.compact-mode-delete ha-icon{--mdc-icon-size:17px}@media(max-width:700px){#overview-top .mode-palette .grid{grid-template-columns:1fr}}";
     style.textContent += "#overview-top .mode-palette .compact-mode-row{display:flex;grid-template-columns:none;grid-template-rows:none;align-items:center;min-height:36px;padding:5px 7px}#overview-top .mode-palette h2{margin-top:0;margin-bottom:2px}#overview-top .mode-palette #drag-hint{margin-bottom:6px}#overview-top .mode-palette .grid{margin-top:-4px;gap:6px}.compact-mode-row .compact-mode-name{min-width:0}.compact-mode-row .compact-mode-temperature,.compact-mode-row .compact-mode-priority{flex:none}#schedules .schedule-entity-row{grid-template-columns:minmax(0,1fr) max-content}#schedules .schedule-entity-values{width:max-content;min-width:max-content;flex-wrap:nowrap}@media(min-width:1001px){#overview-top .mode-palette{position:relative;top:-16px;margin-top:-16px}}";
     style.textContent += ".settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}#overview-top{display:block}#general-settings{margin:0 0 18px}#general-settings>h2{margin:0 0 12px}#overview-top .planner-settings{width:auto;max-width:none;margin:0;padding:12px}#overview-top .planner-settings h2{margin:0 0 3px;font-size:15px}#overview-top .planner-settings p{margin:0 0 8px}#overview-top .mode-palette{position:static;top:auto;margin:0;max-height:none;overflow:visible}#overview-top .mode-palette h2{margin:0 0 2px}@media(max-width:700px){.settings-grid{grid-template-columns:1fr}}";
+    style.textContent += "#general-settings{max-width:1120px}#overview-top .planner-settings{padding:9px 10px}#overview-top .planner-settings p{margin-bottom:5px}.holiday-region-control{margin-top:5px}#schedules .quick-modes{grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:6px}#schedules .quick-mode-wrap{min-height:52px}#schedules .quick-mode-wrap .quick-mode{gap:5px;padding:6px 6px 6px 31px}#schedules .quick-mode-activate{top:3px;left:3px;width:26px;height:26px;padding:4px}";
+    style.textContent += ".auto-rules .auto-rule-row{display:block;padding:8px 10px 8px 31px}.auto-rule-summary{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:28px}.auto-rule-summary-name{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.auto-rule-summary-actions{display:flex;align-items:center;gap:6px;flex:none}.auto-rule-summary-actions button{padding:5px 8px;font-size:12px}.auto-rule-editor{display:grid;gap:9px;margin-top:8px;padding-top:8px;border-top:1px solid var(--divider-color)}.auto-rule-editor[hidden]{display:none}.auto-rule-core{display:grid;grid-template-columns:minmax(180px,1fr) minmax(180px,1fr);gap:8px}.auto-rule-context{display:grid;gap:7px}.auto-rule-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}.auto-rule-action-card{min-width:0;margin:0;padding:8px;border:1px solid var(--divider-color);border-radius:7px}.auto-rule-action-card legend{margin:0 0 6px;font-size:12px}.auto-rule-action-card label{min-width:0}.auto-rule-action-card input{padding:7px}.auto-rule-hint,.auto-rule-calculated{font-size:11px;color:var(--secondary-text-color)}@media(max-width:700px){.auto-rule-core,.auto-rule-actions{grid-template-columns:1fr}}";
     this.shadowRoot.querySelector("header").style.gridArea = "header";
     this.$("notice").style.gridArea = "notice";
     summarySection.style.gridArea = "summary";
     schedulesSection.style.gridArea = "schedules";
     overviewTop.style.gridArea = "overview-top";
     weekSection.style.gridArea = "week";
-    this.$("refresh").title = this.t.connected;
+    this.$("refresh").title = this.t.refresh;
     this.$("refresh").onclick = () => this.load();
     this.$("add-mode").onclick = () => this.openModeDialog();
     this.$("add-schedule").onclick = () => this.openScheduleDialog();
@@ -237,6 +239,7 @@ class ClimatePlannerPanel extends HTMLElement {
   notice(message, error = false) {
     this.$("notice").textContent = message || "";
     this.$("notice").className = error ? "notice error" : "notice";
+    this.$("notice").hidden = !message;
   }
 
   finishDrag() {
@@ -328,7 +331,7 @@ class ClimatePlannerPanel extends HTMLElement {
       this.storageSet("climate-planner-schedule", this.selectedSchedule);
       if (this.dragActive) this.pendingRender = true;
       else this.render();
-      this.notice(this.t.connected);
+      this.notice();
     } catch (error) {
       this.notice(error?.code === "not_ready" ? error.message : this.t.saveError, true);
     }
@@ -1273,11 +1276,39 @@ class ClimatePlannerPanel extends HTMLElement {
       : [];
   }
 
+  autoRuleActionConfig(rule, action) {
+    if (rule?.actions && typeof rule.actions[action] === "object") {
+      return { ...rule.actions[action] };
+    }
+    if (rule?.action !== action) return {};
+    return {
+      time: rule.kind === "cycle" ? rule.start_time || "" : rule.time || "00:00",
+      start_date: rule.start_date || "",
+      end_date: rule.end_date || "",
+    };
+  }
+
+  autoRuleKindLabel(kind) {
+    return {
+      date: this.t.autoKindDate,
+      holiday: this.t.autoKindHoliday,
+      cycle: this.t.autoKindCycle,
+    }[kind] || this.t.autoKind;
+  }
+
+  autoRuleDisplayName(rule) {
+    const name = String(rule?.name || "").trim();
+    if (name) return name;
+    const action = rule?.action === "off" ? this.t.autoOff : this.t.autoOn;
+    return `${action} · ${this.autoRuleKindLabel(rule?.kind)}`;
+  }
+
   autoRuleHolidayOptions() {
     const options = [
       ["new_year", this.t.autoHolidayNewYear], ["epiphany", this.t.autoHolidayEpiphany],
       ["international_womens_day", this.t.autoHolidayInternationalWomensDay],
-      ["good_friday", this.t.autoHolidayGoodFriday], ["easter_sunday", this.t.autoHolidayEasterSunday],
+      ["good_friday", this.t.autoHolidayGoodFriday], ["easter_saturday", this.t.autoHolidayEasterSaturday],
+      ["easter_sunday", this.t.autoHolidayEasterSunday],
       ["easter_monday", this.t.autoHolidayEasterMonday], ["easter_period", this.t.autoHolidayEasterPeriod],
       ["whit_sunday", this.t.autoHolidayWhitSunday],
       ["labour_day", this.t.autoHolidayLabourDay], ["ascension", this.t.autoHolidayAscension],
@@ -1305,25 +1336,38 @@ class ClimatePlannerPanel extends HTMLElement {
     ].map(([value, label]) => `<option value="${value}" ${value === selected ? "selected" : ""}>${escapeHTML(label)}</option>`).join("");
   }
 
-  autoRuleRowMarkup(rule = {}) {
-    const action = rule.action || "";
+  autoRuleActionMarkup(action, config, kind) {
+    const actionLabel = action === "on" ? this.t.autoOn : this.t.autoOff;
+    const timeLabel = action === "on" ? this.t.autoOnTime : this.t.autoOffTime;
+    if (kind === "cycle") {
+      const startDateLabel = action === "on" ? this.t.autoOnStartDate : this.t.autoOffStartDate;
+      const endDateLabel = action === "on" ? this.t.autoOnEndDate : this.t.autoOffEndDate;
+      return `<fieldset class="auto-rule-action-card" data-auto-rule-action-card="${action}"><legend>${escapeHTML(actionLabel)}</legend><label>${escapeHTML(startDateLabel)}<input type="date" data-auto-rule-action-start-date="${action}" value="${escapeHTML(config.start_date || "")}"></label><label>${escapeHTML(endDateLabel)}<input type="date" data-auto-rule-action-end-date="${action}" value="${escapeHTML(config.end_date || "")}"></label><label>${escapeHTML(timeLabel)}<input type="time" step="900" data-auto-rule-action-time="${action}" value="${escapeHTML(config.time || "")}"></label></fieldset>`;
+    }
+    return `<fieldset class="auto-rule-action-card" data-auto-rule-action-card="${action}"><legend>${escapeHTML(actionLabel)}</legend><label>${escapeHTML(timeLabel)}<input type="time" step="900" data-auto-rule-action-time="${action}" value="${escapeHTML(config.time || "")}"></label></fieldset>`;
+  }
+
+  autoRuleRowMarkup(rule = {}, expanded = false) {
     const kind = rule.kind || "";
-    return `<div class="auto-rule-row" data-auto-rule-row data-rule-id="${escapeHTML(rule.id || "")}" data-date="${escapeHTML(rule.date || "")}" data-holiday="${escapeHTML(rule.holiday || "")}" data-start-date="${escapeHTML(rule.start_date || "")}" data-end-date="${escapeHTML(rule.end_date || "")}" data-start-time="${escapeHTML(rule.start_time || "")}" data-recurrence="${escapeHTML(rule.recurrence || "")}"><span class="auto-rule-drag" data-auto-rule-drag draggable="true" role="button" tabindex="0" aria-label="${escapeHTML(this.t.autoDrag)}" title="${escapeHTML(this.t.autoDrag)}"><ha-icon icon="mdi:drag-vertical" aria-hidden="true"></ha-icon></span><label>${escapeHTML(this.t.autoAction)}<select data-auto-rule-action><option value="">${escapeHTML(this.t.autoActionEmpty)}</option><option value="on" ${action === "on" ? "selected" : ""}>${escapeHTML(this.t.autoOn)}</option><option value="off" ${action === "off" ? "selected" : ""}>${escapeHTML(this.t.autoOff)}</option></select></label><label>${escapeHTML(this.t.autoKind)}<select data-auto-rule-kind><option value="">${escapeHTML(this.t.autoKindEmpty)}</option><option value="date" ${kind === "date" ? "selected" : ""}>${escapeHTML(this.t.autoKindDate)}</option><option value="holiday" ${kind === "holiday" ? "selected" : ""}>${escapeHTML(this.t.autoKindHoliday)}</option><option value="cycle" ${kind === "cycle" ? "selected" : ""}>${escapeHTML(this.t.autoKindCycle)}</option></select></label><label class="auto-rule-name">${escapeHTML(this.t.autoRuleName)}<input data-auto-rule-name maxlength="160" placeholder="${escapeHTML(this.t.autoRuleNamePlaceholder)}" value="${escapeHTML(rule.name || "")}"></label><div class="auto-rule-value" data-auto-rule-value></div><button type="button" class="auto-rule-remove" data-remove-auto-rule aria-label="${escapeHTML(this.t.removeAutoRule)}" title="${escapeHTML(this.t.removeAutoRule)}"><ha-icon icon="mdi:trash-can-outline" aria-hidden="true"></ha-icon></button></div>`;
+    const onAction = this.autoRuleActionConfig(rule, "on");
+    const offAction = this.autoRuleActionConfig(rule, "off");
+    return `<div class="auto-rule-row ${expanded ? "" : "auto-rule-collapsed"}" data-auto-rule-row data-rule-id="${escapeHTML(rule.id || "")}" data-rule-action="${escapeHTML(rule.action || "")}" data-date="${escapeHTML(rule.date || "")}" data-holiday="${escapeHTML(rule.holiday || "")}" data-recurrence="${escapeHTML(rule.recurrence || "")}" data-on-time="${escapeHTML(onAction.time || "")}" data-on-start-date="${escapeHTML(onAction.start_date || "")}" data-on-end-date="${escapeHTML(onAction.end_date || "")}" data-off-time="${escapeHTML(offAction.time || "")}" data-off-start-date="${escapeHTML(offAction.start_date || "")}" data-off-end-date="${escapeHTML(offAction.end_date || "")}"><span class="auto-rule-drag" data-auto-rule-drag draggable="true" role="button" tabindex="0" aria-label="${escapeHTML(this.t.autoDrag)}" title="${escapeHTML(this.t.autoDrag)}"><ha-icon icon="mdi:drag-vertical" aria-hidden="true"></ha-icon></span><div class="auto-rule-summary"><strong data-auto-rule-summary-name>${escapeHTML(this.autoRuleDisplayName(rule))}</strong><div class="auto-rule-summary-actions"><button type="button" data-auto-rule-edit aria-expanded="${expanded}">${escapeHTML(expanded ? this.t.autoRuleCollapse : this.t.edit)}</button><button type="button" class="auto-rule-remove" data-remove-auto-rule aria-label="${escapeHTML(this.t.removeAutoRule)}" title="${escapeHTML(this.t.removeAutoRule)}"><ha-icon icon="mdi:trash-can-outline" aria-hidden="true"></ha-icon></button></div></div><div class="auto-rule-editor" data-auto-rule-editor ${expanded ? "" : "hidden"}><div class="auto-rule-core"><label class="auto-rule-name">${escapeHTML(this.t.autoRuleName)}<input data-auto-rule-name maxlength="160" placeholder="${escapeHTML(this.t.autoRuleNamePlaceholder)}" value="${escapeHTML(rule.name || "")}"></label><label>${escapeHTML(this.t.autoKind)}<select data-auto-rule-kind><option value="">${escapeHTML(this.t.autoKindEmpty)}</option><option value="date" ${kind === "date" ? "selected" : ""}>${escapeHTML(this.t.autoKindDate)}</option><option value="holiday" ${kind === "holiday" ? "selected" : ""}>${escapeHTML(this.t.autoKindHoliday)}</option><option value="cycle" ${kind === "cycle" ? "selected" : ""}>${escapeHTML(this.t.autoKindCycle)}</option></select></label></div><div class="auto-rule-value" data-auto-rule-value></div></div></div>`;
   }
 
   updateAutoRuleValue(row) {
     const kind = row.querySelector("[data-auto-rule-kind]")?.value || "";
     const target = row.querySelector("[data-auto-rule-value]");
     if (!target) return;
-    row.classList.toggle("auto-rule-cycle", kind === "cycle");
     const storedDate = row.dataset.date || "";
     const storedHoliday = row.dataset.holiday || "";
     const storedRecurrence = row.dataset.recurrence || "daily";
-    const storedStartDate = row.dataset.startDate || "";
-    const storedEndDate = row.dataset.endDate || "";
-    const storedStartTime = row.dataset.startTime || "00:00";
+    const actionConfig = (action) => ({
+      time: row.dataset[`${action}Time`] || "",
+      start_date: row.dataset[`${action}StartDate`] || "",
+      end_date: row.dataset[`${action}EndDate`] || "",
+    });
     if (kind === "date") {
-      target.innerHTML = `<label>${escapeHTML(this.t.autoDate)}<input type="date" data-auto-rule-value-control value="${escapeHTML(storedDate)}"></label>`;
+      target.innerHTML = `<div class="auto-rule-context"><label>${escapeHTML(this.t.autoDate)}<input type="date" data-auto-rule-value-control value="${escapeHTML(storedDate)}"></label></div><div class="auto-rule-actions">${this.autoRuleActionMarkup("on", actionConfig("on"), kind)}${this.autoRuleActionMarkup("off", actionConfig("off"), kind)}</div>`;
       return;
     }
     if (kind === "holiday") {
@@ -1331,11 +1375,11 @@ class ClimatePlannerPanel extends HTMLElement {
       if (storedHoliday && !holidayOptions.some(([value]) => value === storedHoliday)) {
         holidayOptions.unshift([storedHoliday, `${storedHoliday} (${this.t.unavailableRegion})`]);
       }
-      target.innerHTML = `<label>${escapeHTML(this.t.autoHoliday)}<select data-auto-rule-value-control><option value="">${escapeHTML(this.t.autoKindEmpty)}</option>${holidayOptions.map(([value, label]) => `<option value="${value}" ${value === storedHoliday ? "selected" : ""}>${escapeHTML(label)}</option>`).join("")}</select></label>`;
+      target.innerHTML = `<div class="auto-rule-context"><label>${escapeHTML(this.t.autoHoliday)}<select data-auto-rule-value-control><option value="">${escapeHTML(this.t.autoKindEmpty)}</option>${holidayOptions.map(([value, label]) => `<option value="${value}" ${value === storedHoliday ? "selected" : ""}>${escapeHTML(label)}</option>`).join("")}</select></label></div><div class="auto-rule-actions">${this.autoRuleActionMarkup("on", actionConfig("on"), kind)}${this.autoRuleActionMarkup("off", actionConfig("off"), kind)}</div>`;
       return;
     }
     if (kind === "cycle") {
-      target.innerHTML = `<div class="auto-rule-cycle-fields"><label>${escapeHTML(this.t.autoRecurrence)}<select data-auto-rule-recurrence>${this.autoRuleRecurrenceOptions(storedRecurrence)}</select></label><label>${escapeHTML(this.t.autoStartDate)}<input type="date" data-auto-rule-start-date value="${escapeHTML(storedStartDate)}"></label><label>${escapeHTML(this.t.autoEndDate)}<input type="date" data-auto-rule-end-date value="${escapeHTML(storedEndDate)}"></label><label>${escapeHTML(this.t.autoStartTime)}<input type="time" step="900" data-auto-rule-start-time value="${escapeHTML(storedStartTime)}"></label><small class="auto-rule-hint">${escapeHTML(this.t.autoCycleHint)}</small></div>`;
+      target.innerHTML = `<div class="auto-rule-context"><label>${escapeHTML(this.t.autoRecurrence)}<select data-auto-rule-recurrence>${this.autoRuleRecurrenceOptions(storedRecurrence)}</select></label><small class="auto-rule-hint">${escapeHTML(this.t.autoCycleHint)}</small></div><div class="auto-rule-actions">${this.autoRuleActionMarkup("on", actionConfig("on"), kind)}${this.autoRuleActionMarkup("off", actionConfig("off"), kind)}</div>`;
       return;
     }
     target.innerHTML = kind
@@ -1345,38 +1389,57 @@ class ClimatePlannerPanel extends HTMLElement {
 
   bindAutoRuleRow(row) {
     const clearRuleValidity = () => {
-      row.querySelector("[data-auto-rule-action]")?.setCustomValidity("");
       row.querySelector("[data-auto-rule-kind]")?.setCustomValidity("");
+      row.querySelector("[data-auto-rule-name]")?.setCustomValidity("");
+    };
+    const updateSummary = () => {
+      const name = row.querySelector("[data-auto-rule-name]")?.value.trim() || "";
+      const kind = row.querySelector("[data-auto-rule-kind]")?.value || "";
+      const actions = ["on", "off"].filter((action) => row.querySelector(`[data-auto-rule-action-time="${action}"]`));
+      const action = actions.length === 1 ? actions[0] : row.dataset.ruleAction;
+      row.querySelector("[data-auto-rule-summary-name]").textContent = name || this.autoRuleDisplayName({ name, kind, action });
     };
     const syncValue = () => {
       const kind = row.querySelector("[data-auto-rule-kind]")?.value || "";
+      const name = row.querySelector("[data-auto-rule-name]")?.value.trim() || "";
+      row.dataset.ruleName = name;
       const value = row.querySelector("[data-auto-rule-value-control]")?.value || "";
       if (kind === "holiday") row.dataset.holiday = value;
-      else if (kind === "date") row.dataset.date = value;
-      else if (kind === "cycle") {
+      if (kind === "date") row.dataset.date = value;
+      if (kind === "cycle") {
         row.dataset.recurrence = row.querySelector("[data-auto-rule-recurrence]")?.value || "";
-        row.dataset.startDate = row.querySelector("[data-auto-rule-start-date]")?.value || "";
-        row.dataset.endDate = row.querySelector("[data-auto-rule-end-date]")?.value || "";
-        row.dataset.startTime = row.querySelector("[data-auto-rule-start-time]")?.value || "";
       }
+      ["on", "off"].forEach((action) => {
+        row.dataset[`${action}Time`] = row.querySelector(`[data-auto-rule-action-time="${action}"]`)?.value || "";
+        row.dataset[`${action}StartDate`] = row.querySelector(`[data-auto-rule-action-start-date="${action}"]`)?.value || "";
+        row.dataset[`${action}EndDate`] = row.querySelector(`[data-auto-rule-action-end-date="${action}"]`)?.value || "";
+      });
       if (!row.dataset.ruleId) row.dataset.ruleId = newId("auto_rule");
+      updateSummary();
     };
     row.querySelector("[data-auto-rule-kind]")?.addEventListener("change", () => {
       clearRuleValidity();
       this.updateAutoRuleValue(row);
       syncValue();
     });
-    row.querySelector("[data-auto-rule-action]")?.addEventListener("change", () => {
-      clearRuleValidity();
+    row.querySelector("[data-auto-rule-name]")?.addEventListener("input", () => {
+      row.querySelector("[data-auto-rule-name]")?.setCustomValidity("");
       syncValue();
     });
+    const clearValueValidity = () => {
+      row.querySelector("[data-auto-rule-value]")?.querySelectorAll("input, select").forEach((input) => input.setCustomValidity(""));
+    };
     row.querySelector("[data-auto-rule-value]")?.addEventListener("input", () => {
-      row.querySelector("[data-auto-rule-end-date]")?.setCustomValidity("");
+      clearValueValidity();
       syncValue();
     });
     row.querySelector("[data-auto-rule-value]")?.addEventListener("change", () => {
-      row.querySelector("[data-auto-rule-end-date]")?.setCustomValidity("");
+      clearValueValidity();
       syncValue();
+    });
+    row.querySelector("[data-auto-rule-edit]")?.addEventListener("click", () => {
+      const editor = row.querySelector("[data-auto-rule-editor]");
+      this.setAutoRuleExpanded(row, Boolean(editor?.hidden));
     });
     row.querySelector("[data-remove-auto-rule]")?.addEventListener("click", () => row.remove());
     const dragHandle = row.querySelector("[data-auto-rule-drag]");
@@ -1410,6 +1473,22 @@ class ClimatePlannerPanel extends HTMLElement {
       row.classList.remove("drag-over");
     });
     this.updateAutoRuleValue(row);
+    row.querySelectorAll("input, select").forEach((control) => {
+      control.addEventListener("input", syncValue);
+      control.addEventListener("change", syncValue);
+    });
+    syncValue();
+  }
+
+  setAutoRuleExpanded(row, expanded, focusName = false) {
+    const editor = row.querySelector("[data-auto-rule-editor]");
+    const editButton = row.querySelector("[data-auto-rule-edit]");
+    if (!editor || !editButton) return;
+    editor.hidden = !expanded;
+    row.classList.toggle("auto-rule-collapsed", !expanded);
+    editButton.textContent = expanded ? this.t.autoRuleCollapse : this.t.edit;
+    editButton.setAttribute("aria-expanded", String(expanded));
+    if (focusName) row.querySelector("[data-auto-rule-name]")?.focus();
   }
 
   openModeScheduleDialog(scheduleId, assignmentId = null, draggedModeId = null, initialWeekday = null, initialTime = "06:00") {
@@ -1448,11 +1527,11 @@ class ClimatePlannerPanel extends HTMLElement {
     autoRuleContainer.querySelectorAll("[data-auto-rule-row]").forEach((row) => this.bindAutoRuleRow(row));
     form.querySelector("[data-add-auto-rule]")?.addEventListener("click", () => {
       const wrapper = document.createElement("div");
-      wrapper.innerHTML = this.autoRuleRowMarkup();
+      wrapper.innerHTML = this.autoRuleRowMarkup({}, true);
       const row = wrapper.firstElementChild;
       autoRuleContainer.append(row);
       this.bindAutoRuleRow(row);
-      row.querySelector("[data-auto-rule-action]")?.focus();
+      this.setAutoRuleExpanded(row, true, true);
     });
     const bulkTime = form.elements.bulk_time;
     const temperature = form.elements.target_temperature;
@@ -1562,46 +1641,78 @@ class ClimatePlannerPanel extends HTMLElement {
       if (!selectedCards.length) return this.notice(this.t.missingDay, true);
       const autoRulesValue = [];
       for (const row of autoRuleContainer.querySelectorAll("[data-auto-rule-row]")) {
-        const actionControl = row.querySelector("[data-auto-rule-action]");
         const kindControl = row.querySelector("[data-auto-rule-kind]");
-        const action = actionControl?.value || "";
         const kind = kindControl?.value || "";
         const name = row.querySelector("[data-auto-rule-name]")?.value.trim() || "";
         const value = row.querySelector("[data-auto-rule-value-control]")?.value || "";
-        if (!action && !kind && !name && !value) continue;
-        if (!action || !kind) {
-          const invalidControl = !action ? actionControl : kindControl;
+        const actionControls = ["on", "off"].map((action) => ({
+          action,
+          timeControl: row.querySelector(`[data-auto-rule-action-time="${action}"]`),
+          startDateControl: row.querySelector(`[data-auto-rule-action-start-date="${action}"]`),
+          endDateControl: row.querySelector(`[data-auto-rule-action-end-date="${action}"]`),
+        }));
+        const hasActionInput = actionControls.some(({ timeControl, startDateControl, endDateControl }) => timeControl?.value || startDateControl?.value || endDateControl?.value);
+        if (!name && !kind && !value && !hasActionInput) continue;
+        if (!name || !kind) {
+          const invalidControl = !name ? row.querySelector("[data-auto-rule-name]") : kindControl;
           invalidControl?.setCustomValidity(this.t.autoRuleIncomplete);
           invalidControl?.reportValidity();
           return;
         }
-        const rule = { id: row.dataset.ruleId || newId("auto_rule"), action, kind };
-        if (name) rule.name = name;
+        const rule = { id: row.dataset.ruleId || newId("auto_rule"), name, kind };
         if (kind === "date") {
-          if (!value || !DATE_PATTERN.test(value)) return this.notice(this.t.invalid, true);
+          if (!value || !DATE_PATTERN.test(value)) {
+            row.querySelector("[data-auto-rule-value-control]")?.setCustomValidity(this.t.invalid);
+            row.querySelector("[data-auto-rule-value-control]")?.reportValidity();
+            return;
+          }
           rule.date = value;
         } else if (kind === "holiday") {
-          if (!value) return this.notice(this.t.invalid, true);
+          if (!value) {
+            row.querySelector("[data-auto-rule-value-control]")?.setCustomValidity(this.t.invalid);
+            row.querySelector("[data-auto-rule-value-control]")?.reportValidity();
+            return;
+          }
           rule.holiday = value;
         } else if (kind === "cycle") {
           const recurrence = row.querySelector("[data-auto-rule-recurrence]")?.value || "";
-          const startDate = row.querySelector("[data-auto-rule-start-date]")?.value || "";
-          const endDateControl = row.querySelector("[data-auto-rule-end-date]");
-          const endDate = endDateControl?.value || "";
-          const startTime = row.querySelector("[data-auto-rule-start-time]")?.value || "";
-          if (!recurrence || (startDate && !DATE_PATTERN.test(startDate)) || !TIME_PATTERN.test(startTime)) {
+          if (!recurrence) {
             return this.notice(this.t.invalid, true);
           }
-          if (endDate && (!DATE_PATTERN.test(endDate) || (startDate && endDate < startDate))) {
+          rule.recurrence = recurrence;
+        }
+        const actions = {};
+        for (const { action, timeControl, startDateControl, endDateControl } of actionControls) {
+          const time = timeControl?.value || "";
+          const startDate = startDateControl?.value || "";
+          const endDate = endDateControl?.value || "";
+          if (!time && !startDate && !endDate) continue;
+          if (!TIME_PATTERN.test(time)) {
+            timeControl?.setCustomValidity(this.t.invalidTime || this.t.invalid);
+            timeControl?.reportValidity();
+            return;
+          }
+          if (kind !== "cycle" && (startDate || endDate)) {
+            return this.notice(this.t.invalid, true);
+          }
+          if (kind === "cycle" && ((startDate && !DATE_PATTERN.test(startDate)) || (endDate && (!DATE_PATTERN.test(endDate) || (startDate && endDate < startDate)))) {
             endDateControl?.setCustomValidity(this.t.autoRuleEndBeforeStart);
             endDateControl?.reportValidity();
             return;
           }
-          rule.recurrence = recurrence;
-          if (startDate) rule.start_date = startDate;
-          if (endDate) rule.end_date = endDate;
-          rule.start_time = startTime;
+          const actionValue = { time };
+          if (kind === "cycle") {
+            if (startDate) actionValue.start_date = startDate;
+            if (endDate) actionValue.end_date = endDate;
+          }
+          actions[action] = actionValue;
         }
+        if (!Object.keys(actions).length) {
+          kindControl?.setCustomValidity(this.t.autoRuleIncomplete);
+          kindControl?.reportValidity();
+          return;
+        }
+        rule.actions = actions;
         autoRulesValue.push(rule);
       }
       for (const card of selectedCards) {
@@ -1912,25 +2023,21 @@ class ClimatePlannerPanel extends HTMLElement {
 
   externalTargetForEntity(schedule, entityId, requestedTemperature) {
     const requested = Number(requestedTemperature);
-    if (!Number.isFinite(requested)) return "";
+    if (!Number.isFinite(requested)) return false;
     const windowOpenEntityIds = new Set(this.data.window_status?.[schedule.id]?.open_entity_ids || []);
-    if (windowOpenEntityIds.has(entityId)) return "";
+    if (windowOpenEntityIds.has(entityId)) return false;
     const entityTarget = this.climateEntityTemperatureValue(entityId, "temperature", "target_temperature");
-    if (entityTarget == null || Math.abs(entityTarget - requested) <= this.targetTemperatureTolerance(entityId)) return "";
-    return this.temperatureText(entityTarget);
+    if (entityTarget == null || Math.abs(entityTarget - requested) <= this.targetTemperatureTolerance(entityId)) return false;
+    return true;
   }
 
   externalTargetText(schedule, lastActivated) {
     const requested = Number(lastActivated?.target_temperature);
     if (!Number.isFinite(requested)) return "";
     const entityIds = schedule.climate_entity_ids || [];
-    const externalTargets = [];
-    entityIds.forEach((entityId) => {
-      const text = this.externalTargetForEntity(schedule, entityId, requested);
-      if (!text) return;
-      if (!externalTargets.includes(text)) externalTargets.push(text);
-    });
-    return externalTargets.join(", ");
+    return entityIds.some((entityId) => this.externalTargetForEntity(schedule, entityId, requested))
+      ? this.t.external
+      : "";
   }
 
   scheduleHasExternalTarget(schedule, lastActivated) {
@@ -1940,11 +2047,11 @@ class ClimatePlannerPanel extends HTMLElement {
   climateEntityRows(entityIds, requestedTemperature = null, schedule = null) {
     const ids = Array.isArray(entityIds) ? entityIds : entityIds ? [entityIds] : [];
     if (!ids.length) return `<p class="muted schedule-entities-empty">${this.t.noClimate}</p>`;
-    const requestedText = requestedTemperature == null ? "—" : this.temperatureText(requestedTemperature);
     return ids.map((entityId) => {
       const externalTarget = schedule ? this.externalTargetForEntity(schedule, entityId, requestedTemperature) : "";
-      const externalMarkup = externalTarget ? `<span class="external-badge">${escapeHTML(`${this.t.external} (${externalTarget})`)}</span>` : "";
-      return `<button type="button" class="schedule-entity-row" data-climate-entity="${escapeHTML(entityId)}" title="${escapeHTML(this.climateEntityLabel(entityId, schedule))}"><span class="schedule-entity-name">${escapeHTML(this.climateEntityLabel(entityId, schedule))}</span><span class="schedule-entity-values"><span class="climate-value climate-target"><span><b title="${escapeHTML(this.t.targetRequest)}">${escapeHTML(this.t.targetRequestShort)}</b> ${escapeHTML(requestedText)}</span>${externalMarkup}</span><span class="climate-value"><b>${escapeHTML(this.t.currentShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "current_temperature"))}</span></span></button>`;
+      const externalMarkup = externalTarget ? `<span class="external-badge">${escapeHTML(this.t.external)}</span>` : "";
+      const entityTarget = this.climateEntityTemperature(entityId, "temperature", "target_temperature");
+      return `<button type="button" class="schedule-entity-row" data-climate-entity="${escapeHTML(entityId)}" title="${escapeHTML(this.climateEntityLabel(entityId, schedule))}"><span class="schedule-entity-name">${escapeHTML(this.climateEntityLabel(entityId, schedule))}</span><span class="schedule-entity-values"><span class="climate-value climate-target"><span><b title="${escapeHTML(this.t.targetRequest)}">${escapeHTML(this.t.targetRequestShort)}</b> ${escapeHTML(entityTarget)}</span>${externalMarkup}</span><span class="climate-value"><b>${escapeHTML(this.t.currentShort)}</b> ${escapeHTML(this.climateEntityTemperature(entityId, "current_temperature"))}</span></span></button>`;
     }).join("");
   }
 

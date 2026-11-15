@@ -116,6 +116,50 @@ def test_repeated_auto_rules_are_normalized():
     assert rules == value["schedules"][0]["assignments"][0]["auto_rules"]
 
 
+def test_grouped_auto_rule_supports_on_and_off_actions():
+    value = planner()
+    value["schedules"][0]["assignments"][0]["auto_rules"] = [
+        {
+            "id": "easter-monday",
+            "name": "Ostermontag",
+            "kind": "holiday",
+            "holiday": "easter_monday",
+            "actions": {
+                "on": {"time": "09:00"},
+                "off": {"time": "21:00"},
+            },
+        }
+    ]
+
+    rules = validate_planner(value)["schedules"][0]["assignments"][0]["auto_rules"]
+
+    assert rules == value["schedules"][0]["assignments"][0]["auto_rules"]
+
+
+def test_grouped_cyclic_auto_rule_has_independent_action_ranges():
+    value = planner()
+    value["schedules"][0]["assignments"][0]["auto_rules"] = [
+        {
+            "id": "wednesday",
+            "name": "Mittwochs lang",
+            "kind": "cycle",
+            "recurrence": "weekly",
+            "actions": {
+                "on": {
+                    "start_date": "2027-01-01",
+                    "end_date": "2027-02-01",
+                    "time": "09:00",
+                },
+                "off": {"start_date": "2027-01-01", "time": "22:00"},
+            },
+        }
+    ]
+
+    rules = validate_planner(value)["schedules"][0]["assignments"][0]["auto_rules"]
+
+    assert rules == value["schedules"][0]["assignments"][0]["auto_rules"]
+
+
 def test_repeated_auto_rules_require_their_value():
     value = planner()
     value["schedules"][0]["assignments"][0]["auto_rules"] = [

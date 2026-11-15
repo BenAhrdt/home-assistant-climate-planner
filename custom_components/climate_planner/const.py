@@ -4,7 +4,7 @@ from __future__ import annotations
 
 DOMAIN = "climate_planner"
 NAME = "Climate Planner"
-VERSION = "0.1.67"
+VERSION = "0.1.68"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = f"{DOMAIN}.planner"
@@ -70,6 +70,7 @@ AUTO_RULE_HOLIDAYS: tuple[str, ...] = (
     "epiphany",
     "international_womens_day",
     "good_friday",
+    "easter_saturday",
     "easter_monday",
     "easter_sunday",
     "whit_sunday",
@@ -100,7 +101,9 @@ HOLIDAY_NATIONAL: frozenset[str] = frozenset(
     {
         "new_year",
         "good_friday",
+        "easter_saturday",
         "easter_monday",
+        "easter_sunday",
         "labour_day",
         "ascension",
         "whit_monday",
@@ -112,7 +115,6 @@ HOLIDAY_NATIONAL: frozenset[str] = frozenset(
 HOLIDAY_STATE_AVAILABILITY: dict[str, frozenset[str]] = {
     "epiphany": frozenset({"bw", "by", "st"}),
     "international_womens_day": frozenset({"be", "mv"}),
-    "easter_sunday": frozenset({"bb"}),
     "whit_sunday": frozenset({"bb"}),
     "corpus_christi": frozenset({"bw", "by", "he", "nw", "rp", "sl"}),
     "maria_himmelfahrt": frozenset({"sl"}),

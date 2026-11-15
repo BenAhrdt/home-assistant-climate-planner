@@ -16,9 +16,9 @@ entities and uses centrally managed modes with target temperatures.
 - complete heating-plan duplication with new stable IDs and a paused copy
 - multiple climate entities per plan through the native searchable Home
   Assistant entity picker; integration, area and device remain visible
-- display of the last target sent by the planner and current temperature, with
-  an external-change indicator (including the differing climate target) when
-  the climate readback differs
+- display of the climate entity's actual target and current temperature, with
+  an external-change indicator when it differs from the last planner target;
+  window-open setback targets are shown without an external indicator
 - external-target indication and persistence of the last activation across
   integration restarts
 - mode assignment editing directly from a heating-plan card; manual mode

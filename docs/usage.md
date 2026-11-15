@@ -46,36 +46,36 @@ gespeichert. Bei gleichzeitig passenden Regeln gewinnt die höhere Priorität,
 danach die zuletzt aktivierte Regel.
 
 Über das Zahnrad rechts an einem verwendeten Mode lassen sich die Einstellungen
-dieser Mode-Zuordnung im Heizplan öffnen. Unter **Automatische Regeln** können
-beliebig viele Regeln für **Auto ein** und **Auto aus** angelegt werden. Eine
-neue Regel wird über **Regel hinzufügen** angelegt; unvollständige Zeilen werden
-nicht gespeichert.
-Jede Regel kann zusätzlich mit einer eigenen Bezeichnung versehen werden, zum
-Beispiel „Morgens einschalten“. Über den Griff links lässt sich die Reihenfolge
-der Regeln per Drag-and-Drop ändern; diese Reihenfolge wird beim Speichern
+dieser Mode-Zuordnung im Heizplan öffnen. Unter **Automatische Regeln** wird
+zuerst der Name der Regel eingetragen. Im Anschluss werden der **Anlass** und
+mindestens eine Aktion (**Auto ein**, **Auto aus** oder beide) festgelegt.
+Gespeicherte Regeln zeigen in der Übersicht nur ihren Namen; über **Bearbeiten**
+wird die vollständige Regel wieder geöffnet. Über den Griff links lässt sich die
+Reihenfolge per Drag-and-Drop ändern; diese Reihenfolge wird beim Speichern
 beibehalten.
 
 Als Anlass stehen ein einmaliges Datum, ausgewählte Feiertage und **Zyklisch**
-zur Verfügung. Geburtstage werden über „Zyklisch → Jährlich“ angelegt. Ostern,
-der 1. bis 4. Advent, alle Adventssonntage sowie die Weihnachtstage werden
-innerhalb der Feiertagsauswahl angeboten; zusätzlich gibt es den Sammeltermin
-„Ostern (Karfreitag–Ostermontag)“ und „Weihnachten (24.–26. Dezember)“.
-Die beweglichen Termine werden lokal berechnet. Unter **Feiertagsregion
-(Deutschland)** wird festgelegt, ob nur bundesweite Feiertage oder zusätzlich
-die gesetzlichen Feiertage eines Bundeslands angeboten und berechnet werden.
-Gemeinde- oder ortsabhängige Sonderfälle, etwa in Teilen Bayerns, Sachsens oder
-Thüringens, werden nicht automatisch berücksichtigt. Das zuletzt erreichte Ereignis
-bestimmt den Aktivierungszustand, wobei bei gleichem Datum **Auto aus** Vorrang
-hat. Die manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar.
-Eine Regel mit dem Anlass **Zyklisch** verwendet ein Intervall und eine
-Startzeit. Start- und Enddatum sind optional. Ohne Startdatum wird der aktuelle
-Tag als Anker verwendet. Optional kann ein Enddatum gesetzt werden; die letzte
-Wiederholung am Enddatum ist eingeschlossen. Das Enddatum beendet jedoch nicht
-automatisch den zuletzt gesetzten Zustand, dafür wird eine eigene Auto-aus-Regel
-benötigt. Verfügbar sind stündlich,
-täglich, wöchentlich, monatlich, quartalsweise und jährlich. Das Startdatum ist
-dabei der Anker: Es bestimmt bei wöchentlichen Regeln den Wochentag und bei
-monatlichen, quartalsweisen sowie jährlichen Regeln den Kalendertag.
+zur Verfügung. Für Auto ein und Auto aus kann jeweils eine eigene Uhrzeit
+angegeben werden. Bei Feiertagen ist die Uhrzeit ebenfalls frei wählbar.
+Ostersamstag und Ostersonntag sind als einzelne Feiertage vorhanden; zusätzlich
+gibt es den Sammeltermin „Ostern (Karfreitag–Ostermontag)“, die Adventstermine
+und „Weihnachten (24.–26. Dezember)“. Die beweglichen Termine werden lokal
+berechnet. Unter **Feiertagsregion (Deutschland)** wird festgelegt, ob nur
+bundesweite Feiertage oder zusätzlich die gesetzlichen Feiertage eines
+Bundeslands angeboten und berechnet werden. Gemeinde- oder ortsabhängige
+Sonderfälle, etwa in Teilen Bayerns, Sachsens oder Thüringens, werden nicht
+automatisch berücksichtigt. Das zuletzt erreichte Ereignis bestimmt den
+Aktivierungszustand; bei gleichem Zeitpunkt hat **Auto aus** Vorrang. Die
+manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar.
+
+Eine Regel mit dem Anlass **Zyklisch** verwendet eine Wiederholung. Auto ein und
+Auto aus besitzen dabei jeweils eigene Uhrzeit-, Startdatum- und optionale
+Enddatum-Felder. Ohne Startdatum wird der aktuelle Tag als Anker verwendet.
+Optional kann ein Enddatum gesetzt werden; die letzte Wiederholung am Enddatum
+ist eingeschlossen. Verfügbar sind stündlich, täglich, wöchentlich, monatlich,
+quartalsweise und jährlich. Das Startdatum ist dabei der Anker: Es bestimmt bei
+wöchentlichen Regeln den Wochentag und bei monatlichen, quartalsweisen sowie
+jährlichen Regeln den Kalendertag.
 
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.
@@ -186,14 +186,14 @@ Climate Planner aktivierten Mode. Das gilt auch, wenn eine Automation einen
 Climate-Planner-Dienst oder Aktivierungs-Button verwendet.
 
 Für jede Klima-Entität stehen **Soll** und **Ist** nebeneinander. **Soll** ist
-der zuletzt erfolgreich vom Climate Planner an `climate.set_temperature`
-gesendete Wert. Der aktuelle Rückgabewert der Climate-Entität aus dem Attribut
-`temperature` wird damit verglichen, aber nicht als Sollwert überschrieben.
-Weicht der Rückgabewert unter Berücksichtigung der Thermostat-Schrittweite von
-der letzten Planner-Vorgabe ab, erscheint beim zuletzt aktivierten Mode der
-Hinweis **extern** mit dem aktuell von der Climate-Entität zurückgemeldeten
-Sollwert in Klammern, zum Beispiel **extern (18,6 °C)**. Der Hinweis löst keine
-automatische Nachregelung aus. Der zuletzt aktivierte Mode bleibt auch nach
+der aktuelle Sollwert der Climate-Entität aus dem Attribut `temperature`.
+Weicht dieser unter Berücksichtigung der Thermostat-Schrittweite von der
+letzten Planner-Vorgabe ab, erscheint der Hinweis **extern** ohne zusätzlichen
+Temperaturwert. Während der Fenster-Absenkung wird der tatsächliche
+Absenk-Sollwert angezeigt, aber nicht als **extern** markiert. Der Hinweis löst
+keine automatische Nachregelung aus. **Zuletzt aktiviert** bleibt der zuletzt
+vom Climate Planner aktivierte Mode; die Anzeige **Fenster offen – Absenkung
+aktiv** bleibt dabei erhalten. Der zuletzt aktivierte Mode bleibt auch nach
 einem Neustart der Integration erhalten.
 
 Phasen lassen sich im 15-Minuten-Raster verschieben, über die sichtbaren
