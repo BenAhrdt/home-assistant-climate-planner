@@ -222,7 +222,7 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
         if kind not in AUTO_RULE_KINDS:
             raise InvalidData("invalid_auto_rule_kind")
         normalized = {"id": rule_id, "action": action, "kind": kind}
-        if kind in {"date", "birthday"}:
+        if kind == "date":
             date_text = _optional_date(raw_rule.get("date"), "invalid_auto_rule_date")
             if not date_text:
                 raise InvalidData("missing_auto_rule_date")
@@ -294,8 +294,6 @@ def _normalize_assignment(
         "id",
         "mode_id",
         "enabled",
-        "auto_on_date",
-        "auto_off_date",
         "auto_rules",
         "weekday_rules",
     }:
@@ -316,12 +314,6 @@ def _normalize_assignment(
     auto_rules = _normalize_auto_rules(raw.get("auto_rules"), phase_ids)
     if auto_rules:
         result["auto_rules"] = auto_rules
-    auto_on_date = _optional_date(raw.get("auto_on_date"), "invalid_auto_on_date")
-    auto_off_date = _optional_date(raw.get("auto_off_date"), "invalid_auto_off_date")
-    if auto_on_date:
-        result["auto_on_date"] = auto_on_date
-    if auto_off_date:
-        result["auto_off_date"] = auto_off_date
     return result
 
 

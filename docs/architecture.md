@@ -66,13 +66,11 @@ Planner
         ├── id
         ├── mode_id              # stabile Referenz in modes[]
         ├── enabled
-        ├── auto_on_date?        # ISO-Kalenderdatum für automatische Aktivierung
-        ├── auto_off_date?       # ISO-Kalenderdatum für automatische Deaktivierung
         ├── auto_rules[]?        # beliebig viele automatische Ein-/Aus-Regeln
         │   ├── id
         │   ├── action             # on oder off
-        │   ├── kind               # date, birthday, holiday, easter oder cycle
-        │   ├── date?              # ISO-Datum für date/birthday
+        │   ├── kind               # date, holiday oder cycle
+        │   ├── date?              # ISO-Datum für kind=date
         │   ├── holiday?           # unterstützter Feiertag für kind=holiday
         │   ├── recurrence?       # hourly, daily, weekly, monthly, quarterly, yearly
         │   ├── start_date?       # ISO-Ankerdatum für kind=cycle
@@ -108,11 +106,10 @@ abwärtskompatibel in `assignments[].enabled` des jeweiligen Heizplans
 überführt; neue Daten führen den Aktivierungszustand ausschließlich an der
 Mode-Zuordnung.
 
-`auto_on_date` und `auto_off_date` gehören ausschließlich zur Mode-Zuordnung und
-bleiben als Legacy-Felder lesbar. Neue Daten verwenden `auto_rules[]`, sodass
-mehrere Auto-ein-/Auto-aus-Ereignisse pro Zuordnung möglich sind. Einmalige
-Datumsregeln werden nur am angegebenen Tag ausgelöst; Geburtstage und die
-berechneten Anlässe wiederholen sich jährlich. Eine zyklische Regel erzeugt
+`auto_rules[]` gehört ausschließlich zur Mode-Zuordnung, sodass mehrere
+Auto-ein-/Auto-aus-Ereignisse pro Zuordnung möglich sind. Einmalige Datumsregeln
+werden nur am angegebenen Tag ausgelöst; berechnete Feiertage wiederholen sich
+jährlich. Eine zyklische Regel erzeugt
 Ereignisse anhand ihres Intervalls und Ankerdatums. Das zuletzt erreichte Ereignis
 bestimmt den Zustand; bei gleichem Datum gewinnt Auto aus. Manuelle Änderungen
 des Play-/Pause-Zustands bleiben unabhängig davon möglich. Die Laufzeit merkt

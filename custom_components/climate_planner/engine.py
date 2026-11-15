@@ -92,6 +92,10 @@ def _holiday_dates(holiday: str, year: int) -> tuple[date, ...]:
         first = _first_advent(year)
         return tuple(first + timedelta(days=7 * offset) for offset in range(4))
     easter = _easter_sunday(year)
+    if holiday == "easter_sunday":
+        return (easter,)
+    if holiday == "christmas_period":
+        return tuple(date(year, 12, day) for day in (24, 25, 26))
     movable_offsets = {
         "good_friday": -2,
         "easter_monday": 1,
@@ -110,42 +114,17 @@ def _auto_rule_dates(rule: dict, year: int) -> tuple[date, ...]:
     if kind == "date":
         event_date = date.fromisoformat(rule["date"])
         return (event_date,) if event_date.year == year else ()
-    if kind == "birthday":
-        source_date = date.fromisoformat(rule["date"])
-        try:
-            return (date(year, source_date.month, source_date.day),)
-        except ValueError:
-            # A 29 February birthday has no occurrence in a non-leap year.
-            return ()
     if kind == "holiday":
         return _holiday_dates(rule["holiday"], year)
-    if kind == "easter":
-        return (_easter_sunday(year),)
-    if kind == "advent":
-        return (_first_advent(year),)
-    if kind == "christmas":
-        return (date(year, 12, 25),)
     return ()
 
 
 def _auto_rule_events(
     assignment: dict, current_date: date, *, future_only: bool = False
 ) -> list[tuple[date, int, int, str, bool]]:
-    """Return legacy and repeated automatic events relevant to ``current_date``."""
+    """Return automatic date and holiday events relevant to ``current_date``."""
 
     events: list[tuple[date, int, int, str, bool]] = []
-    for field, enabled, tie_breaker in (
-        ("auto_on_date", True, 0),
-        ("auto_off_date", False, 1),
-    ):
-        date_text = assignment.get(field)
-        if not date_text:
-            continue
-        event_date = date.fromisoformat(date_text)
-        matches = event_date > current_date if future_only else event_date <= current_date
-        if matches:
-            events.append((event_date, tie_breaker, 0, f"{field}:{date_text}", enabled))
-
     rules = assignment.get("auto_rules", [])
     if not isinstance(rules, list):
         return events

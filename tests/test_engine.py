@@ -164,61 +164,32 @@ def test_week_view_keeps_last_phase_until_day_end():
     assert monday["segments"][-1]["end"] == 1440
 
 
-def test_auto_date_event_uses_latest_date_without_order_validation():
+def test_auto_date_event_uses_latest_date():
     value = {
-        "auto_on_date": "2026-11-20",
-        "auto_off_date": "2026-11-10",
+        "auto_rules": [
+            {"id": "on", "action": "on", "kind": "date", "date": "2026-11-20"},
+            {"id": "off", "action": "off", "kind": "date", "date": "2026-11-10"},
+        ]
     }
 
     assert latest_auto_date_event(value, date(2026, 11, 15)) == (
-        "auto_off_date:2026-11-10",
+        "auto_rule:off:off:2026-11-10",
         False,
     )
     assert latest_auto_date_event(value, date(2026, 11, 21)) == (
-        "auto_on_date:2026-11-20",
+        "auto_rule:on:on:2026-11-20",
         True,
     )
 
 
 def test_next_auto_date_is_scheduled_at_local_midnight():
     value = schedule([assignment("rule", "comfort", monday=["06:00"])])
-    value["assignments"][0]["auto_on_date"] = "2026-11-10"
+    value["assignments"][0]["auto_rules"] = [
+        {"id": "on", "action": "on", "kind": "date", "date": "2026-11-10"}
+    ]
 
     assert next_auto_date(value, datetime(2026, 11, 9, 12, tzinfo=ZONE)) == datetime(
         2026, 11, 10, tzinfo=ZONE
-    )
-
-
-def test_repeated_auto_rules_support_birthdays_and_calculated_occasions():
-    value = {
-        "auto_rules": [
-            {"id": "birthday", "action": "off", "kind": "birthday", "date": "1990-11-10"},
-            {"id": "easter", "action": "on", "kind": "easter"},
-        ]
-    }
-
-    assert latest_auto_date_event(value, date(2026, 11, 15)) == (
-        "auto_rule:birthday:off:2026-11-10",
-        False,
-    )
-    configured = assignment("rule", "comfort", monday=["06:00"])
-    configured["auto_rules"] = value["auto_rules"]
-    assert next_auto_date(
-        schedule([configured]), datetime(2026, 11, 15, 12, tzinfo=ZONE)
-    ) == datetime(2027, 3, 28, tzinfo=ZONE)
-
-
-def test_repeated_auto_rule_holiday_and_first_advent_are_resolved():
-    value = {
-        "auto_rules": [
-            {"id": "good-friday", "action": "off", "kind": "holiday", "holiday": "good_friday"},
-            {"id": "advent", "action": "on", "kind": "advent"},
-        ]
-    }
-
-    assert latest_auto_date_event(value, date(2026, 12, 1)) == (
-        "auto_rule:advent:on:2026-11-29",
-        True,
     )
 
 
@@ -248,6 +219,21 @@ def test_all_advent_holiday_has_four_occurrences():
     assert next_auto_date(
         schedule([configured]), datetime(2026, 12, 1, 12, tzinfo=ZONE)
     ) == datetime(2026, 12, 6, tzinfo=ZONE)
+
+
+def test_easter_and_christmas_period_are_holiday_occurrences():
+    easter = {"auto_rules": [{"id": "easter", "action": "on", "kind": "holiday", "holiday": "easter_sunday"}]}
+    christmas = {"auto_rules": [{"id": "christmas", "action": "off", "kind": "holiday", "holiday": "christmas_period"}]}
+
+    assert latest_auto_date_event(easter, date(2026, 4, 6)) == (
+        "auto_rule:easter:on:2026-04-05",
+        True,
+    )
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = christmas["auto_rules"]
+    assert next_auto_date(
+        schedule([configured]), datetime(2026, 12, 23, 12, tzinfo=ZONE)
+    ) == datetime(2026, 12, 24, tzinfo=ZONE)
 
 
 def test_hourly_cycle_uses_the_configured_start_time():

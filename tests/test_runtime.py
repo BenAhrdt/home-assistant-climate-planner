@@ -454,7 +454,12 @@ async def test_auto_dates_apply_in_order_and_manual_toggle_remains_independent(f
     fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
     payload = planner_payload()
     payload["schedules"][0]["assignments"][0].update(
-        {"auto_off_date": "2026-11-10", "auto_on_date": "2026-11-20"}
+        {
+            "auto_rules": [
+                {"id": "off", "action": "off", "kind": "date", "date": "2026-11-10"},
+                {"id": "on", "action": "on", "kind": "date", "date": "2026-11-20"},
+            ]
+        }
     )
     runtime = PlannerRuntime(fake_runtime, "entry")
     runtime._now = lambda: datetime(2026, 11, 15, 12, tzinfo=ZONE)
@@ -465,7 +470,7 @@ async def test_auto_dates_apply_in_order_and_manual_toggle_remains_independent(f
 
     assignment_value = runtime.data["schedules"][0]["assignments"][0]
     assert assignment_value["enabled"] is False
-    assert runtime._auto_date_actions["assignment_home"] == "auto_off_date:2026-11-10"
+    assert runtime._auto_date_actions["assignment_home"] == "auto_rule:off:off:2026-11-10"
 
     await runtime.async_set_assignment_enabled("schedule_living", "assignment_home", True)
     assert runtime.data["schedules"][0]["assignments"][0]["enabled"] is True
@@ -473,7 +478,7 @@ async def test_auto_dates_apply_in_order_and_manual_toggle_remains_independent(f
     runtime._now = lambda: datetime(2026, 11, 21, 12, tzinfo=ZONE)
     await runtime.async_evaluate()
     assert runtime.data["schedules"][0]["assignments"][0]["enabled"] is True
-    assert runtime._auto_date_actions["assignment_home"] == "auto_on_date:2026-11-20"
+    assert runtime._auto_date_actions["assignment_home"] == "auto_rule:on:on:2026-11-20"
 
     await runtime.async_set_assignment_enabled("schedule_living", "assignment_home", False)
     assert runtime.data["schedules"][0]["assignments"][0]["enabled"] is False

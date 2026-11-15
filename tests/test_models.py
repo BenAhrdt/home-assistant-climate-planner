@@ -79,24 +79,19 @@ def test_legacy_global_mode_pause_is_migrated_to_assignments():
     assert normalized["schedules"][0]["assignments"][0]["enabled"] is False
 
 
-def test_assignment_auto_dates_are_preserved_without_order_validation():
-    value = planner()
-    value["schedules"][0]["assignments"][0].update(
-        {"auto_on_date": "2026-11-20", "auto_off_date": "2026-11-10"}
-    )
-
-    assignment_value = validate_planner(value)["schedules"][0]["assignments"][0]
-
-    assert assignment_value["auto_on_date"] == "2026-11-20"
-    assert assignment_value["auto_off_date"] == "2026-11-10"
-
-
 def test_repeated_auto_rules_are_normalized():
     value = planner()
     value["schedules"][0]["assignments"][0]["auto_rules"] = [
-        {"id": "rule_on", "action": "on", "kind": "birthday", "date": "1990-02-14"},
+        {"id": "rule_on", "action": "on", "kind": "date", "date": "2026-02-14"},
         {"id": "rule_off", "action": "off", "kind": "holiday", "holiday": "christmas_eve"},
-        {"id": "rule_on_easter", "action": "on", "kind": "easter"},
+        {
+            "id": "rule_cycle",
+            "action": "on",
+            "kind": "cycle",
+            "recurrence": "yearly",
+            "start_date": "2026-02-14",
+            "start_time": "08:00",
+        },
     ]
 
     rules = validate_planner(value)["schedules"][0]["assignments"][0]["auto_rules"]
@@ -221,11 +216,23 @@ def test_unknown_climate_entity_display_name_is_rejected():
                 "schedules": [
                     {
                         **schedule(),
-                        "assignments": [{**assignment(), "auto_on_date": "2026-02-30"}],
+                        "assignments": [
+                            {
+                                **assignment(),
+                                "auto_rules": [
+                                    {
+                                        "id": "invalid-date",
+                                        "action": "on",
+                                        "kind": "date",
+                                        "date": "2026-02-30",
+                                    }
+                                ],
+                            }
+                        ],
                     }
                 ]
             },
-            "invalid_auto_on_date",
+            "invalid_auto_rule_date",
         ),
     ],
 )

@@ -51,20 +51,18 @@ beliebig viele Regeln für **Auto ein** und **Auto aus** angelegt werden. Eine
 neue Regel wird über **Regel hinzufügen** angelegt; unvollständige Zeilen werden
 nicht gespeichert.
 
-Als Anlass stehen ein einmaliges Datum, ein jährlich wiederkehrender Geburtstag,
-ausgewählte Feiertage sowie Ostern zur Verfügung. Der 1. bis 4. Advent, alle
-Adventssonntage und die Weihnachtstage werden innerhalb der Feiertagsauswahl
-angeboten.
+Als Anlass stehen ein einmaliges Datum, ausgewählte Feiertage und **Zyklisch**
+zur Verfügung. Geburtstage werden über „Zyklisch → Jährlich“ angelegt. Ostern,
+der 1. bis 4. Advent, alle Adventssonntage sowie die Weihnachtstage werden
+innerhalb der Feiertagsauswahl angeboten; zusätzlich gibt es den Sammeltermin
+„Weihnachten (24.–26. Dezember)“.
 Die beweglichen Termine werden lokal berechnet. Die Feiertagsauswahl enthält die
 gängigen deutschen festen und beweglichen Feiertage; eine landesspezifische
 Feiertagskonfiguration gibt es derzeit nicht. Das zuletzt erreichte Ereignis
 bestimmt den Aktivierungszustand, wobei bei gleichem Datum **Auto aus** Vorrang
 hat. Die manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar.
-Alte einzelne Auto-ein-/Auto-aus-Daten werden weiterhin gelesen und beim
-Bearbeiten in die neue Regelliste übernommen.
-
-Zusätzlich kann eine Regel den Anlass **Zyklisch** verwenden. Dafür werden ein
-Intervall, ein Startdatum und eine Startzeit gesetzt. Verfügbar sind stündlich,
+Eine Regel mit dem Anlass **Zyklisch** verwendet ein Intervall, ein Startdatum
+und eine Startzeit. Verfügbar sind stündlich,
 täglich, wöchentlich, monatlich, quartalsweise und jährlich. Das Startdatum ist
 dabei der Anker: Es bestimmt bei wöchentlichen Regeln den Wochentag und bei
 monatlichen, quartalsweisen sowie jährlichen Regeln den Kalendertag.
