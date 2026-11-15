@@ -1695,7 +1695,7 @@ class ClimatePlannerPanel extends HTMLElement {
           if (kind !== "cycle" && (startDate || endDate)) {
             return this.notice(this.t.invalid, true);
           }
-          if (kind === "cycle" && ((startDate && !DATE_PATTERN.test(startDate)) || (endDate && (!DATE_PATTERN.test(endDate) || (startDate && endDate < startDate)))) {
+          if (kind === "cycle" && ((startDate && !DATE_PATTERN.test(startDate)) || (endDate && (!DATE_PATTERN.test(endDate) || (startDate && endDate < startDate))))) {
             endDateControl?.setCustomValidity(this.t.autoRuleEndBeforeStart);
             endDateControl?.reportValidity();
             return;
