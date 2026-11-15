@@ -60,6 +60,7 @@ Planner
     ├── id
     ├── name
     ├── climate_entity_ids[]    # eine oder mehrere climate.<object_id>
+    ├── window_open_enabled     # Fensterabsenkung für diesen Heizplan
     ├── window_open_temperature # Absenktemperatur bei offenem Fenster in °C
     ├── enabled
     └── assignments[]
@@ -196,8 +197,13 @@ sofort ausgewertet und dessen Sollwert erneut angewendet. Dies gilt für das
 Panel und den Home-Assistant-Switch gleichermaßen.
 
 Für die Fensterabsenkung wird das Home-Assistant-Label zentral im Panel unter
-„Fenster-Erkennung“ oder in den Optionen des Config Entries ausgewählt; die
-Absenktemperatur wird je Heizplan mit dem Standardwert 18,5 °C gespeichert.
+„Allgemeine Einstellungen“ ausgewählt; die deutsche Feiertagsregion wird dort
+ebenfalls festgelegt. Beide Werte sind
+als Select-Entitäten verfügbar. Die Absenktemperatur wird je Heizplan mit dem
+Standardwert 18,5 °C gespeichert. `window_open_enabled` ist standardmäßig
+`true` und kann je Heizplan im Panel oder über einen Switch deaktiviert werden.
+Deaktivierte Heizpläne erhalten keine Fenster-Listener und keine
+Fensterabsenkung.
 Das Panel zeigt dabei den Namen aus der Label-Registry, während die
 Konfiguration die stabile Label-ID speichert. Eine Umbenennung des Labels
 ändert die ID nicht; nur Löschen und Neuerstellen erzeugt eine neue ID.

@@ -41,6 +41,36 @@ class ScheduleEnabledSwitch(PlannerEntity, SwitchEntity):
         return {"schedule_id": self.schedule_id}
 
 
+class WindowDetectionSwitch(PlannerEntity, SwitchEntity):
+    """Enable or disable labelled open-window setback for one heating plan."""
+
+    _attr_icon = "mdi:window-open-variant"
+
+    def __init__(self, runtime: PlannerRuntime, entry_id: str, schedule_id: str) -> None:
+        super().__init__(runtime, entry_id, f"{entry_id}_schedule_{schedule_id}_window_detection")
+        self.schedule_id = schedule_id
+        self._attr_name = "Window detection"
+
+    @property
+    def is_on(self) -> bool:
+        schedule = self._schedule(self.schedule_id)
+        return bool(schedule and schedule.get("window_open_enabled", True))
+
+    @property
+    def available(self) -> bool:
+        return super().available and self._schedule(self.schedule_id) is not None
+
+    async def async_turn_on(self, **kwargs) -> None:
+        await self.runtime.async_set_window_open_enabled(self.schedule_id, True)
+
+    async def async_turn_off(self, **kwargs) -> None:
+        await self.runtime.async_set_window_open_enabled(self.schedule_id, False)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, str]:
+        return {"schedule_id": self.schedule_id}
+
+
 class AssignmentEnabledSwitch(PlannerEntity, SwitchEntity):
     """Enable or pause one specific mode assignment in one heating plan."""
 

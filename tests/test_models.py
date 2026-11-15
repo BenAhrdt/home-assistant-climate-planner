@@ -68,7 +68,17 @@ def test_window_setback_temperature_is_preserved_and_legacy_label_is_removed():
 
     assert "window_label" not in normalized["schedules"][0]
     assert normalized["schedules"][0]["window_open_temperature"] == 18.5
+    assert normalized["schedules"][0]["window_open_enabled"] is True
     assert validate_planner(planner())["schedules"][0]["window_open_temperature"] == 18.5
+
+
+def test_window_detection_can_be_disabled_per_schedule():
+    value = planner()
+    value["schedules"][0]["window_open_enabled"] = False
+
+    normalized = validate_planner(value)
+
+    assert normalized["schedules"][0]["window_open_enabled"] is False
 
 
 def test_legacy_global_mode_pause_is_migrated_to_assignments():

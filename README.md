@@ -46,6 +46,8 @@ entities and uses centrally managed modes with target temperatures.
   `apply_enabled_mode_matching`)
 - controllable Home Assistant switches and buttons per heating plan and mode
   assignment
+- per-plan window-detection switches plus select entities for the global window
+  label and German holiday region
 - a dedicated Home Assistant device for each heating plan
 
 The integration intentionally does not implement feedback control loops,

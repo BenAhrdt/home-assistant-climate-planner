@@ -341,6 +341,7 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
         "climate_entity_ids",
         "climate_entity_names",
         "window_label",
+        "window_open_enabled",
         "window_open_temperature",
         "enabled",
         "assignments",
@@ -384,6 +385,9 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
         "id": schedule_id,
         "name": _string(raw.get("name"), "invalid_schedule_name"),
         "climate_entity_ids": entity_ids,
+        "window_open_enabled": _bool(
+            raw.get("window_open_enabled", True), "invalid_window_open_enabled"
+        ),
         "window_open_temperature": window_open_temperature,
         "enabled": _bool(raw.get("enabled"), "invalid_schedule_enabled"),
         "assignments": [

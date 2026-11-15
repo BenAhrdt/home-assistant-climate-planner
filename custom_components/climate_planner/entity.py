@@ -39,10 +39,10 @@ class PlannerEntity(Entity):
                 "model": "Heating plan",
             }
         return {
-            "identifiers": {(DOMAIN, self._entry_id)},
-            "name": "Climate Planner",
+            "identifiers": {(DOMAIN, f"{self._entry_id}_settings")},
+            "name": "Climate Planner Grundeinstellungen",
             "manufacturer": "Climate Planner",
-            "model": "Heating planner",
+            "model": "Global settings",
         }
 
     @property
@@ -149,10 +149,16 @@ class PlannerEntityManager:
             entities.append(entity)
 
         if self.platform == "switch":
-            from .switch import AssignmentEnabledSwitch, ScheduleEnabledSwitch
+            from .switch import (
+                AssignmentEnabledSwitch,
+                ScheduleEnabledSwitch,
+                WindowDetectionSwitch,
+            )
 
             for schedule in self.runtime.data["schedules"]:
                 entity = ScheduleEnabledSwitch(self.runtime, self.entry_id, schedule["id"])
+                register(entity)
+                entity = WindowDetectionSwitch(self.runtime, self.entry_id, schedule["id"])
                 register(entity)
                 for assignment in schedule["assignments"]:
                     entity = AssignmentEnabledSwitch(

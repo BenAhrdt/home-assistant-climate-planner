@@ -6,9 +6,11 @@ import custom_components.climate_planner.entity as entity_module
 from custom_components.climate_planner.button import ActivateAssignmentButton, ApplyMatchingButton
 from custom_components.climate_planner.entity import PlannerEntityManager
 from custom_components.climate_planner.models import validate_planner
+from custom_components.climate_planner.select import HolidayRegionSelect, WindowLabelSelect
 from custom_components.climate_planner.switch import (
     AssignmentEnabledSwitch,
     ScheduleEnabledSwitch,
+    WindowDetectionSwitch,
 )
 
 
@@ -44,6 +46,7 @@ def runtime():
 def test_entities_are_grouped_under_their_heating_plan_device():
     value = runtime()
     schedule_entity = ScheduleEnabledSwitch(value, "entry", "schedule_living")
+    window_entity = WindowDetectionSwitch(value, "entry", "schedule_living")
     assignment_entity = AssignmentEnabledSwitch(
         value, "entry", "schedule_living", "assignment_home"
     )
@@ -52,6 +55,8 @@ def test_entities_are_grouped_under_their_heating_plan_device():
     assert assignment_entity.device_info["identifiers"] == expected
     assert schedule_entity.device_info["name"] == "Living room"
     assert schedule_entity.name == "Automatic"
+    assert window_entity.name == "Window detection"
+    assert window_entity.is_on is True
     assert assignment_entity.name == "Home automatic"
 
 
@@ -98,6 +103,23 @@ def test_duplicate_assignments_get_distinct_concise_names():
 
     assert first_switch.name == "Home 1 automatic"
     assert second_button.name == "Home 2 activate"
+
+
+def test_global_configuration_selects_expose_display_options():
+    value = runtime()
+    value.holiday_region = "sn"
+    value.window_label = "fenster"
+    value._window_label_options = lambda: [{"id": "fenster", "name": "Fensterkontakte"}]
+
+    holiday_select = HolidayRegionSelect(value, "entry")
+    label_select = WindowLabelSelect(value, "entry")
+
+    assert holiday_select.current_option == "Sachsen"
+    assert "Sachsen" in holiday_select.options
+    assert label_select.current_option == "Fensterkontakte"
+    assert label_select.options == ["Kein Label", "Fensterkontakte"]
+    assert label_select.device_info["identifiers"] == {("climate_planner", "entry_settings")}
+    assert label_select.device_info["name"] == "Climate Planner Grundeinstellungen"
 
 
 @pytest.mark.asyncio

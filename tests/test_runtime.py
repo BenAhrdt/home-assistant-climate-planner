@@ -209,6 +209,9 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
     assert delayed[-1][0] == 10
     await delayed[-1][1](datetime.now(tz=ZONE))
     assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
+    await runtime.async_set_window_open_enabled("schedule_living", False)
+    assert runtime.data["schedules"][0]["window_open_enabled"] is False
+    assert runtime._window_target_entities == {}
     await runtime.async_shutdown()
 
 

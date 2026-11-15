@@ -12,16 +12,5 @@
     "abort": {
       "already_configured": "Climate Planner is already configured."
     }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Climate Planner",
-        "description": "Choose the central Home Assistant label for window-open detection. It applies to all heating plans; the setback temperature is configured per plan.",
-        "data": {
-          "window_label": "Window label"
-        }
-      }
-    }
   }
 }

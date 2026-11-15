@@ -127,6 +127,19 @@ class PlannerRuntime:
         return self._window_label
 
     @property
+    def window_label_name(self) -> str:
+        """Return the display name of the selected window label."""
+
+        return next(
+            (
+                item["name"]
+                for item in self._window_label_options()
+                if item["id"] == self._window_label
+            ),
+            "",
+        )
+
+    @property
     def holiday_region(self) -> str:
         """Return the selected German holiday region."""
 
@@ -437,10 +450,7 @@ class PlannerRuntime:
             weeks[schedule["id"]] = week_view(schedule, modes, now)
         climate_entities = await self._async_climate_entities()
         window_labels = self._window_label_options()
-        window_label_name = next(
-            (item["name"] for item in window_labels if item["id"] == self._window_label),
-            "",
-        )
+        window_label_name = self.window_label_name
         window_status = {
             schedule["id"]: {
                 "open_entity_ids": sorted(
@@ -523,6 +533,26 @@ class PlannerRuntime:
                 self._applied[schedule_id] = None
         await self.async_evaluate()
 
+    async def async_set_window_open_enabled(self, schedule_id: str, enabled: bool) -> None:
+        """Persist whether one heating plan reacts to labelled open windows."""
+
+        if type(enabled) is not bool:
+            raise InvalidData("invalid_window_open_enabled")
+        async with self._data_lock:
+            candidate = deepcopy(self.data)
+            schedule = next(
+                (item for item in candidate["schedules"] if item["id"] == schedule_id), None
+            )
+            if schedule is None:
+                raise InvalidData("unknown_schedule")
+            schedule["window_open_enabled"] = enabled
+            normalized = validate_planner(candidate)
+            normalized["revision"] = self.data["revision"] + 1
+            await self.store.async_save(normalized)
+            self.data = normalized
+        await self._async_refresh_window_tracking()
+        await self.async_evaluate()
+
     async def async_set_assignment_enabled(
         self, schedule_id: str, assignment_id: str, enabled: bool
     ) -> None:
@@ -565,7 +595,11 @@ class PlannerRuntime:
         window_temperature = float(
             schedule.get("window_open_temperature", DEFAULT_WINDOW_OPEN_TEMPERATURE)
         )
-        overrides = self._window_overrides.get(schedule["id"], {})
+        overrides = (
+            self._window_overrides.get(schedule["id"], {})
+            if schedule.get("window_open_enabled", True)
+            else {}
+        )
         return {
             entity_id: window_temperature if overrides.get(entity_id, False) else target_temperature
             for entity_id in schedule["climate_entity_ids"]
@@ -881,6 +915,9 @@ class PlannerRuntime:
         for schedule in self.data["schedules"]:
             schedule_id = schedule["id"]
             schedule_overrides: dict[str, bool] = {}
+            if not schedule.get("window_open_enabled", True):
+                self._window_overrides[schedule_id] = schedule_overrides
+                continue
             label_id = self._window_label
             if not label_id:
                 self._window_overrides[schedule_id] = schedule_overrides

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 DOMAIN = "climate_planner"
 NAME = "Climate Planner"
-VERSION = "0.1.62"
+VERSION = "0.1.63"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = f"{DOMAIN}.planner"
@@ -123,7 +123,7 @@ HOLIDAY_STATE_AVAILABILITY: dict[str, frozenset[str]] = {
 }
 
 CLIMATE_DOMAIN = "climate"
-PLATFORMS: tuple[str, ...] = ("switch", "button")
+PLATFORMS: tuple[str, ...] = ("switch", "button", "select")
 SERVICE_SET_TEMPERATURE = "set_temperature"
 SERVICE_ACTIVATE_MODE = "activate_mode"
 SERVICE_APPLY_MATCHED = "apply_matched"

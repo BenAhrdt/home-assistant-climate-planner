@@ -12,16 +12,5 @@
     "abort": {
       "already_configured": "Climate Planner ist bereits eingerichtet."
     }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Climate Planner",
-        "description": "Wähle das zentrale Home-Assistant-Label für die Fenster-offen-Erkennung. Es gilt für alle Heizpläne; die Absenktemperatur wird je Heizplan eingestellt.",
-        "data": {
-          "window_label": "Fenster-Label"
-        }
-      }
-    }
   }
 }

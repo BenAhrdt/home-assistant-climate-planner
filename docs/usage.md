@@ -94,15 +94,18 @@ eigener Anzeigename hinterlegt werden. Dieser Name gilt nur in diesem Heizplan
 und ändert weder die Home-Assistant-Entität noch ihre stabile ID. Ein Klick auf
 die Entitätszeile im Heizplan öffnet den normalen Home-Assistant-More-Info-Dialog.
 
-Unter „Fenster-Erkennung“ direkt unter dem Titel des Climate-Planner-Panels
-wird zentral ein Home-Assistant-Label für Fensterkontakte gewählt. Die Auswahl
-ist zusätzlich weiterhin in den Optionen des Config Entries verfügbar. Für jede ausgewählte
+Unter **Allgemeine Einstellungen** wird zentral ein Home-Assistant-Label für
+Fensterkontakte gewählt und die deutsche Feiertagsregion eingestellt. Beide
+Einstellungen sind zusätzlich als Home-Assistant-Select-Entitäten verfügbar.
+Für jede ausgewählte
 Climate-Entität werden nur Fenster mit diesem Label aus demselben
 Home-Assistant-Bereich berücksichtigt. Das ist auch bei einem Heizplan mit
 Climate-Entitäten aus mehreren Bereichen eindeutig: Ein offenes Fenster senkt
 nur die Climate-Entitäten desselben Bereichs ab. Die Absenktemperatur wird je
-Heizplan eingestellt und ist standardmäßig auf 18,5 °C gesetzt. Ohne zentrales
-Fenster-Label ist die Fensterabsenkung deaktiviert.
+Heizplan eingestellt und ist standardmäßig auf 18,5 °C gesetzt. Die
+Fenstererkennung ist je Heizplan standardmäßig aktiv und kann im Heizplan oder
+über den zugehörigen Switch deaktiviert werden. Ohne zentrales Fenster-Label
+ist die Fensterabsenkung deaktiviert.
 
 Die Auswahl verwendet im Panel den nativen Home-Assistant-Label-Picker mit
 Suche, Label-Farbe und optionalem Label-Icon. Der ausgewählte Eintrag wird als
@@ -252,7 +255,9 @@ Für Automationen sind folgende Dienste verfügbar:
 Zusätzlich legt die Integration steuerbare Entitäten an:
 
 - einen Switch pro Heizplan für dessen automatische Aktivierung/Pause,
+- einen Switch pro Heizplan für die Fenstererkennung,
 - einen separaten Switch pro Mode-Zuordnung innerhalb eines Heizplans,
+- zwei Select-Entitäten für Fenster-Label und Feiertagsregion,
 - einen Button pro Zuordnung zur manuellen Aktivierung bis zum nächsten
   automatischen Wechsel,
 - drei Buttons pro Heizplan für `apply_matched`,
