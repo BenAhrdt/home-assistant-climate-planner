@@ -227,6 +227,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += "#overview-top .mode-palette .compact-mode-row{gap:10px}.compact-mode-temperature{margin-left:auto}.compact-mode-priority{margin-left:4px}";
     style.textContent += "main.overview-layout{height:auto;min-height:100vh;overflow:visible}main.overview-layout #schedules-section{display:block}main.overview-layout #schedules{overflow:visible;min-height:0}#overview-top .mode-palette .grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}#overview-top .mode-palette .compact-mode-name{white-space:nowrap;overflow:visible;text-overflow:clip}@media(max-width:1100px){#overview-top .mode-palette .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){#overview-top .mode-palette .grid{grid-template-columns:1fr}}#schedules .quick-modes{display:grid;grid-template-columns:1fr;gap:6px}#schedules .quick-mode-wrap{width:100%;min-width:0;min-height:0;height:42px}#schedules .quick-mode-wrap .quick-mode{width:100%;min-height:42px;height:100%;padding:5px 8px 5px 34px;gap:8px}#schedules .quick-mode-copy{display:flex;align-items:center;flex:1;min-width:0;gap:10px;overflow:visible}#schedules .quick-mode-copy strong{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:visible;text-overflow:clip;overflow-wrap:normal;line-height:1.2}#schedules .quick-mode-copy small{flex:none;white-space:nowrap;font-size:11px}.quick-mode-priority{color:var(--secondary-text-color)}#schedules .assignment-tools{display:flex;align-items:stretch;align-self:stretch;flex:none;border-left:1px solid var(--divider-color)}#schedules .assignment-toggle,#schedules .assignment-settings,#schedules .assignment-delete{height:100%;min-width:30px;padding:5px 7px;border:0;border-radius:0}#schedules .assignment-delete{border-top:0;border-left:1px solid var(--divider-color)}";
     style.textContent += ".notice{height:auto;min-height:0;padding:0;max-width:min(320px,35vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--secondary-text-color)}.notice.error{color:var(--error-color,#db4437)}";
+    style.textContent += ".dialog-form .form-grid{align-items:start}.dialog-form .form-grid>label{align-self:start}";
     const header = this.shadowRoot.querySelector("header");
     const notice = this.$("notice");
     header.insertBefore(notice, this.$("refresh"));
@@ -1508,10 +1509,13 @@ class ClimatePlannerPanel extends HTMLElement {
       this.notice(this.t.modeAlreadyAssigned, true);
       return;
     }
+    const assignmentMode = assignment ? this.mode(assignment.mode_id) : null;
     const assignedModeIds = new Set(schedule.assignments.filter((item) => item.id !== assignmentId).map((item) => item.mode_id));
-    const selectableModes = this.data.modes.filter((mode) => mode.id === assignment?.mode_id || !assignedModeIds.has(mode.id));
-    if (!selectableModes.length) return this.notice(this.t.modeAlreadyAssigned, true);
-    const selectedMode = this.mode(assignment?.mode_id || normalizedModeId) || selectableModes[0];
+    const selectableModes = assignment
+      ? (assignmentMode ? [assignmentMode] : [])
+      : this.data.modes.filter((mode) => !assignedModeIds.has(mode.id));
+    if (!selectableModes.length) return this.notice(assignment ? this.t.invalid : this.t.modeAlreadyAssigned, true);
+    const selectedMode = assignmentMode || this.mode(normalizedModeId) || selectableModes[0];
     const phaseEntries = assignment
       ? this.schedulePhases(schedule).filter((item) => item.assignment.id === assignment.id)
       : [];
@@ -1530,6 +1534,10 @@ class ClimatePlannerPanel extends HTMLElement {
     const dialog = this.$("dialog"); this.dialogKind = "assignment"; this.dialogContext = { scheduleId, assignmentId };
     dialog.innerHTML = `<form method="dialog" class="dialog-form"><h2>${assignment ? this.t.editAssignment : this.t.addAssignment}</h2><div class="form-grid"><label>${this.t.modes}<select name="mode_id">${selectableModes.map((item) => `<option value="${escapeHTML(item.id)}" ${item.id === selectedMode.id ? "selected" : ""}>${escapeHTML(item.name)} · ${escapeHTML(this.temperatureText(item.target_temperature))}</option>`).join("")}</select></label><label>${this.t.bulkTime}<input name="bulk_time" type="time" required step="900" value="${escapeHTML(firstTime)}"><small class="muted">${this.t.defaultDuration}</small></label><label>${this.t.temperature}<input name="target_temperature" type="number" step="0.1" value="${sharedOverride == null ? "" : escapeHTML(this.displayTemperature(sharedOverride))}" placeholder="${escapeHTML(this.temperatureText(selectedMode.target_temperature))}"><small class="muted">${this.t.localTemperature}</small></label><fieldset class="auto-rules"><legend>${escapeHTML(this.t.autoRules)}</legend><div class="auto-rules-list" data-auto-rules>${autoRules.map((rule) => this.autoRuleRowMarkup(rule)).join("")}</div><button type="button" class="auto-rule-add" data-add-auto-rule>＋ ${escapeHTML(this.t.addAutoRule)}</button></fieldset><fieldset class="full"><legend>${this.t.weekdays}</legend><div class="mode-day-actions"><button type="button" data-select-days="all">${escapeHTML(this.t.selectAllDays)}</button><button type="button" data-select-days="none">${escapeHTML(this.t.clearAllDays)}</button></div><div class="mode-day-grid">${dayMarkup}</div></fieldset></div><div class="dialog-actions"><button type="button" data-cancel>${this.t.cancel}</button><button class="primary" type="submit">${this.t.save}</button></div></form>`;
     const form = dialog.querySelector("form");
+    if (assignment) {
+      const modeField = form.elements.mode_id?.closest("label");
+      if (modeField) modeField.innerHTML = `${escapeHTML(this.t.name)}<input type="text" name="mode_name" value="${escapeHTML(selectedMode.name)}" readonly aria-readonly="true"><input type="hidden" name="mode_id" value="${escapeHTML(selectedMode.id)}">`;
+    }
     const autoRuleContainer = form.querySelector("[data-auto-rules]");
     autoRuleContainer.querySelectorAll("[data-auto-rule-row]").forEach((row) => this.bindAutoRuleRow(row));
     form.querySelector("[data-add-auto-rule]")?.addEventListener("click", () => {
@@ -1794,7 +1802,7 @@ class ClimatePlannerPanel extends HTMLElement {
       });
       await this.save(next);
     };
-    dialog.showModal(); form.querySelector("select")?.focus();
+    dialog.showModal(); form.querySelector("select, [name=bulk_time]")?.focus();
   }
 
   async handleAction(action, id, scheduleId) {
