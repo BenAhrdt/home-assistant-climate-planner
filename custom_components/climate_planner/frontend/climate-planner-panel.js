@@ -214,6 +214,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += "#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}#overview-top .mode-palette .mode-card{min-height:0;padding:8px 9px}#overview-top .mode-palette .mode-card h3{font-size:15px}#overview-top .mode-palette .mode-meta{font-size:12px;gap:5px}#overview-top .mode-palette .mode-card .actions button{padding:5px 7px;font-size:11px}";
     style.textContent += "@media(min-width:1001px){#overview-top{grid-template-columns:minmax(320px,390px) minmax(0,1fr)}}#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}#overview-top .mode-palette .mode-card{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:0;row-gap:6px}#overview-top .mode-palette .mode-card-top{grid-column:1;grid-row:1}#overview-top .mode-palette .mode-meta{grid-column:1;grid-row:2;flex-wrap:wrap;line-height:1.2}#overview-top .mode-palette .mode-card .actions{grid-column:1;grid-row:3;align-self:start;justify-content:flex-start}.quick-modes{grid-template-columns:repeat(auto-fit,minmax(178px,1fr))}.quick-mode-wrap{min-height:58px}.quick-mode-wrap .quick-mode{justify-content:flex-start}.quick-mode-copy{display:grid;align-items:start}.quick-mode-copy strong{white-space:normal;overflow-wrap:anywhere;line-height:1.2}.quick-mode-check{margin-left:auto}";
     style.textContent += "#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.compact-mode-row{display:flex;align-items:center;gap:7px;min-height:42px;padding:7px 8px;cursor:grab}.compact-mode-row:focus-visible{cursor:grab}.compact-mode-leading{display:flex;align-items:center;gap:5px;flex:none}.compact-mode-leading .mode-color{margin:0}.compact-mode-leading .mode-icon{--mdc-icon-size:18px}.compact-mode-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.compact-mode-temperature,.compact-mode-priority{white-space:nowrap;font-size:11px}.compact-mode-priority{color:var(--secondary-text-color)}.compact-mode-delete{display:flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;padding:3px;border:0;border-radius:6px;background:transparent;color:var(--error-color,#db4437)}.compact-mode-delete:hover{background:color-mix(in srgb,var(--error-color,#db4437) 12%,transparent)}.compact-mode-delete ha-icon{--mdc-icon-size:17px}@media(max-width:700px){#overview-top .mode-palette .grid{grid-template-columns:1fr}}";
+    style.textContent += "#overview-top .mode-palette .compact-mode-row{display:flex;grid-template-columns:none;grid-template-rows:none;align-items:center}.compact-mode-row .compact-mode-name{min-width:0}.compact-mode-row .compact-mode-temperature,.compact-mode-row .compact-mode-priority{flex:none}#schedules .schedule-entity-row{grid-template-columns:minmax(0,1fr) max-content}#schedules .schedule-entity-values{width:max-content;min-width:max-content;flex-wrap:nowrap}";
     this.shadowRoot.querySelector("header").style.gridArea = "header";
     this.$("notice").style.gridArea = "notice";
     summarySection.style.gridArea = "summary";
@@ -413,6 +414,16 @@ class ClimatePlannerPanel extends HTMLElement {
     picker._labels = this.windowLabelRegistryEntries();
     picker.label = this.t.windowLabel;
     picker.value = this.windowLabelDraft || undefined;
+    Promise.resolve(picker.updateComplete).then(() => {
+      const genericPicker = picker.shadowRoot?.querySelector("ha-generic-picker");
+      if (!genericPicker) return;
+      genericPicker.valueRenderer = (value) => {
+        const display = document.createElement("span");
+        display.slot = "headline";
+        display.textContent = this.windowLabelDisplayName(value);
+        return display;
+      };
+    });
   }
 
   windowLabelRegistryEntries() {
@@ -431,6 +442,10 @@ class ClimatePlannerPanel extends HTMLElement {
       });
     }
     return entries;
+  }
+
+  windowLabelDisplayName(labelId) {
+    return this.windowLabelRegistryEntries().find((item) => item.label_id === labelId)?.name || labelId;
   }
 
   renderFallbackWindowLabelSelect(control) {
