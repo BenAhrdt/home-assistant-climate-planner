@@ -1339,7 +1339,7 @@ class ClimatePlannerPanel extends HTMLElement {
 
   autoRuleRecurrenceOptions(selected) {
     return [
-      ["hourly", this.t.recurrenceHourly], ["daily", this.t.recurrenceDaily],
+      ["daily", this.t.recurrenceDaily],
       ["weekly", this.t.recurrenceWeekly], ["monthly", this.t.recurrenceMonthly],
       ["quarterly", this.t.recurrenceQuarterly], ["yearly", this.t.recurrenceYearly],
     ].map(([value, label]) => `<option value="${value}" ${value === selected ? "selected" : ""}>${escapeHTML(label)}</option>`).join("");
