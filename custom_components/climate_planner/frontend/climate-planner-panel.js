@@ -229,6 +229,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".notice{height:auto;min-height:0;padding:0;max-width:min(320px,35vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--secondary-text-color)}.notice.error{color:var(--error-color,#db4437)}";
     style.textContent += ".dialog-form .form-grid{align-items:start}.dialog-form .form-grid>label{align-self:start}";
     style.textContent += ".schedule-card-top{position:relative;padding-right:38px}.schedule-card-icon-tools{position:absolute;top:0;right:0;display:grid;gap:4px}";
+    style.textContent += "main.overview-layout{row-gap:0}main.overview-layout #overview-top{margin-top:-12px}main.overview-layout #schedules-section{margin-top:-32px}main.overview-layout #schedules-title{margin-top:0}";
     const header = this.shadowRoot.querySelector("header");
     const notice = this.$("notice");
     header.insertBefore(notice, this.$("refresh"));
