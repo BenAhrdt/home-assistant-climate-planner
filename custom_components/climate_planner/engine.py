@@ -186,7 +186,8 @@ def _cycle_occurrences(rule: dict, now: datetime, *, future_only: bool) -> list[
 
     zone = now.tzinfo
     assert zone is not None
-    start = _at_local(date.fromisoformat(rule["start_date"]), rule["start_time"], zone)
+    anchor_date = date.fromisoformat(rule["start_date"]) if rule.get("start_date") else now.date()
+    start = _at_local(anchor_date, rule["start_time"], zone)
     end_date = date.fromisoformat(rule["end_date"]) if rule.get("end_date") else None
     recurrence = rule["recurrence"]
     if recurrence in {"hourly", "daily", "weekly"}:

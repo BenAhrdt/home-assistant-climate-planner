@@ -288,6 +288,23 @@ def test_cycle_end_date_limits_past_and_future_occurrences():
     ) is None
 
 
+def test_cycle_without_start_date_uses_current_local_day_as_anchor():
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = [
+        {
+            "id": "no-start",
+            "action": "on",
+            "kind": "cycle",
+            "recurrence": "daily",
+            "start_time": "09:00",
+        }
+    ]
+
+    assert latest_auto_event(configured, datetime(2026, 11, 15, 10, tzinfo=ZONE))[0].endswith(
+        "2026-11-15T09:00:00+01:00"
+    )
+
+
 @pytest.mark.parametrize(
     ("recurrence", "expected"),
     [

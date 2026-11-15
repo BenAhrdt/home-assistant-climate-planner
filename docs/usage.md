@@ -65,8 +65,9 @@ gängigen deutschen festen und beweglichen Feiertage; eine landesspezifische
 Feiertagskonfiguration gibt es derzeit nicht. Das zuletzt erreichte Ereignis
 bestimmt den Aktivierungszustand, wobei bei gleichem Datum **Auto aus** Vorrang
 hat. Die manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar.
-Eine Regel mit dem Anlass **Zyklisch** verwendet ein Intervall, ein Startdatum
-und eine Startzeit. Optional kann ein Enddatum gesetzt werden; die letzte
+Eine Regel mit dem Anlass **Zyklisch** verwendet ein Intervall und eine
+Startzeit. Start- und Enddatum sind optional. Ohne Startdatum wird der aktuelle
+Tag als Anker verwendet. Optional kann ein Enddatum gesetzt werden; die letzte
 Wiederholung am Enddatum ist eingeschlossen. Das Enddatum beendet jedoch nicht
 automatisch den zuletzt gesetzten Zustand, dafür wird eine eigene Auto-aus-Regel
 benötigt. Verfügbar sind stündlich,

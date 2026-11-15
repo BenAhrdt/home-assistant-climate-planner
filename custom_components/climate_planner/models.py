@@ -248,16 +248,14 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
             if recurrence not in AUTO_RULE_RECURRENCES:
                 raise InvalidData("invalid_auto_rule_recurrence")
             start_date = _optional_date(raw_rule.get("start_date"), "invalid_auto_rule_start_date")
-            if not start_date:
-                raise InvalidData("missing_auto_rule_start_date")
             start_time = raw_rule.get("start_time")
             if not isinstance(start_time, str) or not TIME_PATTERN.fullmatch(start_time):
                 raise InvalidData("invalid_auto_rule_start_time")
-            normalized.update(
-                {"recurrence": recurrence, "start_date": start_date, "start_time": start_time}
-            )
+            normalized.update({"recurrence": recurrence, "start_time": start_time})
+            if start_date:
+                normalized["start_date"] = start_date
             end_date = _optional_date(raw_rule.get("end_date"), "invalid_auto_rule_end_date")
-            if end_date and end_date < start_date:
+            if end_date and start_date and end_date < start_date:
                 raise InvalidData("invalid_auto_rule_end_date")
             if end_date:
                 normalized["end_date"] = end_date

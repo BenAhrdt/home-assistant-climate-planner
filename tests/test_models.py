@@ -134,6 +134,23 @@ def test_cyclic_auto_rule_is_normalized():
     assert normalized == value["schedules"][0]["assignments"][0]["auto_rules"]
 
 
+def test_cyclic_auto_rule_dates_are_optional():
+    value = planner()
+    value["schedules"][0]["assignments"][0]["auto_rules"] = [
+        {
+            "id": "open-ended",
+            "action": "on",
+            "kind": "cycle",
+            "recurrence": "daily",
+            "start_time": "09:00",
+        }
+    ]
+
+    normalized = validate_planner(value)["schedules"][0]["assignments"][0]["auto_rules"]
+
+    assert normalized == value["schedules"][0]["assignments"][0]["auto_rules"]
+
+
 def test_cyclic_auto_rule_rejects_unknown_recurrence():
     value = planner()
     value["schedules"][0]["assignments"][0]["auto_rules"] = [
