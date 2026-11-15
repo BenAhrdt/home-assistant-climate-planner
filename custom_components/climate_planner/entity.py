@@ -184,7 +184,10 @@ class PlannerEntityManager:
                     )
                     register(entity)
         elif self.platform == "select":
-            from .select import AssignmentModeSelect
+            from .select import AssignmentModeSelect, HolidayRegionSelect, WindowLabelSelect
+
+            register(HolidayRegionSelect(self.runtime, self.entry_id))
+            register(WindowLabelSelect(self.runtime, self.entry_id))
 
             for schedule in self.runtime.data["schedules"]:
                 for assignment in schedule["assignments"]:
@@ -268,7 +271,11 @@ class PlannerEntityManager:
         prefixes = {
             "switch": (f"{self.entry_id}_schedule_",),
             "button": (f"{self.entry_id}_schedule_",),
-            "select": (f"{self.entry_id}_schedule_",),
+            "select": (
+                f"{self.entry_id}_holiday_region",
+                f"{self.entry_id}_window_label",
+                f"{self.entry_id}_schedule_",
+            ),
             "number": (f"{self.entry_id}_schedule_", f"{self.entry_id}_mode_"),
             "text": (f"{self.entry_id}_schedule_", f"{self.entry_id}_mode_"),
             "sensor": (
@@ -282,7 +289,7 @@ class PlannerEntityManager:
     def _is_managed_device(self, device) -> bool:
         """Return whether a device is one of this entry's schedule devices."""
 
-        prefix = f"{self.entry_id}_"
+        prefix = f"{self.entry_id}_schedule_"
         return any(
             domain == DOMAIN and identifier.startswith(prefix)
             for domain, identifier in device.identifiers

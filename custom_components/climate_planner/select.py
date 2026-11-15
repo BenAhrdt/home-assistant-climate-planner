@@ -191,12 +191,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_e
     """Create global and heating-plan configuration selects."""
 
     runtime: PlannerRuntime = entry.runtime_data
-    async_add_entities(
-        [
-            HolidayRegionSelect(runtime, entry.entry_id),
-            WindowLabelSelect(runtime, entry.entry_id),
-        ]
-    )
     manager = PlannerEntityManager(hass, runtime, entry.entry_id, "select", async_add_entities)
     hass.data.setdefault("climate_planner", {}).setdefault("entity_managers", {})[
         (entry.entry_id, "select")

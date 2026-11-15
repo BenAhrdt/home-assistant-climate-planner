@@ -4,7 +4,7 @@ from __future__ import annotations
 
 DOMAIN = "climate_planner"
 NAME = "Climate Planner"
-VERSION = "0.1.66"
+VERSION = "0.1.67"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = f"{DOMAIN}.planner"
