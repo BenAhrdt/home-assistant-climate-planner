@@ -199,7 +199,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".week-mode-chip-wrap{display:inline-flex;align-items:stretch}.week-mode-chip-wrap .week-mode-chip{border-radius:8px 0 0 8px}.week-mode-chip-toggle{padding:6px 8px;border-left:0;border-radius:0 8px 8px 0;line-height:1}.week-mode-chip.paused+.week-mode-chip-toggle{opacity:.65}";
     this.shadowRoot.querySelector("main").style.display = "grid";
     this.shadowRoot.querySelector("main").style.gridTemplateColumns = "minmax(0,1fr)";
-    this.shadowRoot.querySelector("main").style.gridTemplateAreas = '"header" "notice" "overview-top" "schedules"';
+    this.shadowRoot.querySelector("main").style.gridTemplateAreas = '"header" "overview-top" "schedules"';
     this.shadowRoot.querySelector("main").style.gap = "8px";
     style.textContent += ".mode-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.mode-card-top h3{margin:0}.mode-toggle{padding:5px 8px;font-size:13px;line-height:1}.mode-card.disabled{opacity:.68}.mode-card .mode-meta{flex-wrap:wrap}.mode-priority{font-size:11px;margin-left:auto}.quick-mode-wrap{display:flex;align-items:stretch;min-width:178px;border:1px solid var(--divider-color);border-radius:10px;background:var(--secondary-background-color);overflow:hidden;transition:border-color .12s,box-shadow .12s,background .12s}.quick-mode-wrap.active{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 12%,var(--card-background-color));box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 18%,transparent)}.quick-mode-wrap.paused{opacity:.72}.quick-mode-wrap .quick-mode{min-width:0;flex:1;border:0;border-radius:0;background:transparent}.quick-mode-wrap .quick-mode:not(:disabled):hover{transform:none;border-color:transparent;box-shadow:none}.assignment-toggle{align-self:flex-start;padding:7px 8px;font-size:13px;line-height:1;color:var(--secondary-text-color);border:0;border-left:1px solid var(--divider-color);border-radius:0;background:transparent}.assignment-toggle:hover{color:var(--primary-text-color);border-color:var(--primary-color)}";
     style.textContent += ".assignment-tools{display:grid;align-self:stretch;border-left:1px solid var(--divider-color)}.assignment-toggle,.assignment-settings,.assignment-delete{display:flex;align-items:center;justify-content:center;min-width:30px;padding:5px 7px;font-size:13px;line-height:1;border:0;border-radius:0;background:transparent}.assignment-toggle{color:var(--secondary-text-color)}.assignment-toggle:hover,.assignment-settings:hover{color:var(--primary-text-color);background:color-mix(in srgb,var(--primary-color) 8%,transparent)}.assignment-settings{color:var(--primary-color)}.assignment-delete{border-top:1px solid var(--divider-color);color:var(--error-color,#db4437)}.assignment-delete:hover{background:color-mix(in srgb,var(--error-color,#db4437) 12%,transparent)}.assignment-settings ha-icon,.assignment-delete ha-icon{--mdc-icon-size:16px}";
@@ -226,9 +226,12 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".overview-layout header{margin-bottom:0}#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}#overview-top .mode-palette .compact-mode-row{min-height:36px;padding:5px 7px}.compact-mode-temperature,.compact-mode-priority{font-size:10px}#schedules .quick-modes{grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:6px}#schedules .quick-mode-wrap{min-width:0;min-height:52px}#schedules .quick-mode-wrap .quick-mode{gap:5px;padding:6px 6px 6px 31px;justify-content:flex-start}#schedules .quick-mode-copy{display:flex;align-items:center;gap:4px;min-width:0;overflow:hidden}#schedules .quick-mode-copy strong{min-width:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;overflow-wrap:normal;line-height:1.2}#schedules .quick-mode-copy small{flex:none;white-space:nowrap}";
     style.textContent += "#overview-top .mode-palette .compact-mode-row{gap:10px}.compact-mode-temperature{margin-left:auto}.compact-mode-priority{margin-left:4px}";
     style.textContent += "main.overview-layout{height:auto;min-height:100vh;overflow:visible}main.overview-layout #schedules-section{display:block}main.overview-layout #schedules{overflow:visible;min-height:0}#overview-top .mode-palette .grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}#overview-top .mode-palette .compact-mode-name{white-space:nowrap;overflow:visible;text-overflow:clip}@media(max-width:1100px){#overview-top .mode-palette .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){#overview-top .mode-palette .grid{grid-template-columns:1fr}}#schedules .quick-modes{display:grid;grid-template-columns:1fr;gap:6px}#schedules .quick-mode-wrap{width:100%;min-width:0;min-height:0;height:42px}#schedules .quick-mode-wrap .quick-mode{width:100%;min-height:42px;height:100%;padding:5px 8px 5px 34px;gap:8px}#schedules .quick-mode-copy{display:flex;align-items:center;flex:1;min-width:0;gap:10px;overflow:visible}#schedules .quick-mode-copy strong{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:visible;text-overflow:clip;overflow-wrap:normal;line-height:1.2}#schedules .quick-mode-copy small{flex:none;white-space:nowrap;font-size:11px}.quick-mode-priority{color:var(--secondary-text-color)}#schedules .assignment-tools{display:flex;align-items:stretch;align-self:stretch;flex:none;border-left:1px solid var(--divider-color)}#schedules .assignment-toggle,#schedules .assignment-settings,#schedules .assignment-delete{height:100%;min-width:30px;padding:5px 7px;border:0;border-radius:0}#schedules .assignment-delete{border-top:0;border-left:1px solid var(--divider-color)}";
-    style.textContent += ".notice{height:40px;min-height:40px;overflow:hidden}.notice[hidden]{display:block;visibility:hidden}";
-    this.shadowRoot.querySelector("header").style.gridArea = "header";
-    this.$("notice").style.gridArea = "notice";
+    style.textContent += ".notice{height:auto;min-height:0;padding:0;max-width:min(320px,35vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--secondary-text-color)}.notice.error{color:var(--error-color,#db4437)}";
+    const header = this.shadowRoot.querySelector("header");
+    const notice = this.$("notice");
+    header.insertBefore(notice, this.$("refresh"));
+    notice.hidden = true;
+    header.style.gridArea = "header";
     summarySection.style.gridArea = "summary";
     schedulesSection.style.gridArea = "schedules";
     overviewTop.style.gridArea = "overview-top";
@@ -324,7 +327,7 @@ class ClimatePlannerPanel extends HTMLElement {
   }
 
   async load() {
-    this.notice(this.t.loading);
+    if (this.data) this.notice(this.t.loading);
     try {
       this.data = await this._hass.callWS({ type: "climate_planner/data" });
       if (!this.windowLabelDirty) this.windowLabelDraft = this.data.window_label || "";
@@ -583,8 +586,8 @@ class ClimatePlannerPanel extends HTMLElement {
     const detail = this.detailOpen;
     const main = this.shadowRoot.querySelector("main");
     main.classList.toggle("overview-layout", !detail);
-    main.style.gridTemplateAreas = detail ? '"header" "notice" "week"' : '"header" "notice" "overview-top" "schedules"';
-    main.style.gridTemplateRows = detail ? "auto auto auto" : "auto auto auto auto";
+    main.style.gridTemplateAreas = detail ? '"header" "week"' : '"header" "overview-top" "schedules"';
+    main.style.gridTemplateRows = detail ? "auto auto" : "auto auto auto";
     this.$("back-overview").hidden = !detail;
     this.$("back-overview").title = this.t.overview;
     this.$("summary-section").hidden = true;
