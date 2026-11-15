@@ -213,6 +213,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".planner-settings{width:fit-content;max-width:100%;padding:10px 12px;border:1px solid var(--divider-color);border-radius:10px;background:var(--card-background-color)}.planner-settings h2{margin:0 0 2px;font-size:15px}.planner-settings p{margin:0 0 6px}.planner-settings-row{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.planner-settings-form{flex:1 1 240px;min-width:0}.planner-settings-form label{min-width:0}.planner-settings-actions{margin:0}.planner-settings-actions button{white-space:nowrap}.window-label-control{min-width:0}.window-label-control ha-form,.window-label-control ha-label-picker{display:block}";
     style.textContent += "#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}#overview-top .mode-palette .mode-card{min-height:0;padding:8px 9px}#overview-top .mode-palette .mode-card h3{font-size:15px}#overview-top .mode-palette .mode-meta{font-size:12px;gap:5px}#overview-top .mode-palette .mode-card .actions button{padding:5px 7px;font-size:11px}";
     style.textContent += "@media(min-width:1001px){#overview-top{grid-template-columns:minmax(320px,390px) minmax(0,1fr)}}#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}#overview-top .mode-palette .mode-card{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:0;row-gap:6px}#overview-top .mode-palette .mode-card-top{grid-column:1;grid-row:1}#overview-top .mode-palette .mode-meta{grid-column:1;grid-row:2;flex-wrap:wrap;line-height:1.2}#overview-top .mode-palette .mode-card .actions{grid-column:1;grid-row:3;align-self:start;justify-content:flex-start}.quick-modes{grid-template-columns:repeat(auto-fit,minmax(178px,1fr))}.quick-mode-wrap{min-height:58px}.quick-mode-wrap .quick-mode{justify-content:flex-start}.quick-mode-copy{display:grid;align-items:start}.quick-mode-copy strong{white-space:normal;overflow-wrap:anywhere;line-height:1.2}.quick-mode-check{margin-left:auto}";
+    style.textContent += "#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.compact-mode-row{display:flex;align-items:center;gap:7px;min-height:42px;padding:7px 8px;cursor:grab}.compact-mode-row:focus-visible{cursor:grab}.compact-mode-leading{display:flex;align-items:center;gap:5px;flex:none}.compact-mode-leading .mode-color{margin:0}.compact-mode-leading .mode-icon{--mdc-icon-size:18px}.compact-mode-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.compact-mode-temperature,.compact-mode-priority{white-space:nowrap;font-size:11px}.compact-mode-priority{color:var(--secondary-text-color)}.compact-mode-delete{display:flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;padding:3px;border:0;border-radius:6px;background:transparent;color:var(--error-color,#db4437)}.compact-mode-delete:hover{background:color-mix(in srgb,var(--error-color,#db4437) 12%,transparent)}.compact-mode-delete ha-icon{--mdc-icon-size:17px}@media(max-width:700px){#overview-top .mode-palette .grid{grid-template-columns:1fr}}";
     this.shadowRoot.querySelector("header").style.gridArea = "header";
     this.$("notice").style.gridArea = "notice";
     summarySection.style.gridArea = "summary";
@@ -539,8 +540,18 @@ class ClimatePlannerPanel extends HTMLElement {
     const target = this.$("modes");
     if (!this.data.modes.length) { target.innerHTML = `<p class="empty">${this.t.noModes}</p>`; return; }
     const sortedModes = [...this.data.modes].sort((left, right) => left.name.localeCompare(right.name, this._hass?.language, { sensitivity: "base" }));
-    target.innerHTML = sortedModes.map((mode) => `<article class="card mode-card" draggable="${admin}" data-mode-drag="${escapeHTML(mode.id)}"><div class="mode-card-top"><h3>${escapeHTML(mode.name)}</h3></div><div class="mode-meta">${mode.color ? `<span class="mode-color" style="background:${escapeHTML(mode.color)}"></span>` : ""}${mode.icon ? `<ha-icon class="mode-icon" icon="${escapeHTML(mode.icon)}" aria-label="${escapeHTML(mode.icon)}" title="${escapeHTML(mode.icon)}"></ha-icon>` : ""}<span>${escapeHTML(this.temperatureText(mode.target_temperature))}</span><span class="muted mode-priority">${escapeHTML(this.t.priority)} ${escapeHTML(mode.priority ?? 0)}</span></div>${admin ? `<div class="actions"><button data-action="edit-mode" data-id="${escapeHTML(mode.id)}">${this.t.edit}</button><button class="danger" data-action="delete-mode" data-id="${escapeHTML(mode.id)}">${this.t.remove}</button></div>` : ""}</article>`).join("");
+    target.innerHTML = sortedModes.map((mode) => `<article class="card mode-card compact-mode-row" draggable="${admin}" data-mode-drag="${escapeHTML(mode.id)}" ${admin ? `role="button" tabindex="0" aria-label="${escapeHTML(`${this.t.edit}: ${mode.name}`)}"` : ""}><span class="compact-mode-leading">${mode.color ? `<span class="mode-color" style="background:${escapeHTML(mode.color)}"></span>` : ""}${mode.icon ? `<ha-icon class="mode-icon" icon="${escapeHTML(mode.icon)}" aria-label="${escapeHTML(mode.icon)}" title="${escapeHTML(mode.icon)}"></ha-icon>` : ""}</span><strong class="compact-mode-name">${escapeHTML(mode.name)}</strong><span class="compact-mode-temperature">${escapeHTML(this.temperatureText(mode.target_temperature))}</span><span class="muted compact-mode-priority">${escapeHTML(this.t.priority)} ${escapeHTML(mode.priority ?? 0)}</span>${admin ? `<button type="button" class="compact-mode-delete" data-action="delete-mode" data-id="${escapeHTML(mode.id)}" aria-label="${escapeHTML(this.t.remove)}" title="${escapeHTML(this.t.remove)}"><ha-icon icon="mdi:trash-can-outline" aria-hidden="true"></ha-icon></button>` : ""}</article>`).join("");
     if (admin) this.$("modes").querySelectorAll("[data-mode-drag]").forEach((card) => {
+      const openEditor = (event) => {
+        if (event.target.closest("[data-action]") || Date.now() < (this.modeDragClickSuppressUntil || 0)) return;
+        this.openModeDialog(card.dataset.modeDrag);
+      };
+      card.addEventListener("click", openEditor);
+      card.addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        event.preventDefault();
+        openEditor(event);
+      });
       card.addEventListener("dragstart", (event) => {
         this.dragActive = true;
         this.dragState = { modeId: card.dataset.modeDrag };
@@ -549,7 +560,7 @@ class ClimatePlannerPanel extends HTMLElement {
         card.classList.add("dragging");
         this.createModeDragCursor(this.mode(card.dataset.modeDrag));
       });
-      card.addEventListener("dragend", () => { card.classList.remove("dragging"); this.finishDrag(); });
+      card.addEventListener("dragend", () => { card.classList.remove("dragging"); this.modeDragClickSuppressUntil = Date.now() + 250; this.finishDrag(); });
     });
     target.querySelectorAll("[data-action]").forEach((button) => button.onclick = () => this.handleAction(button.dataset.action, button.dataset.id));
   }
