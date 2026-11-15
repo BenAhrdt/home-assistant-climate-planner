@@ -117,6 +117,27 @@ def _optional_date(value: object, code: str) -> str | None:
     return value
 
 
+def _normalize_climate_entity_names(value: object, entity_ids: list[str]) -> dict[str, str]:
+    """Normalize optional per-plan display names without changing entity IDs."""
+
+    if value is None:
+        return {}
+    if not isinstance(value, dict):
+        raise InvalidData("invalid_climate_entity_names")
+    result: dict[str, str] = {}
+    for entity_id, name in value.items():
+        if not isinstance(entity_id, str) or entity_id not in entity_ids:
+            raise InvalidData("invalid_climate_entity_name_entity")
+        if not isinstance(name, str):
+            raise InvalidData("invalid_climate_entity_name")
+        normalized = name.strip()
+        if normalized and len(normalized) > 160:
+            raise InvalidData("invalid_climate_entity_name")
+        if normalized:
+            result[entity_id] = normalized
+    return result
+
+
 def _normalize_weekday_rules(value: object, phase_ids: set[str]) -> dict[str, list[dict]]:
     if not isinstance(value, dict):
         raise InvalidData("invalid_weekday_rules")
@@ -241,6 +262,7 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
         "name",
         "climate_entity_id",
         "climate_entity_ids",
+        "climate_entity_names",
         "window_label",
         "window_open_temperature",
         "enabled",
@@ -267,6 +289,9 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
         if not ENTITY_PATTERN.fullmatch(entity_id) or entity_id in entity_ids:
             raise InvalidData("invalid_climate_entity")
         entity_ids.append(entity_id)
+    climate_entity_names = _normalize_climate_entity_names(
+        raw.get("climate_entity_names"), entity_ids
+    )
     assignments = raw.get("assignments")
     if not isinstance(assignments, list):
         raise InvalidData("invalid_assignments")
@@ -288,6 +313,8 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
             _normalize_assignment(item, mode_ids, assignment_ids, phase_ids) for item in assignments
         ],
     }
+    if climate_entity_names:
+        result["climate_entity_names"] = climate_entity_names
     return result
 
 

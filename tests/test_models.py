@@ -105,6 +105,29 @@ def test_multiple_climate_entities_are_preserved():
     ]
 
 
+def test_climate_entity_display_names_are_preserved_and_trimmed():
+    value = planner()
+    value["schedules"][0]["climate_entity_names"] = {
+        "climate.living_room": "  Wohnzimmer  ",
+    }
+
+    normalized = validate_planner(value)
+
+    assert normalized["schedules"][0]["climate_entity_names"] == {
+        "climate.living_room": "Wohnzimmer",
+    }
+
+
+def test_unknown_climate_entity_display_name_is_rejected():
+    value = planner()
+    value["schedules"][0]["climate_entity_names"] = {
+        "climate.missing": "Fehlt",
+    }
+
+    with pytest.raises(InvalidData, match="invalid_climate_entity_name_entity"):
+        validate_planner(value)
+
+
 @pytest.mark.parametrize(
     ("change", "code"),
     [

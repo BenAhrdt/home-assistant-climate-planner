@@ -65,6 +65,11 @@ erscheinen nur die tatsächlich ausgewählten Entitäten; die vollständige
 Entitätsliste mit Checkboxen wird nicht dauerhaft angezeigt. Beim Anlegen
 eines neuen Heizplans ist zunächst keine Entität vorausgewählt.
 
+Im Heizplan-Dialog kann für jede ausgewählte Klima-Entität zusätzlich ein
+eigener Anzeigename hinterlegt werden. Dieser Name gilt nur in diesem Heizplan
+und ändert weder die Home-Assistant-Entität noch ihre stabile ID. Ein Klick auf
+die Entitätszeile im Heizplan öffnet den normalen Home-Assistant-More-Info-Dialog.
+
 Unter „Fenster-Erkennung“ direkt unter dem Titel des Climate-Planner-Panels
 wird zentral ein Home-Assistant-Label für Fensterkontakte gewählt. Die Auswahl
 ist zusätzlich weiterhin in den Optionen des Config Entries verfügbar. Für jede ausgewählte
@@ -75,8 +80,12 @@ nur die Climate-Entitäten desselben Bereichs ab. Die Absenktemperatur wird je
 Heizplan eingestellt und ist standardmäßig auf 18,5 °C gesetzt. Ohne zentrales
 Fenster-Label ist die Fensterabsenkung deaktiviert.
 
-Die Auswahl zeigt den Label-Namen an; gespeichert wird weiterhin die stabile
-Label-ID. Wird ein Label in Home Assistant umbenannt, bleibt diese ID erhalten
+Die Auswahl verwendet im Panel den nativen Home-Assistant-Label-Picker mit
+Suche, Label-Farbe und optionalem Label-Icon. Der ausgewählte Eintrag wird als
+native Label-Darstellung angezeigt; gespeichert wird weiterhin ausschließlich
+die stabile Label-ID.
+
+Wird ein Label in Home Assistant umbenannt, bleibt diese ID erhalten
 und es muss nichts neu angelegt oder ausgewählt werden. Nur beim Löschen und
 anschließenden Neuerstellen entsteht eine neue ID.
 
