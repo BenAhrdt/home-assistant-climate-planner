@@ -72,6 +72,8 @@ class ClimatePlannerPanel extends HTMLElement {
     this.windowLabelDraft = "";
     this.windowLabelDirty = false;
     this.windowLabelNativeLoadPending = false;
+    this.windowLabelSaveTimer = null;
+    this.windowLabelSavePending = false;
   }
 
   set hass(value) {
@@ -201,7 +203,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".mode-palette{position:sticky;top:12px;align-self:start;max-height:calc(100vh - 24px);overflow:auto;scrollbar-gutter:stable}@media(max-width:1100px){.mode-palette{position:static;max-height:none;overflow:visible}}";
     style.textContent += ".schedule-card{cursor:default}.segment-head{padding-right:25px}.segment-duplicate{position:absolute;z-index:4;top:3px;right:3px;width:24px;height:24px;padding:3px;border:0;background:color-mix(in srgb,var(--card-background-color) 72%,transparent);line-height:1}.segment-duplicate ha-icon{--mdc-icon-size:16px}.schedule-card-top-tools{align-items:flex-start}.schedule-card-icon-tools{display:grid;gap:4px}.schedule-toggle,.schedule-duplicate{width:30px;height:30px;padding:5px;font-size:13px;line-height:1}.schedule-duplicate ha-icon{--mdc-icon-size:18px}";
     style.textContent += ".external-badge{display:inline-block;margin-left:5px;padding:2px 6px;border-radius:999px;color:var(--warning-color,#b06a00);background:color-mix(in srgb,var(--warning-color,#b06a00) 14%,transparent);font-size:11px;font-weight:600}";
-    style.textContent += ".schedule-entity-row{width:100%;padding:0;border:0;border-radius:6px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}.schedule-entity-row:hover{background:color-mix(in srgb,var(--primary-color) 8%,transparent)}.schedule-entity-values{align-items:start}.climate-value{display:grid;justify-items:end;gap:2px;white-space:nowrap}.climate-target .external-badge{margin-left:0}";
+    style.textContent += ".schedule-entity-row{width:100%;padding:0;border:0;border-radius:6px;background:transparent;color:inherit;font:inherit;text-align:left;cursor:pointer}.schedule-entity-row:hover{background:color-mix(in srgb,var(--primary-color) 8%,transparent)}.schedule-entity-values{align-items:start;flex-wrap:nowrap}.climate-value{display:grid;justify-items:end;gap:2px;white-space:nowrap;flex:none}.climate-target .external-badge{margin-left:0}";
     style.textContent += ".climate-selector-field{min-height:56px}.climate-selector-label{display:block;margin-bottom:8px;font-size:13px}.climate-entity-picker-row{display:grid;grid-template-columns:minmax(240px,1fr) minmax(180px,1fr);gap:8px;align-items:end}.climate-entity-picker-row+.climate-entity-picker-row{margin-top:8px}.climate-entity-display-name{min-width:0}.climate-entity-add{display:block;margin-top:8px}@media(max-width:700px){.climate-entity-picker-row{grid-template-columns:1fr}}";
     style.textContent += ".week-toolbar-main{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap}.week-used-modes{display:grid;gap:5px}.week-used-modes-label{font-size:12px;color:var(--secondary-text-color)}.week-mode-list{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.week-mode-chip,.week-mode-add{display:inline-flex;align-items:center;gap:5px;min-height:38px;padding:7px 9px;font-size:12px}.week-mode-chip.paused{opacity:.6}.week-mode-chip .quick-mode-dot{width:9px;height:9px}.week-mode-chip ha-icon{--mdc-icon-size:16px}.mode-day-grid{display:grid;grid-template-columns:repeat(7,minmax(92px,1fr));gap:7px}.mode-day-card{display:grid;align-content:start;gap:7px;padding:8px;border:1px solid var(--divider-color);border-radius:7px}.mode-day-card>label{display:flex;align-items:center;gap:5px;font-weight:600}.mode-day-card input[type=checkbox]{width:auto}.mode-day-times{display:grid;gap:5px}.mode-day-times[hidden]{display:none}.mode-day-times input{min-width:0;padding:7px}.fixed-weekday{display:block;padding:10px;border:1px solid var(--divider-color);border-radius:7px;background:var(--secondary-background-color)}@media(max-width:900px){.mode-day-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.mode-day-grid{grid-template-columns:1fr}}";
     style.textContent += ".schedule-card.drop-target{cursor:copy;animation:schedule-drop-ready .75s ease-in-out infinite alternate}.schedule-card.drop-invalid{cursor:not-allowed;border:2px solid var(--error-color,#db4437);background:color-mix(in srgb,var(--error-color,#db4437) 10%,var(--card-background-color));box-shadow:0 0 0 3px color-mix(in srgb,var(--error-color,#db4437) 18%,transparent)}.mode-drag-cursor{position:fixed;z-index:10000;display:flex;align-items:center;gap:8px;max-width:240px;padding:8px 11px;border:1px solid var(--divider-color);border-radius:12px;background:color-mix(in srgb,var(--card-background-color) 94%,transparent);box-shadow:0 8px 24px rgba(0,0,0,.24);opacity:0;transform:translate(18px,18px) scale(.92);pointer-events:none;transition:opacity .12s,transform .12s,border-color .12s,background .12s}.mode-drag-cursor.visible{opacity:1;transform:translate(18px,18px) scale(1)}.mode-drag-cursor.allowed{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 12%,var(--card-background-color));animation:drag-cursor-float .7s ease-in-out infinite alternate}.mode-drag-cursor.blocked{border-color:var(--error-color,#db4437);color:var(--error-color,#db4437);background:color-mix(in srgb,var(--error-color,#db4437) 12%,var(--card-background-color))}.mode-drag-cursor ha-icon{--mdc-icon-size:24px;flex:none}.mode-drag-cursor.allowed ha-icon{animation:drag-cursor-icon .55s ease-in-out infinite alternate}.mode-drag-cursor-copy{display:grid;gap:1px;min-width:0}.mode-drag-cursor-copy strong,.mode-drag-cursor-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mode-drag-cursor-copy strong{font-size:12px}.mode-drag-cursor-copy small{font-size:11px;color:var(--secondary-text-color)}@keyframes schedule-drop-ready{from{box-shadow:0 0 0 2px color-mix(in srgb,var(--primary-color) 16%,transparent)}to{box-shadow:0 0 0 6px color-mix(in srgb,var(--primary-color) 28%,transparent)}}@keyframes drag-cursor-float{from{margin-top:0}to{margin-top:-5px}}@keyframes drag-cursor-icon{from{transform:translateY(-2px)}to{transform:translateY(2px)}}";
@@ -220,13 +222,12 @@ class ClimatePlannerPanel extends HTMLElement {
     const settingsSection = document.createElement("section");
     settingsSection.id = "planner-settings";
     settingsSection.className = "planner-settings";
-    settingsSection.innerHTML = '<div class="planner-settings-row"><div class="planner-settings-form"><h2 id="window-settings-title"></h2><p id="window-settings-hint" class="muted"></p><div id="window-label-control" class="window-label-control"></div></div><div class="planner-settings-actions"><button id="save-window-label" class="primary" type="button"></button></div></div>';
+    settingsSection.innerHTML = '<div class="planner-settings-row"><div class="planner-settings-form"><h2 id="window-settings-title"></h2><p id="window-settings-hint" class="muted"></p><div id="window-label-control" class="window-label-control"></div></div></div>';
     overviewTop.prepend(settingsSection);
     this.$("refresh").title = this.t.connected;
     this.$("refresh").onclick = () => this.load();
     this.$("add-mode").onclick = () => this.openModeDialog();
     this.$("add-schedule").onclick = () => this.openScheduleDialog();
-    this.$("save-window-label").onclick = () => this.saveWindowLabel();
     this.$("dialog").addEventListener("click", (event) => { if (event.target === this.$("dialog")) this.closeDialog(); });
   }
 
@@ -360,6 +361,16 @@ class ClimatePlannerPanel extends HTMLElement {
     this.windowLabelDraft = next;
     this.windowLabelDirty = this.windowLabelDraft !== (this.data?.window_label || "");
     this.updateWindowLabelSaveState();
+    this.scheduleWindowLabelSave();
+  }
+
+  scheduleWindowLabelSave() {
+    clearTimeout(this.windowLabelSaveTimer);
+    if (!this.windowLabelDirty) return;
+    this.windowLabelSaveTimer = setTimeout(() => {
+      this.windowLabelSaveTimer = null;
+      this.saveWindowLabel();
+    }, 150);
   }
 
   scheduleNativeWindowLabelRender() {
@@ -398,8 +409,27 @@ class ClimatePlannerPanel extends HTMLElement {
       control.replaceChildren(picker);
     }
     picker.hass = this._hass;
+    picker._labels = this.windowLabelRegistryEntries();
     picker.label = this.t.windowLabel;
     picker.value = this.windowLabelDraft || undefined;
+  }
+
+  windowLabelRegistryEntries() {
+    const options = Array.isArray(this.data?.window_labels) ? this.data.window_labels : [];
+    const entries = options.map((item) => ({
+      label_id: item.id,
+      name: item.name,
+      description: item.description || undefined,
+      color: item.color || undefined,
+      icon: item.icon || undefined,
+    }));
+    if (this.windowLabelDraft && !entries.some((item) => item.label_id === this.windowLabelDraft)) {
+      entries.push({
+        label_id: this.windowLabelDraft,
+        name: this.data?.window_label_name || this.windowLabelDraft,
+      });
+    }
+    return entries;
   }
 
   renderFallbackWindowLabelSelect(control) {
@@ -411,6 +441,7 @@ class ClimatePlannerPanel extends HTMLElement {
         this.windowLabelDraft = select.value;
         this.windowLabelDirty = this.windowLabelDraft !== (this.data?.window_label || "");
         this.updateWindowLabelSaveState();
+        this.scheduleWindowLabelSave();
       };
       control.replaceChildren(select);
     }
@@ -430,7 +461,6 @@ class ClimatePlannerPanel extends HTMLElement {
     if (!admin) return;
     this.$("window-settings-title").textContent = this.t.windowSettings;
     this.$("window-settings-hint").textContent = this.t.windowLabelHint;
-    this.$("save-window-label").textContent = this.t.saveWindowLabel;
     this.updateWindowLabelSaveState();
     const control = this.$("window-label-control");
     if (!control) return;
@@ -443,18 +473,21 @@ class ClimatePlannerPanel extends HTMLElement {
   }
 
   async saveWindowLabel() {
-    if (!this._hass.user?.is_admin || !this.windowLabelDirty) return;
-    this.$("save-window-label").disabled = true;
+    if (!this._hass.user?.is_admin || !this.windowLabelDirty || this.windowLabelSavePending) return;
+    this.windowLabelSavePending = true;
+    const labelId = this.windowLabelDraft;
     try {
       await this._hass.callWS({
         type: "climate_planner/set_window_label",
-        label_id: this.windowLabelDraft,
+        label_id: labelId,
       });
-      this.windowLabelDirty = false;
+      if (this.windowLabelDraft === labelId) this.windowLabelDirty = false;
       await this.load();
     } catch (error) {
-      this.$("save-window-label").disabled = false;
       this.notice(error?.code === "unauthorized" ? this.t.invalid : this.t.saveError, true);
+    } finally {
+      this.windowLabelSavePending = false;
+      if (this.windowLabelDirty && this.windowLabelDraft !== labelId) this.scheduleWindowLabelSave();
     }
   }
 

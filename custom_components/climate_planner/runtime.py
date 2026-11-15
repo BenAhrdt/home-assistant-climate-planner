@@ -325,7 +325,12 @@ class PlannerRuntime:
             name = getattr(entry, "name", None)
             if not isinstance(label_id, str) or not label_id or not isinstance(name, str):
                 continue
-            result.append({"id": label_id, "name": name})
+            item = {"id": label_id, "name": name}
+            for attribute in ("description", "color", "icon"):
+                value = getattr(entry, attribute, None)
+                if isinstance(value, str) and value:
+                    item[attribute] = value
+            result.append(item)
         return sorted(result, key=lambda item: (item["name"].casefold(), item["id"]))
 
     def _manual_match(

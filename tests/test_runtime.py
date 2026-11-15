@@ -722,7 +722,13 @@ async def test_snapshot_includes_window_label_names(fake_runtime, monkeypatch):
         "async_get",
         lambda _hass: SimpleNamespace(
             async_entries=lambda: [
-                SimpleNamespace(label_id="window_contacts", name="Fensterkontakte")
+                SimpleNamespace(
+                    label_id="window_contacts",
+                    name="Fensterkontakte",
+                    description="Fensterkontakte",
+                    color="#e91e63",
+                    icon="mdi:window-open",
+                )
             ]
         ),
     )
@@ -737,7 +743,15 @@ async def test_snapshot_includes_window_label_names(fake_runtime, monkeypatch):
 
     assert snapshot["window_label"] == "window_contacts"
     assert snapshot["window_label_name"] == "Fensterkontakte"
-    assert snapshot["window_labels"] == [{"id": "window_contacts", "name": "Fensterkontakte"}]
+    assert snapshot["window_labels"] == [
+        {
+            "id": "window_contacts",
+            "name": "Fensterkontakte",
+            "description": "Fensterkontakte",
+            "color": "#e91e63",
+            "icon": "mdi:window-open",
+        }
+    ]
     await runtime.async_shutdown()
 
 
