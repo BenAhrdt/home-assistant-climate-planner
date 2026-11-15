@@ -59,14 +59,17 @@ Als Anlass stehen ein einmaliges Datum, ausgewählte Feiertage und **Zyklisch**
 zur Verfügung. Geburtstage werden über „Zyklisch → Jährlich“ angelegt. Ostern,
 der 1. bis 4. Advent, alle Adventssonntage sowie die Weihnachtstage werden
 innerhalb der Feiertagsauswahl angeboten; zusätzlich gibt es den Sammeltermin
-„Weihnachten (24.–26. Dezember)“.
+„Ostern (Karfreitag–Ostermontag)“ und „Weihnachten (24.–26. Dezember)“.
 Die beweglichen Termine werden lokal berechnet. Die Feiertagsauswahl enthält die
 gängigen deutschen festen und beweglichen Feiertage; eine landesspezifische
 Feiertagskonfiguration gibt es derzeit nicht. Das zuletzt erreichte Ereignis
 bestimmt den Aktivierungszustand, wobei bei gleichem Datum **Auto aus** Vorrang
 hat. Die manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar.
 Eine Regel mit dem Anlass **Zyklisch** verwendet ein Intervall, ein Startdatum
-und eine Startzeit. Verfügbar sind stündlich,
+und eine Startzeit. Optional kann ein Enddatum gesetzt werden; die letzte
+Wiederholung am Enddatum ist eingeschlossen. Das Enddatum beendet jedoch nicht
+automatisch den zuletzt gesetzten Zustand, dafür wird eine eigene Auto-aus-Regel
+benötigt. Verfügbar sind stündlich,
 täglich, wöchentlich, monatlich, quartalsweise und jährlich. Das Startdatum ist
 dabei der Anker: Es bestimmt bei wöchentlichen Regeln den Wochentag und bei
 monatlichen, quartalsweisen sowie jährlichen Regeln den Kalendertag.

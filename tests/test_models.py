@@ -97,6 +97,7 @@ def test_repeated_auto_rules_are_normalized():
             "recurrence": "yearly",
             "start_date": "2026-02-14",
             "start_time": "08:00",
+            "end_date": "2027-02-14",
         },
     ]
 
@@ -147,6 +148,24 @@ def test_cyclic_auto_rule_rejects_unknown_recurrence():
     ]
 
     with pytest.raises(InvalidData, match="invalid_auto_rule_recurrence"):
+        validate_planner(value)
+
+
+def test_cyclic_auto_rule_rejects_end_date_before_start_date():
+    value = planner()
+    value["schedules"][0]["assignments"][0]["auto_rules"] = [
+        {
+            "id": "rule",
+            "action": "on",
+            "kind": "cycle",
+            "recurrence": "daily",
+            "start_date": "2026-11-15",
+            "start_time": "08:00",
+            "end_date": "2026-11-14",
+        }
+    ]
+
+    with pytest.raises(InvalidData, match="invalid_auto_rule_end_date"):
         validate_planner(value)
 
 

@@ -94,6 +94,8 @@ def _holiday_dates(holiday: str, year: int) -> tuple[date, ...]:
     easter = _easter_sunday(year)
     if holiday == "easter_sunday":
         return (easter,)
+    if holiday == "easter_period":
+        return tuple(easter + timedelta(days=offset) for offset in range(-2, 2))
     if holiday == "christmas_period":
         return tuple(date(year, 12, day) for day in (24, 25, 26))
     movable_offsets = {
@@ -185,6 +187,7 @@ def _cycle_occurrences(rule: dict, now: datetime, *, future_only: bool) -> list[
     zone = now.tzinfo
     assert zone is not None
     start = _at_local(date.fromisoformat(rule["start_date"]), rule["start_time"], zone)
+    end_date = date.fromisoformat(rule["end_date"]) if rule.get("end_date") else None
     recurrence = rule["recurrence"]
     if recurrence in {"hourly", "daily", "weekly"}:
         periods = {"hourly": timedelta(hours=1), "daily": timedelta(days=1), "weekly": timedelta(days=7)}
@@ -197,7 +200,8 @@ def _cycle_occurrences(rule: dict, now: datetime, *, future_only: bool) -> list[
             if future_only:
                 index += 1
         occurrence = start + index * period
-        if (occurrence > now) if future_only else (occurrence <= now):
+        in_range = end_date is None or occurrence.date() <= end_date
+        if in_range and ((occurrence > now) if future_only else (occurrence <= now)):
             return [occurrence]
         return []
 
@@ -212,7 +216,8 @@ def _cycle_occurrences(rule: dict, now: datetime, *, future_only: bool) -> list[
         if event_date is None:
             continue
         occurrence = _at_local(event_date, rule["start_time"], zone)
-        if (occurrence > now) if future_only else (occurrence <= now):
+        in_range = end_date is None or event_date <= end_date
+        if in_range and ((occurrence > now) if future_only else (occurrence <= now)):
             occurrences.append(occurrence)
     if future_only:
         return [min(occurrences)] if occurrences else []

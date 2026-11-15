@@ -210,6 +210,7 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
             "recurrence",
             "start_date",
             "start_time",
+            "end_date",
         }:
             raise InvalidData("invalid_auto_rule")
         rule_id = _id(raw_rule.get("id") or new_id("auto_rule"), "invalid_auto_rule_id")
@@ -255,6 +256,11 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
             normalized.update(
                 {"recurrence": recurrence, "start_date": start_date, "start_time": start_time}
             )
+            end_date = _optional_date(raw_rule.get("end_date"), "invalid_auto_rule_end_date")
+            if end_date and end_date < start_date:
+                raise InvalidData("invalid_auto_rule_end_date")
+            if end_date:
+                normalized["end_date"] = end_date
         result.append(normalized)
     return result
 

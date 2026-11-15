@@ -75,7 +75,8 @@ Planner
         │   ├── holiday?           # unterstützter Feiertag für kind=holiday
         │   ├── recurrence?       # hourly, daily, weekly, monthly, quarterly, yearly
         │   ├── start_date?       # ISO-Ankerdatum für kind=cycle
-        │   └── start_time?       # HH:mm für kind=cycle
+        │   ├── start_time?       # HH:mm für kind=cycle
+        │   └── end_date?         # inklusives ISO-Enddatum für kind=cycle
         └── weekday_rules        # weekday -> Liste von Phasen
             ├── id
             ├── time              # HH:mm
@@ -116,6 +117,9 @@ bestimmt den Zustand; bei gleichem Datum gewinnt Auto aus. Manuelle Änderungen
 des Play-/Pause-Zustands bleiben unabhängig davon möglich. Die Laufzeit merkt
 sich getrennt, welches Ereignis bereits angewendet wurde, damit ein manueller
 Zustand nicht bei jeder Auswertung sofort wieder überschrieben wird.
+Das optionale Enddatum begrenzt die erzeugten zyklischen Ereignisse einschließlich
+des Enddatums. Es kehrt die Aktion nicht automatisch um; für ein automatisches
+Abschalten wird weiterhin eine eigene Auto-aus-Regel benötigt.
 Jede Regel kann optional eine eigene Bezeichnung tragen. Die Reihenfolge der
 Regeln ist die Reihenfolge der Liste und kann im Panel per Drag-and-Drop geändert
 werden; sie wird beim Speichern zusammen mit den Regeln übernommen.

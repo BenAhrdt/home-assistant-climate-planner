@@ -223,10 +223,15 @@ def test_all_advent_holiday_has_four_occurrences():
 
 def test_easter_and_christmas_period_are_holiday_occurrences():
     easter = {"auto_rules": [{"id": "easter", "action": "on", "kind": "holiday", "holiday": "easter_sunday"}]}
+    easter_period = {"auto_rules": [{"id": "easter-period", "action": "on", "kind": "holiday", "holiday": "easter_period"}]}
     christmas = {"auto_rules": [{"id": "christmas", "action": "off", "kind": "holiday", "holiday": "christmas_period"}]}
 
     assert latest_auto_date_event(easter, date(2026, 4, 6)) == (
         "auto_rule:easter:on:2026-04-05",
+        True,
+    )
+    assert latest_auto_date_event(easter_period, date(2026, 4, 6)) == (
+        "auto_rule:easter-period:on:2026-04-06",
         True,
     )
     configured = assignment("rule", "comfort", monday=["06:00"])
@@ -259,6 +264,28 @@ def test_hourly_cycle_uses_the_configured_start_time():
     assert next_auto_date(
         schedule([configured]), datetime(2026, 11, 15, 10, 30, tzinfo=ZONE)
     ) == datetime(2026, 11, 15, 11, tzinfo=ZONE)
+
+
+def test_cycle_end_date_limits_past_and_future_occurrences():
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = [
+        {
+            "id": "limited",
+            "action": "on",
+            "kind": "cycle",
+            "recurrence": "daily",
+            "start_date": "2026-11-15",
+            "start_time": "08:00",
+            "end_date": "2026-11-17",
+        }
+    ]
+
+    assert latest_auto_event(configured, datetime(2026, 11, 17, 10, tzinfo=ZONE))[0].endswith(
+        "2026-11-17T08:00:00+01:00"
+    )
+    assert next_auto_date(
+        schedule([configured]), datetime(2026, 11, 17, 10, 30, tzinfo=ZONE)
+    ) is None
 
 
 @pytest.mark.parametrize(
