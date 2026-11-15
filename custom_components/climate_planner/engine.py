@@ -60,8 +60,16 @@ def _easter_sunday(year: int) -> date:
     return date(year, month, day)
 
 
-def _holiday_date(holiday: str, year: int) -> date | None:
-    """Return a supported holiday date without relying on an external service."""
+def _first_advent(year: int) -> date:
+    """Return the first Advent Sunday for a year."""
+
+    christmas = date(year, 12, 25)
+    last_sunday = christmas - timedelta(days=(christmas.weekday() + 1) % 7)
+    return last_sunday - timedelta(days=21)
+
+
+def _holiday_dates(holiday: str, year: int) -> tuple[date, ...]:
+    """Return supported holiday dates without relying on an external service."""
 
     fixed = {
         "new_year": (1, 1),
@@ -77,7 +85,12 @@ def _holiday_date(holiday: str, year: int) -> date | None:
     }
     if holiday in fixed:
         month, day = fixed[holiday]
-        return date(year, month, day)
+        return (date(year, month, day),)
+    if holiday.startswith("advent_") and holiday[-1:] in {"1", "2", "3", "4"}:
+        return (_first_advent(year) + timedelta(days=7 * (int(holiday[-1]) - 1)),)
+    if holiday == "all_advent":
+        first = _first_advent(year)
+        return tuple(first + timedelta(days=7 * offset) for offset in range(4))
     easter = _easter_sunday(year)
     movable_offsets = {
         "good_friday": -2,
@@ -87,34 +100,32 @@ def _holiday_date(holiday: str, year: int) -> date | None:
         "corpus_christi": 60,
     }
     offset = movable_offsets.get(holiday)
-    return easter + timedelta(days=offset) if offset is not None else None
+    return (easter + timedelta(days=offset),) if offset is not None else ()
 
 
-def _auto_rule_date(rule: dict, year: int) -> date | None:
+def _auto_rule_dates(rule: dict, year: int) -> tuple[date, ...]:
     """Resolve a recurring rule for one calendar year."""
 
     kind = rule.get("kind")
     if kind == "date":
         event_date = date.fromisoformat(rule["date"])
-        return event_date if event_date.year == year else None
+        return (event_date,) if event_date.year == year else ()
     if kind == "birthday":
         source_date = date.fromisoformat(rule["date"])
         try:
-            return date(year, source_date.month, source_date.day)
+            return (date(year, source_date.month, source_date.day),)
         except ValueError:
             # A 29 February birthday has no occurrence in a non-leap year.
-            return None
+            return ()
     if kind == "holiday":
-        return _holiday_date(rule["holiday"], year)
+        return _holiday_dates(rule["holiday"], year)
     if kind == "easter":
-        return _easter_sunday(year)
+        return (_easter_sunday(year),)
     if kind == "advent":
-        christmas = date(year, 12, 25)
-        last_sunday = christmas - timedelta(days=(christmas.weekday() + 1) % 7)
-        return last_sunday - timedelta(days=21)
+        return (_first_advent(year),)
     if kind == "christmas":
-        return date(year, 12, 25)
-    return None
+        return (date(year, 12, 25),)
+    return ()
 
 
 def _auto_rule_events(
@@ -154,13 +165,11 @@ def _auto_rule_events(
                 events.append((event_date, tie_breaker, index + 1, marker, enabled))
             continue
         for year in years:
-            event_date = _auto_rule_date(rule, year)
-            if event_date is None:
-                continue
-            matches = event_date > current_date if future_only else event_date <= current_date
-            if matches:
-                marker = f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{event_date}"
-                events.append((event_date, tie_breaker, index + 1, marker, enabled))
+            for event_date in _auto_rule_dates(rule, year):
+                matches = event_date > current_date if future_only else event_date <= current_date
+                if matches:
+                    marker = f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{event_date}"
+                    events.append((event_date, tie_breaker, index + 1, marker, enabled))
     return events
 
 
@@ -180,18 +189,114 @@ def latest_auto_date_event(assignment: dict, current_date: date) -> tuple[str, b
     return marker, enabled
 
 
-def next_auto_date(schedule: dict, now: datetime) -> datetime | None:
-    """Return the next future automatic enable/disable date at local midnight."""
+def _add_months(source: date, months: int) -> date | None:
+    """Add calendar months while skipping impossible anchor days."""
+
+    absolute_month = source.year * 12 + source.month - 1 + months
+    year, month_index = divmod(absolute_month, 12)
+    try:
+        return date(year, month_index + 1, source.day)
+    except ValueError:
+        return None
+
+
+def _cycle_occurrences(rule: dict, now: datetime, *, future_only: bool) -> list[datetime]:
+    """Return the relevant previous or next occurrence for a cyclic rule."""
+
+    zone = now.tzinfo
+    assert zone is not None
+    start = _at_local(date.fromisoformat(rule["start_date"]), rule["start_time"], zone)
+    recurrence = rule["recurrence"]
+    if recurrence in {"hourly", "daily", "weekly"}:
+        periods = {"hourly": timedelta(hours=1), "daily": timedelta(days=1), "weekly": timedelta(days=7)}
+        period = periods[recurrence]
+        if now < start:
+            index = 0
+        else:
+            elapsed = now - start
+            index = int(elapsed.total_seconds() // period.total_seconds())
+            if future_only:
+                index += 1
+        occurrence = start + index * period
+        if (occurrence > now) if future_only else (occurrence <= now):
+            return [occurrence]
+        return []
+
+    month_step = {"monthly": 1, "quarterly": 3, "yearly": 12}[recurrence]
+    month_difference = (now.year - start.year) * 12 + now.month - start.month
+    approximate_index = max(0, month_difference // month_step)
+    first_index = max(0, approximate_index - 2)
+    last_index = approximate_index + (5 if future_only else 1)
+    occurrences: list[datetime] = []
+    for index in range(first_index, last_index + 1):
+        event_date = _add_months(start.date(), index * month_step)
+        if event_date is None:
+            continue
+        occurrence = _at_local(event_date, rule["start_time"], zone)
+        if (occurrence > now) if future_only else (occurrence <= now):
+            occurrences.append(occurrence)
+    if future_only:
+        return [min(occurrences)] if occurrences else []
+    return [max(occurrences)] if occurrences else []
+
+
+def latest_auto_event(assignment: dict, now: datetime) -> tuple[str, bool] | None:
+    """Return the latest reached date, holiday, or cyclic rule event."""
 
     local_now = _local_now(now)
     zone = local_now.tzinfo
     assert zone is not None
+    events: list[tuple[datetime, int, int, str, bool]] = []
+    for event_date, tie_breaker, index, marker, enabled in _auto_rule_events(
+        assignment, local_now.date()
+    ):
+        events.append(
+            (_at_local(event_date, "00:00", zone), tie_breaker, index, marker, enabled)
+        )
+    for index, rule in enumerate(assignment.get("auto_rules", [])):
+        if not isinstance(rule, dict) or rule.get("kind") != "cycle":
+            continue
+        enabled = rule.get("action") == "on"
+        tie_breaker = 0 if enabled else 1
+        for occurrence in _cycle_occurrences(rule, local_now, future_only=False):
+            marker = f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{occurrence.isoformat()}"
+            events.append((occurrence, tie_breaker, index + 1, marker, enabled))
+    if not events:
+        return None
+    _occurrence, _tie_breaker, _index, marker, enabled = max(events)
+    return marker, enabled
+
+
+def _next_auto_events(assignment: dict, now: datetime) -> list[tuple[datetime, int, int, str, bool]]:
+    """Return the next occurrence(s) for an assignment's automatic rules."""
+
+    local_now = _local_now(now)
+    zone = local_now.tzinfo
+    assert zone is not None
+    events: list[tuple[datetime, int, int, str, bool]] = []
+    for event_date, tie_breaker, index, marker, enabled in _auto_rule_events(
+        assignment, local_now.date(), future_only=True
+    ):
+        events.append(
+            (_at_local(event_date, "00:00", zone), tie_breaker, index, marker, enabled)
+        )
+    for index, rule in enumerate(assignment.get("auto_rules", [])):
+        if not isinstance(rule, dict) or rule.get("kind") != "cycle":
+            continue
+        enabled = rule.get("action") == "on"
+        tie_breaker = 0 if enabled else 1
+        for occurrence in _cycle_occurrences(rule, local_now, future_only=True):
+            marker = f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{occurrence.isoformat()}"
+            events.append((occurrence, tie_breaker, index + 1, marker, enabled))
+    return events
+
+
+def next_auto_date(schedule: dict, now: datetime) -> datetime | None:
+    """Return the next future automatic enable/disable occurrence."""
+
     upcoming: list[datetime] = []
     for assignment in schedule["assignments"]:
-        for event_date, _tie_breaker, _index, _marker, _enabled in _auto_rule_events(
-            assignment, local_now.date(), future_only=True
-        ):
-            upcoming.append(_at_local(event_date, "00:00", zone))
+        upcoming.extend(event[0] for event in _next_auto_events(assignment, now))
     return min(upcoming) if upcoming else None
 
 

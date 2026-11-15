@@ -47,12 +47,14 @@ danach die zuletzt aktivierte Regel.
 
 Über das Zahnrad rechts an einem verwendeten Mode lassen sich die Einstellungen
 dieser Mode-Zuordnung im Heizplan öffnen. Unter **Automatische Regeln** können
-beliebig viele Regeln für **Auto ein** und **Auto aus** angelegt werden. Nach
-jedem ausgefüllten Eintrag erscheint darunter automatisch eine neue leere Zeile;
-unvollständige Zeilen werden nicht gespeichert.
+beliebig viele Regeln für **Auto ein** und **Auto aus** angelegt werden. Eine
+neue Regel wird über **Regel hinzufügen** angelegt; unvollständige Zeilen werden
+nicht gespeichert.
 
 Als Anlass stehen ein einmaliges Datum, ein jährlich wiederkehrender Geburtstag,
-ausgewählte Feiertage sowie Ostern, der 1. Advent und Weihnachten zur Verfügung.
+ausgewählte Feiertage sowie Ostern zur Verfügung. Der 1. bis 4. Advent, alle
+Adventssonntage und die Weihnachtstage werden innerhalb der Feiertagsauswahl
+angeboten.
 Die beweglichen Termine werden lokal berechnet. Die Feiertagsauswahl enthält die
 gängigen deutschen festen und beweglichen Feiertage; eine landesspezifische
 Feiertagskonfiguration gibt es derzeit nicht. Das zuletzt erreichte Ereignis
@@ -60,6 +62,12 @@ bestimmt den Aktivierungszustand, wobei bei gleichem Datum **Auto aus** Vorrang
 hat. Die manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar.
 Alte einzelne Auto-ein-/Auto-aus-Daten werden weiterhin gelesen und beim
 Bearbeiten in die neue Regelliste übernommen.
+
+Zusätzlich kann eine Regel den Anlass **Zyklisch** verwenden. Dafür werden ein
+Intervall, ein Startdatum und eine Startzeit gesetzt. Verfügbar sind stündlich,
+täglich, wöchentlich, monatlich, quartalsweise und jährlich. Das Startdatum ist
+dabei der Anker: Es bestimmt bei wöchentlichen Regeln den Wochentag und bei
+monatlichen, quartalsweisen sowie jährlichen Regeln den Kalendertag.
 
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.

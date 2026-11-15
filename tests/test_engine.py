@@ -1,8 +1,11 @@
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
+import pytest
+
 from custom_components.climate_planner.engine import (
     latest_auto_date_event,
+    latest_auto_event,
     next_activation,
     next_auto_date,
     select_active_mode,
@@ -227,3 +230,74 @@ def test_repeated_one_time_date_is_not_limited_to_the_next_year():
     assert next_auto_date(
         schedule([configured]), datetime(2026, 11, 15, 12, tzinfo=ZONE)
     ) == datetime(2030, 6, 1, tzinfo=ZONE)
+
+
+def test_all_advent_holiday_has_four_occurrences():
+    value = {
+        "auto_rules": [
+            {"id": "advent", "action": "off", "kind": "holiday", "holiday": "all_advent"}
+        ]
+    }
+
+    assert latest_auto_event(value, datetime(2026, 12, 1, 12, tzinfo=ZONE)) == (
+        "auto_rule:advent:off:2026-11-29",
+        False,
+    )
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = value["auto_rules"]
+    assert next_auto_date(
+        schedule([configured]), datetime(2026, 12, 1, 12, tzinfo=ZONE)
+    ) == datetime(2026, 12, 6, tzinfo=ZONE)
+
+
+def test_hourly_cycle_uses_the_configured_start_time():
+    value = {
+        "auto_rules": [
+            {
+                "id": "hourly",
+                "action": "on",
+                "kind": "cycle",
+                "recurrence": "hourly",
+                "start_date": "2026-11-15",
+                "start_time": "08:00",
+            }
+        ]
+    }
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = value["auto_rules"]
+
+    assert latest_auto_event(configured, datetime(2026, 11, 15, 10, 30, tzinfo=ZONE)) == (
+        "auto_rule:hourly:on:2026-11-15T10:00:00+01:00",
+        True,
+    )
+    assert next_auto_date(
+        schedule([configured]), datetime(2026, 11, 15, 10, 30, tzinfo=ZONE)
+    ) == datetime(2026, 11, 15, 11, tzinfo=ZONE)
+
+
+@pytest.mark.parametrize(
+    ("recurrence", "expected"),
+    [
+        ("daily", datetime(2026, 11, 16, 8, tzinfo=ZONE)),
+        ("weekly", datetime(2026, 11, 22, 8, tzinfo=ZONE)),
+        ("monthly", datetime(2026, 12, 15, 8, tzinfo=ZONE)),
+        ("quarterly", datetime(2027, 2, 15, 8, tzinfo=ZONE)),
+        ("yearly", datetime(2027, 11, 15, 8, tzinfo=ZONE)),
+    ],
+)
+def test_cycle_intervals_schedule_the_next_anchor_occurrence(recurrence, expected):
+    configured = assignment("rule", "comfort", monday=["06:00"])
+    configured["auto_rules"] = [
+        {
+            "id": "cycle",
+            "action": "off",
+            "kind": "cycle",
+            "recurrence": recurrence,
+            "start_date": "2026-11-15",
+            "start_time": "08:00",
+        }
+    ]
+
+    assert next_auto_date(
+        schedule([configured]), datetime(2026, 11, 15, 10, 30, tzinfo=ZONE)
+    ) == expected

@@ -114,6 +114,41 @@ def test_repeated_auto_rules_require_their_value():
         validate_planner(value)
 
 
+def test_cyclic_auto_rule_is_normalized():
+    value = planner()
+    value["schedules"][0]["assignments"][0]["auto_rules"] = [
+        {
+            "id": "hourly",
+            "action": "on",
+            "kind": "cycle",
+            "recurrence": "hourly",
+            "start_date": "2026-11-15",
+            "start_time": "08:00",
+        }
+    ]
+
+    normalized = validate_planner(value)["schedules"][0]["assignments"][0]["auto_rules"]
+
+    assert normalized == value["schedules"][0]["assignments"][0]["auto_rules"]
+
+
+def test_cyclic_auto_rule_rejects_unknown_recurrence():
+    value = planner()
+    value["schedules"][0]["assignments"][0]["auto_rules"] = [
+        {
+            "id": "rule",
+            "action": "on",
+            "kind": "cycle",
+            "recurrence": "every-so-often",
+            "start_date": "2026-11-15",
+            "start_time": "08:00",
+        }
+    ]
+
+    with pytest.raises(InvalidData, match="invalid_auto_rule_recurrence"):
+        validate_planner(value)
+
+
 def test_multiple_climate_entities_are_preserved():
     value = planner()
     value["schedules"][0].pop("climate_entity_id")

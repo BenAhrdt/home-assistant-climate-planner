@@ -15,6 +15,7 @@ from uuid import uuid4
 from .const import (
     AUTO_RULE_HOLIDAYS,
     AUTO_RULE_KINDS,
+    AUTO_RULE_RECURRENCES,
     DEFAULT_WINDOW_OPEN_TEMPERATURE,
     STORAGE_VERSION,
     WEEKDAYS,
@@ -199,7 +200,16 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
     for raw_rule in value:
         if not isinstance(raw_rule, dict):
             raise InvalidData("invalid_auto_rule")
-        if set(raw_rule) - {"id", "action", "kind", "date", "holiday"}:
+        if set(raw_rule) - {
+            "id",
+            "action",
+            "kind",
+            "date",
+            "holiday",
+            "recurrence",
+            "start_date",
+            "start_time",
+        }:
             raise InvalidData("invalid_auto_rule")
         rule_id = _id(raw_rule.get("id") or new_id("auto_rule"), "invalid_auto_rule_id")
         if rule_id in seen:
@@ -222,6 +232,19 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
             if holiday not in AUTO_RULE_HOLIDAYS:
                 raise InvalidData("invalid_auto_rule_holiday")
             normalized["holiday"] = holiday
+        elif kind == "cycle":
+            recurrence = raw_rule.get("recurrence")
+            if recurrence not in AUTO_RULE_RECURRENCES:
+                raise InvalidData("invalid_auto_rule_recurrence")
+            start_date = _optional_date(raw_rule.get("start_date"), "invalid_auto_rule_start_date")
+            if not start_date:
+                raise InvalidData("missing_auto_rule_start_date")
+            start_time = raw_rule.get("start_time")
+            if not isinstance(start_time, str) or not TIME_PATTERN.fullmatch(start_time):
+                raise InvalidData("invalid_auto_rule_start_time")
+            normalized.update(
+                {"recurrence": recurrence, "start_date": start_date, "start_time": start_time}
+            )
         result.append(normalized)
     return result
 

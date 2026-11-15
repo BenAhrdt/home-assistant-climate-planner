@@ -50,7 +50,7 @@ from .const import (
 )
 from .engine import (
     ActiveMatch,
-    latest_auto_date_event,
+    latest_auto_event,
     next_activation,
     next_auto_date,
     select_active_mode,
@@ -932,12 +932,11 @@ class PlannerRuntime:
         assignment_ids: set[str] = set()
         configuration_changed = False
         runtime_state_changed = False
-        current_date = now.date()
         for schedule in candidate["schedules"]:
             for assignment in schedule["assignments"]:
                 assignment_id = assignment["id"]
                 assignment_ids.add(assignment_id)
-                event = latest_auto_date_event(assignment, current_date)
+                event = latest_auto_event(assignment, now)
                 if event is None:
                     if assignment_id in next_auto_date_actions:
                         del next_auto_date_actions[assignment_id]

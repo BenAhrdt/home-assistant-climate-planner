@@ -4,7 +4,7 @@ from __future__ import annotations
 
 DOMAIN = "climate_planner"
 NAME = "Climate Planner"
-VERSION = "0.1.56"
+VERSION = "0.1.57"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = f"{DOMAIN}.planner"
@@ -38,6 +38,15 @@ AUTO_RULE_KINDS: tuple[str, ...] = (
     "easter",
     "advent",
     "christmas",
+    "cycle",
+)
+AUTO_RULE_RECURRENCES: tuple[str, ...] = (
+    "hourly",
+    "daily",
+    "weekly",
+    "monthly",
+    "quarterly",
+    "yearly",
 )
 AUTO_RULE_HOLIDAYS: tuple[str, ...] = (
     "new_year",
@@ -55,6 +64,11 @@ AUTO_RULE_HOLIDAYS: tuple[str, ...] = (
     "christmas_day",
     "boxing_day",
     "new_years_eve",
+    "advent_1",
+    "advent_2",
+    "advent_3",
+    "advent_4",
+    "all_advent",
 )
 
 CLIMATE_DOMAIN = "climate"
