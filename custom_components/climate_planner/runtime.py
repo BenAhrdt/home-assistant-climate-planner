@@ -578,6 +578,119 @@ class PlannerRuntime:
             self.data = normalized
         await self.async_evaluate()
 
+    async def _async_commit_configuration(self, candidate: dict[str, Any]) -> None:
+        """Validate, persist, and publish an entity-driven configuration change."""
+
+        async with self._data_lock:
+            normalized = validate_planner(candidate)
+            normalized["revision"] = self.data["revision"] + 1
+            await self.store.async_save(normalized)
+            self.data = normalized
+        await self._async_refresh_window_tracking()
+        await self.async_evaluate()
+
+    async def async_set_schedule_name(self, schedule_id: str, name: str) -> None:
+        """Set one heating plan name from a Home Assistant text entity."""
+
+        candidate = deepcopy(self.data)
+        schedule = next(
+            (item for item in candidate["schedules"] if item["id"] == schedule_id), None
+        )
+        if schedule is None:
+            raise InvalidData("unknown_schedule")
+        schedule["name"] = name
+        await self._async_commit_configuration(candidate)
+
+    async def async_set_schedule_window_open_temperature(
+        self, schedule_id: str, temperature: float
+    ) -> None:
+        """Set one heating plan's labelled-window setback temperature."""
+
+        candidate = deepcopy(self.data)
+        schedule = next(
+            (item for item in candidate["schedules"] if item["id"] == schedule_id), None
+        )
+        if schedule is None:
+            raise InvalidData("unknown_schedule")
+        schedule["window_open_temperature"] = temperature
+        await self._async_commit_configuration(candidate)
+
+    async def async_set_schedule_climate_entities(
+        self, schedule_id: str, entity_ids: list[str]
+    ) -> None:
+        """Set the climate entities assigned to one heating plan."""
+
+        candidate = deepcopy(self.data)
+        schedule = next(
+            (item for item in candidate["schedules"] if item["id"] == schedule_id), None
+        )
+        if schedule is None:
+            raise InvalidData("unknown_schedule")
+        schedule["climate_entity_ids"] = entity_ids
+        schedule["climate_entity_names"] = {
+            entity_id: name
+            for entity_id, name in schedule.get("climate_entity_names", {}).items()
+            if entity_id in entity_ids
+        }
+        await self._async_commit_configuration(candidate)
+
+    async def async_set_schedule_climate_entity_name(
+        self, schedule_id: str, entity_id: str, name: str
+    ) -> None:
+        """Set or clear a plan-local display name for one climate entity."""
+
+        candidate = deepcopy(self.data)
+        schedule = next(
+            (item for item in candidate["schedules"] if item["id"] == schedule_id), None
+        )
+        if schedule is None or entity_id not in schedule["climate_entity_ids"]:
+            raise InvalidData("unknown_climate_entity")
+        names = schedule.setdefault("climate_entity_names", {})
+        if name.strip():
+            names[entity_id] = name
+        else:
+            names.pop(entity_id, None)
+        await self._async_commit_configuration(candidate)
+
+    async def async_set_mode_setting(self, mode_id: str, key: str, value: Any) -> None:
+        """Set a scalar mode-library value through its configuration entity."""
+
+        if key not in {"name", "target_temperature", "priority", "icon", "color"}:
+            raise InvalidData("invalid_mode_setting")
+        candidate = deepcopy(self.data)
+        mode = next((item for item in candidate["modes"] if item["id"] == mode_id), None)
+        if mode is None:
+            raise InvalidData("unknown_mode")
+        if key in {"icon", "color"} and not str(value).strip():
+            mode.pop(key, None)
+        else:
+            mode[key] = value
+        await self._async_commit_configuration(candidate)
+
+    async def async_set_assignment_mode(
+        self, schedule_id: str, assignment_id: str, mode_id: str
+    ) -> None:
+        """Change the mode referenced by one plan assignment."""
+
+        candidate = deepcopy(self.data)
+        if not any(item["id"] == mode_id for item in candidate["modes"]):
+            raise InvalidData("unknown_mode_reference")
+        schedule = next(
+            (item for item in candidate["schedules"] if item["id"] == schedule_id), None
+        )
+        assignment = (
+            next(
+                (item for item in schedule["assignments"] if item["id"] == assignment_id),
+                None,
+            )
+            if schedule
+            else None
+        )
+        if assignment is None:
+            raise InvalidData("unknown_assignment")
+        assignment["mode_id"] = mode_id
+        await self._async_commit_configuration(candidate)
+
     @staticmethod
     def _match_temperature(match: ActiveMatch) -> float:
         """Return the mode or phase temperature before window adjustment."""

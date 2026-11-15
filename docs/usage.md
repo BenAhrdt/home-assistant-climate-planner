@@ -96,7 +96,9 @@ die Entitätszeile im Heizplan öffnet den normalen Home-Assistant-More-Info-Dia
 
 Unter **Allgemeine Einstellungen** wird zentral ein Home-Assistant-Label für
 Fensterkontakte gewählt und die deutsche Feiertagsregion eingestellt. Beide
-Einstellungen sind zusätzlich als Home-Assistant-Select-Entitäten verfügbar.
+Einstellungen sind am Gerät **Climate Planner Grundeinstellungen** als
+Home-Assistant-Select-Entitäten verfügbar. Dort stehen auch die Mode-Bibliothek
+und ihre steuerbaren Werte als Entitäten bereit.
 Für jede ausgewählte
 Climate-Entität werden nur Fenster mit diesem Label aus demselben
 Home-Assistant-Bereich berücksichtigt. Das ist auch bei einem Heizplan mit
@@ -254,18 +256,30 @@ Für Automationen sind folgende Dienste verfügbar:
 
 Zusätzlich legt die Integration steuerbare Entitäten an:
 
+- ein eigenes Gerät **Climate Planner Grundeinstellungen** mit den globalen
+  Select-Entitäten für Fenster-Label und Feiertagsregion,
+- je Mode Number-Entitäten für Zieltemperatur und Priorität sowie Text-
+  Entitäten für Name, Icon und Farbe,
 - einen Switch pro Heizplan für dessen automatische Aktivierung/Pause,
 - einen Switch pro Heizplan für die Fenstererkennung,
+- je Heizplan Text-Entitäten für Name, Klima-Entitätsliste und lokale
+  Anzeigenamen sowie eine Number-Entität für die Absenktemperatur,
 - einen separaten Switch pro Mode-Zuordnung innerhalb eines Heizplans,
-- zwei Select-Entitäten für Fenster-Label und Feiertagsregion,
+- einen Select pro Mode-Zuordnung zur Auswahl des verwendeten Modes,
 - einen Button pro Zuordnung zur manuellen Aktivierung bis zum nächsten
   automatischen Wechsel,
 - drei Buttons pro Heizplan für `apply_matched`,
   `apply_enabled_matching` und `apply_enabled_mode_matching`.
 
-Home Assistant gruppiert diese Entitäten in einem eigenen Gerät pro Heizplan.
-Die Climate-Planner-Konfiguration bleibt zentral, aber jeder Heizplan erscheint
-im Gerätebereich separat mit seinen Schaltern und Buttons.
+Zusätzlich gibt es Konfigurations-Sensoren: Der globale Sensor enthält die
+vollständige Mode-Bibliothek, der Heizplan-Sensor alle Planwerte einschließlich
+Klima-Entitäten und Anzeigenamen, und der Sensor jeder Zuordnung enthält die
+Wochenphasen und automatischen Regeln. Damit sind auch verschachtelte
+Einstellungen über Zustandsattribute adressierbar.
+
+Home Assistant gruppiert globale Entitäten im Gerät **Climate Planner
+Grundeinstellungen** und plan- beziehungsweise zuordnungsbezogene Entitäten im
+jeweiligen Heizplan-Gerät.
 
 Die Zuordnungs-ID ist Teil der stabilen Unique-ID. Pro Mode und Heizplan gibt es
 in der Oberfläche nur eine Zuordnung und damit einen Switch sowie einen

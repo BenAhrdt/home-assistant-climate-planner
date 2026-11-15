@@ -6,12 +6,27 @@ import custom_components.climate_planner.entity as entity_module
 from custom_components.climate_planner.button import ActivateAssignmentButton, ApplyMatchingButton
 from custom_components.climate_planner.entity import PlannerEntityManager
 from custom_components.climate_planner.models import validate_planner
-from custom_components.climate_planner.select import HolidayRegionSelect, WindowLabelSelect
+from custom_components.climate_planner.number import (
+    ModePriorityNumber,
+    ModeTargetTemperatureNumber,
+    ScheduleWindowTemperatureNumber,
+)
+from custom_components.climate_planner.select import (
+    AssignmentModeSelect,
+    HolidayRegionSelect,
+    WindowLabelSelect,
+)
+from custom_components.climate_planner.sensor import (
+    AssignmentConfigurationSensor,
+    PlannerConfigurationSensor,
+    ScheduleConfigurationSensor,
+)
 from custom_components.climate_planner.switch import (
     AssignmentEnabledSwitch,
     ScheduleEnabledSwitch,
     WindowDetectionSwitch,
 )
+from custom_components.climate_planner.text import ScheduleClimateEntitiesText, ScheduleNameText
 
 
 def runtime():
@@ -39,6 +54,9 @@ def runtime():
     return SimpleNamespace(
         _started=True,
         data=value,
+        window_label="",
+        window_label_name="",
+        holiday_region="national",
         hass=SimpleNamespace(data={"climate_planner": {"runtime": None}}),
     )
 
@@ -120,6 +138,33 @@ def test_global_configuration_selects_expose_display_options():
     assert label_select.options == ["Kein Label", "Fensterkontakte"]
     assert label_select.device_info["identifiers"] == {("climate_planner", "entry_settings")}
     assert label_select.device_info["name"] == "Climate Planner Grundeinstellungen"
+
+
+def test_all_configuration_entities_are_grouped_by_scope():
+    value = runtime()
+
+    global_sensor = PlannerConfigurationSensor(value, "entry")
+    schedule_sensor = ScheduleConfigurationSensor(value, "entry", "schedule_living")
+    assignment_sensor = AssignmentConfigurationSensor(
+        value, "entry", "schedule_living", "assignment_home"
+    )
+    mode_select = AssignmentModeSelect(value, "entry", "schedule_living", "assignment_home")
+    plan_name = ScheduleNameText(value, "entry", "schedule_living")
+    climates = ScheduleClimateEntitiesText(value, "entry", "schedule_living")
+    setback = ScheduleWindowTemperatureNumber(value, "entry", "schedule_living")
+    mode_temperature = ModeTargetTemperatureNumber(value, "entry", "mode_home")
+    mode_priority = ModePriorityNumber(value, "entry", "mode_home")
+
+    assert global_sensor.device_info["name"] == "Climate Planner Grundeinstellungen"
+    assert global_sensor.extra_state_attributes["modes"][0]["id"] == "mode_home"
+    assert schedule_sensor.device_info["name"] == "Living room"
+    assert assignment_sensor.extra_state_attributes["weekday_rules"]["monday"]
+    assert mode_select.current_option == "Home"
+    assert plan_name.native_value == "Living room"
+    assert climates.native_value == "climate.living"
+    assert setback.native_value == 18.5
+    assert mode_temperature.native_value == 21.0
+    assert mode_priority.native_value == 0
 
 
 @pytest.mark.asyncio

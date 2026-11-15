@@ -104,7 +104,7 @@ class PlannerEntity(Entity):
 
 
 class PlannerEntityManager:
-    """Create entities for newly added schedules and assignments at runtime."""
+    """Create and remove dynamic planner entities at runtime."""
 
     def __init__(
         self,
@@ -183,14 +183,101 @@ class PlannerEntityManager:
                         self.runtime, self.entry_id, schedule["id"], assignment["id"]
                     )
                     register(entity)
+        elif self.platform == "select":
+            from .select import AssignmentModeSelect
+
+            for schedule in self.runtime.data["schedules"]:
+                for assignment in schedule["assignments"]:
+                    register(
+                        AssignmentModeSelect(
+                            self.runtime,
+                            self.entry_id,
+                            schedule["id"],
+                            assignment["id"],
+                        )
+                    )
+        elif self.platform == "number":
+            from .number import (
+                ModePriorityNumber,
+                ModeTargetTemperatureNumber,
+                ScheduleWindowTemperatureNumber,
+            )
+
+            for mode in self.runtime.data["modes"]:
+                register(ModeTargetTemperatureNumber(self.runtime, self.entry_id, mode["id"]))
+                register(ModePriorityNumber(self.runtime, self.entry_id, mode["id"]))
+            for schedule in self.runtime.data["schedules"]:
+                register(
+                    ScheduleWindowTemperatureNumber(self.runtime, self.entry_id, schedule["id"])
+                )
+        elif self.platform == "text":
+            from .text import (
+                ModeColorText,
+                ModeIconText,
+                ModeNameText,
+                ScheduleClimateDisplayNameText,
+                ScheduleClimateEntitiesText,
+                ScheduleNameText,
+            )
+
+            for mode in self.runtime.data["modes"]:
+                register(ModeNameText(self.runtime, self.entry_id, mode["id"]))
+                register(ModeIconText(self.runtime, self.entry_id, mode["id"]))
+                register(ModeColorText(self.runtime, self.entry_id, mode["id"]))
+            for schedule in self.runtime.data["schedules"]:
+                register(ScheduleNameText(self.runtime, self.entry_id, schedule["id"]))
+                register(ScheduleClimateEntitiesText(self.runtime, self.entry_id, schedule["id"]))
+                for entity_id in schedule["climate_entity_ids"]:
+                    register(
+                        ScheduleClimateDisplayNameText(
+                            self.runtime,
+                            self.entry_id,
+                            schedule["id"],
+                            entity_id,
+                        )
+                    )
+        elif self.platform == "sensor":
+            from .sensor import (
+                AssignmentConfigurationSensor,
+                ModeConfigurationSensor,
+                PlannerConfigurationSensor,
+                ScheduleConfigurationSensor,
+            )
+
+            register(PlannerConfigurationSensor(self.runtime, self.entry_id))
+            for mode in self.runtime.data["modes"]:
+                register(ModeConfigurationSensor(self.runtime, self.entry_id, mode["id"]))
+            for schedule in self.runtime.data["schedules"]:
+                register(ScheduleConfigurationSensor(self.runtime, self.entry_id, schedule["id"]))
+                for assignment in schedule["assignments"]:
+                    register(
+                        AssignmentConfigurationSensor(
+                            self.runtime,
+                            self.entry_id,
+                            schedule["id"],
+                            assignment["id"],
+                        )
+                    )
         await self._async_remove_stale(desired_unique_ids)
         if entities:
             self.async_add_entities(entities)
 
     def _is_managed_unique_id(self, unique_id: str) -> bool:
-        """Return whether a unique ID belongs to a schedule entity we own."""
+        """Return whether a unique ID belongs to an entity we own."""
 
-        return unique_id.startswith(f"{self.entry_id}_schedule_")
+        prefixes = {
+            "switch": (f"{self.entry_id}_schedule_",),
+            "button": (f"{self.entry_id}_schedule_",),
+            "select": (f"{self.entry_id}_schedule_",),
+            "number": (f"{self.entry_id}_schedule_", f"{self.entry_id}_mode_"),
+            "text": (f"{self.entry_id}_schedule_", f"{self.entry_id}_mode_"),
+            "sensor": (
+                f"{self.entry_id}_settings_",
+                f"{self.entry_id}_mode_",
+                f"{self.entry_id}_schedule_",
+            ),
+        }
+        return any(unique_id.startswith(prefix) for prefix in prefixes.get(self.platform, ()))
 
     def _is_managed_device(self, device) -> bool:
         """Return whether a device is one of this entry's schedule devices."""

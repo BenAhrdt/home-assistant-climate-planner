@@ -198,10 +198,15 @@ Panel und den Home-Assistant-Switch gleichermaßen.
 
 Für die Fensterabsenkung wird das Home-Assistant-Label zentral im Panel unter
 „Allgemeine Einstellungen“ ausgewählt; die deutsche Feiertagsregion wird dort
-ebenfalls festgelegt. Beide Werte sind
-als Select-Entitäten verfügbar. Die Absenktemperatur wird je Heizplan mit dem
-Standardwert 18,5 °C gespeichert. `window_open_enabled` ist standardmäßig
-`true` und kann je Heizplan im Panel oder über einen Switch deaktiviert werden.
+ebenfalls festgelegt. Beide Werte sind am Gerät „Climate Planner
+Grundeinstellungen“ als Select-Entitäten verfügbar. Die Mode-Bibliothek und
+ihre skalaren Werte werden dort ebenfalls als Text- und Number-Entitäten
+angeboten. Je Heizplan gibt es zusätzlich Text- und Number-Entitäten für Name,
+Klima-Entitätsliste, Anzeigenamen und Absenktemperatur; `window_open_enabled`
+ist standardmäßig `true` und kann über einen Switch deaktiviert werden.
+Konfigurations-Sensoren stellen die vollständigen globalen, planbezogenen und
+zuordnungsbezogenen Daten einschließlich Wochenphasen und automatischer Regeln
+als Attribute bereit.
 Deaktivierte Heizpläne erhalten keine Fenster-Listener und keine
 Fensterabsenkung.
 Das Panel zeigt dabei den Namen aus der Label-Registry, während die
