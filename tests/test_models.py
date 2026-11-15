@@ -82,7 +82,13 @@ def test_legacy_global_mode_pause_is_migrated_to_assignments():
 def test_repeated_auto_rules_are_normalized():
     value = planner()
     value["schedules"][0]["assignments"][0]["auto_rules"] = [
-        {"id": "rule_on", "action": "on", "kind": "date", "date": "2026-02-14"},
+        {
+            "id": "rule_on",
+            "name": "Morgens einschalten",
+            "action": "on",
+            "kind": "date",
+            "date": "2026-02-14",
+        },
         {"id": "rule_off", "action": "off", "kind": "holiday", "holiday": "christmas_eve"},
         {
             "id": "rule_cycle",

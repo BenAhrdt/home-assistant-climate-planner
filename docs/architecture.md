@@ -68,6 +68,7 @@ Planner
         ├── enabled
         ├── auto_rules[]?        # beliebig viele automatische Ein-/Aus-Regeln
         │   ├── id
+        │   ├── name?             # optionale Bezeichnung der Regel
         │   ├── action             # on oder off
         │   ├── kind               # date, holiday oder cycle
         │   ├── date?              # ISO-Datum für kind=date
@@ -115,6 +116,9 @@ bestimmt den Zustand; bei gleichem Datum gewinnt Auto aus. Manuelle Änderungen
 des Play-/Pause-Zustands bleiben unabhängig davon möglich. Die Laufzeit merkt
 sich getrennt, welches Ereignis bereits angewendet wurde, damit ein manueller
 Zustand nicht bei jeder Auswertung sofort wieder überschrieben wird.
+Jede Regel kann optional eine eigene Bezeichnung tragen. Die Reihenfolge der
+Regeln ist die Reihenfolge der Liste und kann im Panel per Drag-and-Drop geändert
+werden; sie wird beim Speichern zusammen mit den Regeln übernommen.
 
 Das Panel erzeugt pro Heizplan und Mode höchstens eine Zuordnung und verwendet
 sie für weitere Phasen wieder. Bereits vorhandene Mehrfachzuordnungen bleiben

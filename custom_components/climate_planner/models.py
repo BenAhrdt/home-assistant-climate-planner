@@ -202,6 +202,7 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
             raise InvalidData("invalid_auto_rule")
         if set(raw_rule) - {
             "id",
+            "name",
             "action",
             "kind",
             "date",
@@ -222,6 +223,15 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
         if kind not in AUTO_RULE_KINDS:
             raise InvalidData("invalid_auto_rule_kind")
         normalized = {"id": rule_id, "action": action, "kind": kind}
+        rule_name = raw_rule.get("name")
+        if rule_name is not None and rule_name != "":
+            if not isinstance(rule_name, str):
+                raise InvalidData("invalid_auto_rule_name")
+            rule_name = rule_name.strip()
+            if len(rule_name) > 160:
+                raise InvalidData("invalid_auto_rule_name")
+            if rule_name:
+                normalized["name"] = rule_name
         if kind == "date":
             date_text = _optional_date(raw_rule.get("date"), "invalid_auto_rule_date")
             if not date_text:

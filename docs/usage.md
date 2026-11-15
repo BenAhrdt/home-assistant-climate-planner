@@ -50,6 +50,10 @@ dieser Mode-Zuordnung im Heizplan öffnen. Unter **Automatische Regeln** können
 beliebig viele Regeln für **Auto ein** und **Auto aus** angelegt werden. Eine
 neue Regel wird über **Regel hinzufügen** angelegt; unvollständige Zeilen werden
 nicht gespeichert.
+Jede Regel kann zusätzlich mit einer eigenen Bezeichnung versehen werden, zum
+Beispiel „Morgens einschalten“. Über den Griff links lässt sich die Reihenfolge
+der Regeln per Drag-and-Drop ändern; diese Reihenfolge wird beim Speichern
+beibehalten.
 
 Als Anlass stehen ein einmaliges Datum, ausgewählte Feiertage und **Zyklisch**
 zur Verfügung. Geburtstage werden über „Zyklisch → Jährlich“ angelegt. Ostern,
