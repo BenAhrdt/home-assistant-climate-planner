@@ -4,6 +4,7 @@ from zoneinfo import ZoneInfo
 import pytest
 
 from custom_components.climate_planner.engine import (
+    available_holiday_ids,
     latest_auto_date_event,
     latest_auto_event,
     next_activation,
@@ -11,6 +12,21 @@ from custom_components.climate_planner.engine import (
     select_active_mode,
     week_view,
 )
+
+
+def test_holiday_region_filters_state_specific_holidays():
+    nationwide = set(available_holiday_ids("national"))
+    saxony = set(available_holiday_ids("sn"))
+    brandenburg = set(available_holiday_ids("bb"))
+
+    assert "new_year" in nationwide
+    assert "epiphany" not in nationwide
+    assert "reformation_day" not in nationwide
+    assert "reformation_day" in saxony
+    assert "repentance_day" in saxony
+    assert "easter_sunday" in brandenburg
+    assert "easter_sunday" not in saxony
+
 
 ZONE = ZoneInfo("Europe/Berlin")
 
@@ -222,15 +238,27 @@ def test_all_advent_holiday_has_four_occurrences():
 
 
 def test_easter_and_christmas_period_are_holiday_occurrences():
-    easter = {"auto_rules": [{"id": "easter", "action": "on", "kind": "holiday", "holiday": "easter_sunday"}]}
-    easter_period = {"auto_rules": [{"id": "easter-period", "action": "on", "kind": "holiday", "holiday": "easter_period"}]}
-    christmas = {"auto_rules": [{"id": "christmas", "action": "off", "kind": "holiday", "holiday": "christmas_period"}]}
+    easter = {
+        "auto_rules": [
+            {"id": "easter", "action": "on", "kind": "holiday", "holiday": "easter_sunday"}
+        ]
+    }
+    easter_period = {
+        "auto_rules": [
+            {"id": "easter-period", "action": "on", "kind": "holiday", "holiday": "easter_period"}
+        ]
+    }
+    christmas = {
+        "auto_rules": [
+            {"id": "christmas", "action": "off", "kind": "holiday", "holiday": "christmas_period"}
+        ]
+    }
 
-    assert latest_auto_date_event(easter, date(2026, 4, 6)) == (
+    assert latest_auto_date_event(easter, date(2026, 4, 6), holiday_region="all") == (
         "auto_rule:easter:on:2026-04-05",
         True,
     )
-    assert latest_auto_date_event(easter_period, date(2026, 4, 6)) == (
+    assert latest_auto_date_event(easter_period, date(2026, 4, 6), holiday_region="all") == (
         "auto_rule:easter-period:on:2026-04-06",
         True,
     )
@@ -283,9 +311,9 @@ def test_cycle_end_date_limits_past_and_future_occurrences():
     assert latest_auto_event(configured, datetime(2026, 11, 17, 10, tzinfo=ZONE))[0].endswith(
         "2026-11-17T08:00:00+01:00"
     )
-    assert next_auto_date(
-        schedule([configured]), datetime(2026, 11, 17, 10, 30, tzinfo=ZONE)
-    ) is None
+    assert (
+        next_auto_date(schedule([configured]), datetime(2026, 11, 17, 10, 30, tzinfo=ZONE)) is None
+    )
 
 
 def test_cycle_without_start_date_uses_current_local_day_as_anchor():
@@ -328,6 +356,7 @@ def test_cycle_intervals_schedule_the_next_anchor_occurrence(recurrence, expecte
         }
     ]
 
-    assert next_auto_date(
-        schedule([configured]), datetime(2026, 11, 15, 10, 30, tzinfo=ZONE)
-    ) == expected
+    assert (
+        next_auto_date(schedule([configured]), datetime(2026, 11, 15, 10, 30, tzinfo=ZONE))
+        == expected
+    )

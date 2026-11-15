@@ -5,7 +5,13 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date, datetime, time, timedelta, tzinfo
 
-from .const import WEEKDAYS
+from .const import (
+    AUTO_RULE_HOLIDAYS,
+    DEFAULT_HOLIDAY_REGION,
+    HOLIDAY_NATIONAL,
+    HOLIDAY_STATE_AVAILABILITY,
+    WEEKDAYS,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -68,16 +74,41 @@ def _first_advent(year: int) -> date:
     return last_sunday - timedelta(days=21)
 
 
-def _holiday_dates(holiday: str, year: int) -> tuple[date, ...]:
+def available_holiday_ids(region: str = DEFAULT_HOLIDAY_REGION) -> tuple[str, ...]:
+    """Return holiday IDs available for a German region selection."""
+
+    if region == "all":
+        return AUTO_RULE_HOLIDAYS
+    return tuple(
+        holiday
+        for holiday in AUTO_RULE_HOLIDAYS
+        if (
+            holiday in HOLIDAY_NATIONAL
+            or (
+                holiday not in HOLIDAY_STATE_AVAILABILITY
+                and holiday not in {"easter_sunday", "whit_sunday"}
+            )
+            or region in HOLIDAY_STATE_AVAILABILITY.get(holiday, frozenset())
+        )
+    )
+
+
+def _holiday_dates(holiday: str, year: int, *, holiday_region: str = "all") -> tuple[date, ...]:
     """Return supported holiday dates without relying on an external service."""
+
+    if holiday not in available_holiday_ids(holiday_region):
+        return ()
 
     fixed = {
         "new_year": (1, 1),
         "epiphany": (1, 6),
+        "international_womens_day": (3, 8),
         "labour_day": (5, 1),
         "german_unity": (10, 3),
         "reformation_day": (10, 31),
         "all_saints_day": (11, 1),
+        "maria_himmelfahrt": (8, 15),
+        "world_children_day": (9, 20),
         "christmas_eve": (12, 24),
         "christmas_day": (12, 25),
         "boxing_day": (12, 26),
@@ -98,9 +129,12 @@ def _holiday_dates(holiday: str, year: int) -> tuple[date, ...]:
         return tuple(easter + timedelta(days=offset) for offset in range(-2, 2))
     if holiday == "christmas_period":
         return tuple(date(year, 12, day) for day in (24, 25, 26))
+    if holiday == "repentance_day":
+        return (_first_advent(year) - timedelta(days=11),)
     movable_offsets = {
         "good_friday": -2,
         "easter_monday": 1,
+        "whit_sunday": 49,
         "ascension": 39,
         "whit_monday": 50,
         "corpus_christi": 60,
@@ -109,7 +143,9 @@ def _holiday_dates(holiday: str, year: int) -> tuple[date, ...]:
     return (easter + timedelta(days=offset),) if offset is not None else ()
 
 
-def _auto_rule_dates(rule: dict, year: int) -> tuple[date, ...]:
+def _auto_rule_dates(
+    rule: dict, year: int, *, holiday_region: str = DEFAULT_HOLIDAY_REGION
+) -> tuple[date, ...]:
     """Resolve a recurring rule for one calendar year."""
 
     kind = rule.get("kind")
@@ -117,12 +153,16 @@ def _auto_rule_dates(rule: dict, year: int) -> tuple[date, ...]:
         event_date = date.fromisoformat(rule["date"])
         return (event_date,) if event_date.year == year else ()
     if kind == "holiday":
-        return _holiday_dates(rule["holiday"], year)
+        return _holiday_dates(rule["holiday"], year, holiday_region=holiday_region)
     return ()
 
 
 def _auto_rule_events(
-    assignment: dict, current_date: date, *, future_only: bool = False
+    assignment: dict,
+    current_date: date,
+    *,
+    future_only: bool = False,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
 ) -> list[tuple[date, int, int, str, bool]]:
     """Return automatic date and holiday events relevant to ``current_date``."""
 
@@ -130,8 +170,10 @@ def _auto_rule_events(
     rules = assignment.get("auto_rules", [])
     if not isinstance(rules, list):
         return events
-    years = range(current_date.year, current_date.year + 2) if future_only else range(
-        current_date.year - 1, current_date.year + 1
+    years = (
+        range(current_date.year, current_date.year + 2)
+        if future_only
+        else range(current_date.year - 1, current_date.year + 1)
     )
     for index, rule in enumerate(rules):
         if not isinstance(rule, dict):
@@ -146,7 +188,7 @@ def _auto_rule_events(
                 events.append((event_date, tie_breaker, index + 1, marker, enabled))
             continue
         for year in years:
-            for event_date in _auto_rule_dates(rule, year):
+            for event_date in _auto_rule_dates(rule, year, holiday_region=holiday_region):
                 matches = event_date > current_date if future_only else event_date <= current_date
                 if matches:
                     marker = f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{event_date}"
@@ -154,7 +196,12 @@ def _auto_rule_events(
     return events
 
 
-def latest_auto_date_event(assignment: dict, current_date: date) -> tuple[str, bool] | None:
+def latest_auto_date_event(
+    assignment: dict,
+    current_date: date,
+    *,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
+) -> tuple[str, bool] | None:
     """Return the latest reached automatic enable/disable event.
 
     The assignment's persisted ``enabled`` value remains the manual/current
@@ -163,7 +210,7 @@ def latest_auto_date_event(assignment: dict, current_date: date) -> tuple[str, b
     equal.
     """
 
-    events = _auto_rule_events(assignment, current_date)
+    events = _auto_rule_events(assignment, current_date, holiday_region=holiday_region)
     if not events:
         return None
     _event_date, _tie_breaker, _index, marker, enabled = max(events)
@@ -191,7 +238,11 @@ def _cycle_occurrences(rule: dict, now: datetime, *, future_only: bool) -> list[
     end_date = date.fromisoformat(rule["end_date"]) if rule.get("end_date") else None
     recurrence = rule["recurrence"]
     if recurrence in {"hourly", "daily", "weekly"}:
-        periods = {"hourly": timedelta(hours=1), "daily": timedelta(days=1), "weekly": timedelta(days=7)}
+        periods = {
+            "hourly": timedelta(hours=1),
+            "daily": timedelta(days=1),
+            "weekly": timedelta(days=7),
+        }
         period = periods[recurrence]
         if now < start:
             index = 0
@@ -225,7 +276,12 @@ def _cycle_occurrences(rule: dict, now: datetime, *, future_only: bool) -> list[
     return [max(occurrences)] if occurrences else []
 
 
-def latest_auto_event(assignment: dict, now: datetime) -> tuple[str, bool] | None:
+def latest_auto_event(
+    assignment: dict,
+    now: datetime,
+    *,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
+) -> tuple[str, bool] | None:
     """Return the latest reached date, holiday, or cyclic rule event."""
 
     local_now = _local_now(now)
@@ -233,18 +289,18 @@ def latest_auto_event(assignment: dict, now: datetime) -> tuple[str, bool] | Non
     assert zone is not None
     events: list[tuple[datetime, int, int, str, bool]] = []
     for event_date, tie_breaker, index, marker, enabled in _auto_rule_events(
-        assignment, local_now.date()
+        assignment, local_now.date(), holiday_region=holiday_region
     ):
-        events.append(
-            (_at_local(event_date, "00:00", zone), tie_breaker, index, marker, enabled)
-        )
+        events.append((_at_local(event_date, "00:00", zone), tie_breaker, index, marker, enabled))
     for index, rule in enumerate(assignment.get("auto_rules", [])):
         if not isinstance(rule, dict) or rule.get("kind") != "cycle":
             continue
         enabled = rule.get("action") == "on"
         tie_breaker = 0 if enabled else 1
         for occurrence in _cycle_occurrences(rule, local_now, future_only=False):
-            marker = f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{occurrence.isoformat()}"
+            marker = (
+                f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{occurrence.isoformat()}"
+            )
             events.append((occurrence, tie_breaker, index + 1, marker, enabled))
     if not events:
         return None
@@ -252,7 +308,12 @@ def latest_auto_event(assignment: dict, now: datetime) -> tuple[str, bool] | Non
     return marker, enabled
 
 
-def _next_auto_events(assignment: dict, now: datetime) -> list[tuple[datetime, int, int, str, bool]]:
+def _next_auto_events(
+    assignment: dict,
+    now: datetime,
+    *,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
+) -> list[tuple[datetime, int, int, str, bool]]:
     """Return the next occurrence(s) for an assignment's automatic rules."""
 
     local_now = _local_now(now)
@@ -260,28 +321,38 @@ def _next_auto_events(assignment: dict, now: datetime) -> list[tuple[datetime, i
     assert zone is not None
     events: list[tuple[datetime, int, int, str, bool]] = []
     for event_date, tie_breaker, index, marker, enabled in _auto_rule_events(
-        assignment, local_now.date(), future_only=True
+        assignment,
+        local_now.date(),
+        future_only=True,
+        holiday_region=holiday_region,
     ):
-        events.append(
-            (_at_local(event_date, "00:00", zone), tie_breaker, index, marker, enabled)
-        )
+        events.append((_at_local(event_date, "00:00", zone), tie_breaker, index, marker, enabled))
     for index, rule in enumerate(assignment.get("auto_rules", [])):
         if not isinstance(rule, dict) or rule.get("kind") != "cycle":
             continue
         enabled = rule.get("action") == "on"
         tie_breaker = 0 if enabled else 1
         for occurrence in _cycle_occurrences(rule, local_now, future_only=True):
-            marker = f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{occurrence.isoformat()}"
+            marker = (
+                f"auto_rule:{rule.get('id', index)}:{rule.get('action')}:{occurrence.isoformat()}"
+            )
             events.append((occurrence, tie_breaker, index + 1, marker, enabled))
     return events
 
 
-def next_auto_date(schedule: dict, now: datetime) -> datetime | None:
+def next_auto_date(
+    schedule: dict,
+    now: datetime,
+    *,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
+) -> datetime | None:
     """Return the next future automatic enable/disable occurrence."""
 
     upcoming: list[datetime] = []
     for assignment in schedule["assignments"]:
-        upcoming.extend(event[0] for event in _next_auto_events(assignment, now))
+        upcoming.extend(
+            event[0] for event in _next_auto_events(assignment, now, holiday_region=holiday_region)
+        )
     return min(upcoming) if upcoming else None
 
 

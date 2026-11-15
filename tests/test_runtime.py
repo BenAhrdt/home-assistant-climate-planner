@@ -8,6 +8,7 @@ from homeassistant.const import UnitOfTemperature
 
 import custom_components.climate_planner.runtime as runtime_module
 from custom_components.climate_planner.const import (
+    CONF_HOLIDAY_REGION,
     CONF_WINDOW_LABEL,
     SERVICE_APPLY_ENABLED_MATCHING,
     SERVICE_APPLY_ENABLED_MODE_MATCHING,
@@ -740,13 +741,16 @@ async def test_snapshot_includes_window_label_names(fake_runtime, monkeypatch):
     runtime = PlannerRuntime(
         fake_runtime,
         "entry",
-        options={CONF_WINDOW_LABEL: "window_contacts"},
+        options={CONF_WINDOW_LABEL: "window_contacts", CONF_HOLIDAY_REGION: "sn"},
     )
     await runtime.async_start()
 
     snapshot = await runtime.snapshot()
 
     assert snapshot["window_label"] == "window_contacts"
+    assert snapshot["holiday_region"] == "sn"
+    assert "reformation_day" in snapshot["available_holidays"]
+    assert "epiphany" not in snapshot["available_holidays"]
     assert snapshot["window_label_name"] == "Fensterkontakte"
     assert snapshot["window_labels"] == [
         {

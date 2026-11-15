@@ -4,7 +4,7 @@ from __future__ import annotations
 
 DOMAIN = "climate_planner"
 NAME = "Climate Planner"
-VERSION = "0.1.61"
+VERSION = "0.1.62"
 
 STORAGE_VERSION = 1
 STORAGE_KEY = f"{DOMAIN}.planner"
@@ -13,6 +13,27 @@ DEFAULT_WINDOW_OPEN_TEMPERATURE = 18.5
 WINDOW_OPEN_DELAY_SECONDS = 5
 WINDOW_CLOSE_DELAY_SECONDS = 10
 CONF_WINDOW_LABEL = "window_label"
+CONF_HOLIDAY_REGION = "holiday_region"
+DEFAULT_HOLIDAY_REGION = "national"
+HOLIDAY_REGIONS: tuple[str, ...] = (
+    DEFAULT_HOLIDAY_REGION,
+    "bw",
+    "by",
+    "be",
+    "bb",
+    "hb",
+    "hh",
+    "he",
+    "mv",
+    "ni",
+    "nw",
+    "rp",
+    "sl",
+    "sn",
+    "st",
+    "sh",
+    "th",
+)
 PANEL_PATH = f"/{DOMAIN}-static"
 PANEL_NAME = "climate-planner"
 PANEL_ELEMENT = "climate-planner-panel"
@@ -47,15 +68,21 @@ AUTO_RULE_RECURRENCES: tuple[str, ...] = (
 AUTO_RULE_HOLIDAYS: tuple[str, ...] = (
     "new_year",
     "epiphany",
+    "international_womens_day",
     "good_friday",
     "easter_monday",
+    "easter_sunday",
+    "whit_sunday",
     "labour_day",
     "ascension",
     "whit_monday",
     "corpus_christi",
+    "maria_himmelfahrt",
+    "world_children_day",
     "german_unity",
     "reformation_day",
     "all_saints_day",
+    "repentance_day",
     "christmas_eve",
     "christmas_day",
     "boxing_day",
@@ -65,10 +92,35 @@ AUTO_RULE_HOLIDAYS: tuple[str, ...] = (
     "advent_3",
     "advent_4",
     "all_advent",
-    "easter_sunday",
     "easter_period",
     "christmas_period",
 )
+
+HOLIDAY_NATIONAL: frozenset[str] = frozenset(
+    {
+        "new_year",
+        "good_friday",
+        "easter_monday",
+        "labour_day",
+        "ascension",
+        "whit_monday",
+        "german_unity",
+        "christmas_day",
+        "boxing_day",
+    }
+)
+HOLIDAY_STATE_AVAILABILITY: dict[str, frozenset[str]] = {
+    "epiphany": frozenset({"bw", "by", "st"}),
+    "international_womens_day": frozenset({"be", "mv"}),
+    "easter_sunday": frozenset({"bb"}),
+    "whit_sunday": frozenset({"bb"}),
+    "corpus_christi": frozenset({"bw", "by", "he", "nw", "rp", "sl"}),
+    "maria_himmelfahrt": frozenset({"sl"}),
+    "world_children_day": frozenset({"th"}),
+    "reformation_day": frozenset({"bb", "hb", "hh", "mv", "ni", "sn", "st", "sh", "th"}),
+    "all_saints_day": frozenset({"bw", "by", "nw", "rp", "sl"}),
+    "repentance_day": frozenset({"sn"}),
+}
 
 CLIMATE_DOMAIN = "climate"
 PLATFORMS: tuple[str, ...] = ("switch", "button")

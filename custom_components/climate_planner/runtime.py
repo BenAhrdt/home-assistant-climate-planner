@@ -35,9 +35,12 @@ from homeassistant.util import dt as dt_util
 from homeassistant.util.unit_conversion import TemperatureConverter
 
 from .const import (
+    CONF_HOLIDAY_REGION,
     CONF_WINDOW_LABEL,
+    DEFAULT_HOLIDAY_REGION,
     DEFAULT_WINDOW_OPEN_TEMPERATURE,
     EVENT_UPDATED,
+    HOLIDAY_REGIONS,
     RUNTIME_STORAGE_KEY,
     SERVICE_APPLY_ENABLED_MATCHING,
     SERVICE_APPLY_ENABLED_MODE_MATCHING,
@@ -50,6 +53,7 @@ from .const import (
 )
 from .engine import (
     ActiveMatch,
+    available_holiday_ids,
     latest_auto_event,
     next_activation,
     next_auto_date,
@@ -83,6 +87,10 @@ class PlannerRuntime:
         self.entry_id = entry_id
         self._config_entry = config_entry
         self._window_label = str((options or {}).get(CONF_WINDOW_LABEL) or "").strip()
+        configured_region = str((options or {}).get(CONF_HOLIDAY_REGION) or "").strip()
+        self._holiday_region = (
+            configured_region if configured_region in HOLIDAY_REGIONS else DEFAULT_HOLIDAY_REGION
+        )
         self.store: Store[dict[str, Any]] = Store(
             hass, STORAGE_VERSION, STORAGE_KEY, atomic_writes=True
         )
@@ -118,6 +126,12 @@ class PlannerRuntime:
 
         return self._window_label
 
+    @property
+    def holiday_region(self) -> str:
+        """Return the selected German holiday region."""
+
+        return self._holiday_region
+
     async def async_set_window_label(self, label_id: str) -> None:
         """Persist and apply the integration-wide window label."""
 
@@ -139,6 +153,25 @@ class PlannerRuntime:
         else:
             options.pop(CONF_WINDOW_LABEL, None)
         self.hass.config_entries.async_update_entry(self._config_entry, options=options)
+
+    async def async_set_holiday_region(self, region: str) -> None:
+        """Persist and apply the selected German holiday region."""
+
+        if not isinstance(region, str) or region not in HOLIDAY_REGIONS:
+            raise InvalidData("invalid_holiday_region")
+        if self._config_entry is None:
+            raise InvalidData("options_unavailable")
+        if region == self._holiday_region:
+            return
+
+        self._holiday_region = region
+        options = dict(self._config_entry.options)
+        if region == DEFAULT_HOLIDAY_REGION:
+            options.pop(CONF_HOLIDAY_REGION, None)
+        else:
+            options[CONF_HOLIDAY_REGION] = region
+        self.hass.config_entries.async_update_entry(self._config_entry, options=options)
+        await self.async_evaluate()
 
     async def async_start(self) -> None:
         raw = await self.store.async_load()
@@ -392,7 +425,7 @@ class PlannerRuntime:
                 else None
             )
             upcoming_points = []
-            automatic_date = next_auto_date(schedule, now)
+            automatic_date = next_auto_date(schedule, now, holiday_region=self._holiday_region)
             if automatic_date:
                 upcoming_points.append(automatic_date)
             if schedule["enabled"]:
@@ -429,6 +462,8 @@ class PlannerRuntime:
             "window_label": self._window_label,
             "window_label_name": window_label_name,
             "window_labels": window_labels,
+            "holiday_region": self._holiday_region,
+            "available_holidays": list(available_holiday_ids(self._holiday_region)),
             "climate_entities": climate_entities,
             "window_status": window_status,
         }
@@ -936,7 +971,7 @@ class PlannerRuntime:
             for assignment in schedule["assignments"]:
                 assignment_id = assignment["id"]
                 assignment_ids.add(assignment_id)
-                event = latest_auto_event(assignment, now)
+                event = latest_auto_event(assignment, now, holiday_region=self._holiday_region)
                 if event is None:
                     if assignment_id in next_auto_date_actions:
                         del next_auto_date_actions[assignment_id]
@@ -994,7 +1029,7 @@ class PlannerRuntime:
                     self._manual_overrides.pop(schedule["id"], None)
                     match = select_active_mode(schedule, modes, now)
                 self.active[schedule["id"]] = match
-                automatic_date = next_auto_date(schedule, now)
+                automatic_date = next_auto_date(schedule, now, holiday_region=self._holiday_region)
                 if automatic_date:
                     next_points.append(automatic_date)
                 if schedule["enabled"]:

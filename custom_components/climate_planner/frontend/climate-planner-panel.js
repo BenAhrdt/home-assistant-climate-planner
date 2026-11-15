@@ -22,8 +22,8 @@ const labels = {
     week: "Wochenansicht", addMode: "Mode anlegen", addSchedule: "Heizplan anlegen",
     addAssignment: "Mode hinzufügen", editAssignment: "Mode bearbeiten", editPhase: "Phase bearbeiten", usedModes: "Verwendete Modes", details: "Details öffnen", edit: "Bearbeiten", remove: "Löschen", save: "Speichern",
     cancel: "Abbrechen", name: "Name", temperature: "Zieltemperatur", priority: "Priorität", color: "Farbe (optional)",
-    icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", entityDisplayName: "Anzeigename (optional)", entityDisplayNamePlaceholder: "Name in diesem Heizplan", enabled: "Aktiviert", windowSettings: "Fenster-Erkennung", windowLabel: "Fenster-Label", noWindowLabel: "Kein Label", windowLabelHint: "Zentrale Auswahl für Fensterkontakte in allen Heizplänen.", saveWindowLabel: "Speichern", windowOpenTemperature: "Absenktemperatur bei offenem Fenster", windowOpenTemperatureHint: "Standard: 18,5 °C; gilt für Fenster mit dem zentral ausgewählten Label im selben Raum wie die Climate-Entität.", windowOpen: "Fenster offen – Absenkung aktiv",
-    sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage", addTime: "Weitere Zeit", removeTime: "Zeit entfernen", autoRules: "Automatische Regeln", addAutoRule: "Weitere Regel", removeAutoRule: "Regel entfernen", autoAction: "Aktion", autoActionEmpty: "Aktion auswählen", autoOn: "Auto ein", autoOff: "Auto aus", autoKind: "Anlass", autoKindEmpty: "Anlass auswählen", autoKindDate: "Einmaliges Datum", autoKindHoliday: "Feiertag", autoKindCycle: "Zyklisch", autoRuleName: "Bezeichnung (optional)", autoRuleNamePlaceholder: "z. B. morgens einschalten", autoDrag: "Regel verschieben", autoRuleIncomplete: "Bitte Aktion und Anlass auswählen.", autoRuleEndBeforeStart: "Das Enddatum darf nicht vor dem Startdatum liegen.", autoRecurrence: "Wiederholung", recurrenceHourly: "Stündlich", recurrenceDaily: "Täglich", recurrenceWeekly: "Wöchentlich", recurrenceMonthly: "Monatlich", recurrenceQuarterly: "Quartalsweise", recurrenceYearly: "Jährlich", autoStartDate: "Startdatum (optional)", autoEndDate: "Enddatum (optional)", autoStartTime: "Startzeit", autoCycleHint: "Ohne Startdatum wird der aktuelle Tag als Anker verwendet.", autoDate: "Datum", autoHoliday: "Feiertag", autoRecurringHint: "Wiederholt sich jährlich.", autoCalculatedHint: "Wird automatisch berechnet.", autoHolidayNewYear: "Neujahr", autoHolidayEpiphany: "Heilige Drei Könige", autoHolidayGoodFriday: "Karfreitag", autoHolidayEasterMonday: "Ostermontag", autoHolidayLabourDay: "Tag der Arbeit", autoHolidayAscension: "Christi Himmelfahrt", autoHolidayWhitMonday: "Pfingstmontag", autoHolidayCorpusChristi: "Fronleichnam", autoHolidayGermanUnity: "Tag der Deutschen Einheit", autoHolidayReformationDay: "Reformationstag", autoHolidayAllSaintsDay: "Allerheiligen", autoHolidayAdvent1: "1. Advent", autoHolidayAdvent2: "2. Advent", autoHolidayAdvent3: "3. Advent", autoHolidayAdvent4: "4. Advent", autoHolidayAllAdvent: "Alle Adventssonntage", autoHolidayEaster: "Ostersonntag", autoHolidayEasterPeriod: "Ostern (Karfreitag–Ostermontag)", autoHolidayChristmasEve: "Heiligabend", autoHolidayChristmasDay: "1. Weihnachtsfeiertag", autoHolidayBoxingDay: "2. Weihnachtsfeiertag", autoHolidayChristmasPeriod: "Weihnachten (24.–26. Dezember)", autoHolidayNewYearsEve: "Silvester",
+    icon: "Icon (optional, z. B. mdi:leaf)", hexColor: "Hex-Farbwert", iconPlaceholder: "mdi:leaf", climate: "Klima-Entitäten", entityDisplayName: "Anzeigename (optional)", entityDisplayNamePlaceholder: "Name in diesem Heizplan", enabled: "Aktiviert", windowSettings: "Fenster-Erkennung", windowLabel: "Fenster-Label", noWindowLabel: "Kein Label", windowLabelHint: "Zentrale Auswahl für Fensterkontakte in allen Heizplänen.", saveWindowLabel: "Speichern", holidayRegion: "Feiertagsregion (Deutschland)", holidayRegionHint: "Filtert regionale gesetzliche Feiertage. Lokale Sonderfälle werden nicht berücksichtigt.", holidayRegionNational: "Nur bundesweite Feiertage", unavailableRegion: "in dieser Region nicht aktiv", regionBw: "Baden-Württemberg", regionBy: "Bayern", regionBe: "Berlin", regionBb: "Brandenburg", regionHb: "Bremen", regionHh: "Hamburg", regionHe: "Hessen", regionMv: "Mecklenburg-Vorpommern", regionNi: "Niedersachsen", regionNw: "Nordrhein-Westfalen", regionRp: "Rheinland-Pfalz", regionSl: "Saarland", regionSn: "Sachsen", regionSt: "Sachsen-Anhalt", regionSh: "Schleswig-Holstein", regionTh: "Thüringen", windowOpenTemperature: "Absenktemperatur bei offenem Fenster", windowOpenTemperatureHint: "Standard: 18,5 °C; gilt für Fenster mit dem zentral ausgewählten Label im selben Raum wie die Climate-Entität.", windowOpen: "Fenster offen – Absenkung aktiv",
+    sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage", addTime: "Weitere Zeit", removeTime: "Zeit entfernen", autoRules: "Automatische Regeln", addAutoRule: "Weitere Regel", removeAutoRule: "Regel entfernen", autoAction: "Aktion", autoActionEmpty: "Aktion auswählen", autoOn: "Auto ein", autoOff: "Auto aus", autoKind: "Anlass", autoKindEmpty: "Anlass auswählen", autoKindDate: "Einmaliges Datum", autoKindHoliday: "Feiertag", autoKindCycle: "Zyklisch", autoRuleName: "Bezeichnung (optional)", autoRuleNamePlaceholder: "z. B. morgens einschalten", autoDrag: "Regel verschieben", autoRuleIncomplete: "Bitte Aktion und Anlass auswählen.", autoRuleEndBeforeStart: "Das Enddatum darf nicht vor dem Startdatum liegen.", autoRecurrence: "Wiederholung", recurrenceHourly: "Stündlich", recurrenceDaily: "Täglich", recurrenceWeekly: "Wöchentlich", recurrenceMonthly: "Monatlich", recurrenceQuarterly: "Quartalsweise", recurrenceYearly: "Jährlich", autoStartDate: "Startdatum (optional)", autoEndDate: "Enddatum (optional)", autoStartTime: "Startzeit", autoCycleHint: "Ohne Startdatum wird der aktuelle Tag als Anker verwendet.", autoDate: "Datum", autoHoliday: "Feiertag", autoRecurringHint: "Wiederholt sich jährlich.", autoCalculatedHint: "Wird automatisch berechnet.", autoHolidayNewYear: "Neujahr", autoHolidayEpiphany: "Heilige Drei Könige", autoHolidayInternationalWomensDay: "Internationaler Frauentag", autoHolidayGoodFriday: "Karfreitag", autoHolidayEasterMonday: "Ostermontag", autoHolidayEasterSunday: "Ostersonntag", autoHolidayWhitSunday: "Pfingstsonntag", autoHolidayLabourDay: "Tag der Arbeit", autoHolidayAscension: "Christi Himmelfahrt", autoHolidayWhitMonday: "Pfingstmontag", autoHolidayCorpusChristi: "Fronleichnam", autoHolidayMariaHimmelfahrt: "Mariä Himmelfahrt", autoHolidayWorldChildrenDay: "Weltkindertag", autoHolidayGermanUnity: "Tag der Deutschen Einheit", autoHolidayReformationDay: "Reformationstag", autoHolidayAllSaintsDay: "Allerheiligen", autoHolidayRepentanceDay: "Buß- und Bettag", autoHolidayAdvent1: "1. Advent", autoHolidayAdvent2: "2. Advent", autoHolidayAdvent3: "3. Advent", autoHolidayAdvent4: "4. Advent", autoHolidayAllAdvent: "Alle Adventssonntage", autoHolidayEasterPeriod: "Ostern (Karfreitag–Ostermontag)", autoHolidayChristmasEve: "Heiligabend", autoHolidayChristmasDay: "1. Weihnachtsfeiertag", autoHolidayBoxingDay: "2. Weihnachtsfeiertag", autoHolidayChristmasPeriod: "Weihnachten (24.–26. Dezember)", autoHolidayNewYearsEve: "Silvester",
     time: "Uhrzeit", bulkTime: "Uhrzeit für ausgewählte Tage", weekday: "Wochentag", transition: "Übergang verschieben", phase: "Phase", duplicate: "Duplizieren", placeDuplicate: "Duplikat platzieren", duplicateTimeOccupied: "Eine Stunde vor diesem Mode liegt bereits ein Wechsel. Bitte eine andere Uhrzeit wählen.", duplicateNoRoom: "Vor diesem Mode ist nicht genug Platz für die Duplikatdauer. Der vorherige Mode behält mindestens eine Stunde.", selectAllDays: "Alle anwählen", clearAllDays: "Alle abwählen", copySuffix: "Kopie", defaultDuration: "Richtwert: 8 Stunden · letzter Block bis 24:00", drop: "Mode auf die Heizplankachel ziehen", dropTimeline: "Mode auf einen Tag und eine Uhrzeit ziehen · Richtwert 8 h · letzter Block bis 24:00 · Alt/Strg/Cmd = kopieren", chooseMode: "Mode direkt aktivieren", noModes: "Noch keine Modes angelegt.",
     noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode aktivieren", pauseMode: "Mode pausieren", targetRequestShort: "Soll", targetRequest: "Vom Climate Planner gesetzter Sollwert", currentShort: "Ist", next: "Nächster Wechsel",
     none: "Noch kein Mode aktiviert", connected: "Bereit", loading: "Wird geladen …",
@@ -39,8 +39,8 @@ const labels = {
     title: "Time-based heating plans", overview: "Overview", modes: "Mode library", schedules: "Heating plans", week: "Week view",
     addMode: "Add mode", addSchedule: "Add heating plan", addAssignment: "Add mode", editAssignment: "Edit mode", editPhase: "Edit phase", usedModes: "Used modes", details: "Open details", edit: "Edit", remove: "Delete",
     save: "Save", cancel: "Cancel", name: "Name", temperature: "Target temperature", priority: "Priority", color: "Color (optional)",
-    icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", entityDisplayName: "Display name (optional)", entityDisplayNamePlaceholder: "Name in this heating plan", enabled: "Enabled", windowSettings: "Window detection", windowLabel: "Window label", noWindowLabel: "No label", windowLabelHint: "Central selection for window contacts in all heating plans.", saveWindowLabel: "Save", windowOpenTemperature: "Setback temperature with window open", windowOpenTemperatureHint: "Default: 18.5 °C; applies to windows with the centrally selected label in the same area as the climate entity.", windowOpen: "Window open – setback active",
-    sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", addTime: "Add another time", removeTime: "Remove time", autoRules: "Automatic rules", addAutoRule: "Add another rule", removeAutoRule: "Remove rule", autoAction: "Action", autoActionEmpty: "Select action", autoOn: "Auto on", autoOff: "Auto off", autoKind: "Occasion", autoKindEmpty: "Select occasion", autoKindDate: "One-time date", autoKindHoliday: "Holiday", autoKindCycle: "Cyclic", autoRuleName: "Name (optional)", autoRuleNamePlaceholder: "e.g. turn on in the morning", autoDrag: "Move rule", autoRuleIncomplete: "Please select an action and an occasion.", autoRuleEndBeforeStart: "The end date must not be before the start date.", autoRecurrence: "Repeat", recurrenceHourly: "Hourly", recurrenceDaily: "Daily", recurrenceWeekly: "Weekly", recurrenceMonthly: "Monthly", recurrenceQuarterly: "Quarterly", recurrenceYearly: "Yearly", autoStartDate: "Start date (optional)", autoEndDate: "End date (optional)", autoStartTime: "Start time", autoCycleHint: "Without a start date, the current day is used as the anchor.", autoDate: "Date", autoHoliday: "Holiday", autoRecurringHint: "Repeats every year.", autoCalculatedHint: "Calculated automatically.", autoHolidayNewYear: "New Year's Day", autoHolidayEpiphany: "Epiphany", autoHolidayGoodFriday: "Good Friday", autoHolidayEasterMonday: "Easter Monday", autoHolidayLabourDay: "Labour Day", autoHolidayAscension: "Ascension Day", autoHolidayWhitMonday: "Whit Monday", autoHolidayCorpusChristi: "Corpus Christi", autoHolidayGermanUnity: "German Unity Day", autoHolidayReformationDay: "Reformation Day", autoHolidayAllSaintsDay: "All Saints' Day", autoHolidayAdvent1: "1st Advent", autoHolidayAdvent2: "2nd Advent", autoHolidayAdvent3: "3rd Advent", autoHolidayAdvent4: "4th Advent", autoHolidayAllAdvent: "All Advent Sundays", autoHolidayEaster: "Easter Sunday", autoHolidayEasterPeriod: "Easter (Good Friday–Easter Monday)", autoHolidayChristmasEve: "Christmas Eve", autoHolidayChristmasDay: "Christmas Day", autoHolidayBoxingDay: "Boxing Day", autoHolidayChristmasPeriod: "Christmas (24–26 December)", autoHolidayNewYearsEve: "New Year's Eve",
+    icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", entityDisplayName: "Display name (optional)", entityDisplayNamePlaceholder: "Name in this heating plan", enabled: "Enabled", windowSettings: "Window detection", windowLabel: "Window label", noWindowLabel: "No label", windowLabelHint: "Central selection for window contacts in all heating plans.", saveWindowLabel: "Save", holidayRegion: "Holiday region (Germany)", holidayRegionHint: "Filters regional public holidays. Local exceptions are not included.", holidayRegionNational: "Nationwide holidays only", unavailableRegion: "not active in this region", regionBw: "Baden-Württemberg", regionBy: "Bavaria", regionBe: "Berlin", regionBb: "Brandenburg", regionHb: "Bremen", regionHh: "Hamburg", regionHe: "Hesse", regionMv: "Mecklenburg-Western Pomerania", regionNi: "Lower Saxony", regionNw: "North Rhine-Westphalia", regionRp: "Rhineland-Palatinate", regionSl: "Saarland", regionSn: "Saxony", regionSt: "Saxony-Anhalt", regionSh: "Schleswig-Holstein", regionTh: "Thuringia", windowOpenTemperature: "Setback temperature with window open", windowOpenTemperatureHint: "Default: 18.5 °C; applies to windows with the centrally selected label in the same area as the climate entity.", windowOpen: "Window open – setback active",
+    sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", addTime: "Add another time", removeTime: "Remove time", autoRules: "Automatic rules", addAutoRule: "Add another rule", removeAutoRule: "Remove rule", autoAction: "Action", autoActionEmpty: "Select action", autoOn: "Auto on", autoOff: "Auto off", autoKind: "Occasion", autoKindEmpty: "Select occasion", autoKindDate: "One-time date", autoKindHoliday: "Holiday", autoKindCycle: "Cyclic", autoRuleName: "Name (optional)", autoRuleNamePlaceholder: "e.g. turn on in the morning", autoDrag: "Move rule", autoRuleIncomplete: "Please select an action and an occasion.", autoRuleEndBeforeStart: "The end date must not be before the start date.", autoRecurrence: "Repeat", recurrenceHourly: "Hourly", recurrenceDaily: "Daily", recurrenceWeekly: "Weekly", recurrenceMonthly: "Monthly", recurrenceQuarterly: "Quarterly", recurrenceYearly: "Yearly", autoStartDate: "Start date (optional)", autoEndDate: "End date (optional)", autoStartTime: "Start time", autoCycleHint: "Without a start date, the current day is used as the anchor.", autoDate: "Date", autoHoliday: "Holiday", autoRecurringHint: "Repeats every year.", autoCalculatedHint: "Calculated automatically.", autoHolidayNewYear: "New Year's Day", autoHolidayEpiphany: "Epiphany", autoHolidayInternationalWomensDay: "International Women's Day", autoHolidayGoodFriday: "Good Friday", autoHolidayEasterMonday: "Easter Monday", autoHolidayEasterSunday: "Easter Sunday", autoHolidayWhitSunday: "Whit Sunday", autoHolidayLabourDay: "Labour Day", autoHolidayAscension: "Ascension Day", autoHolidayWhitMonday: "Whit Monday", autoHolidayCorpusChristi: "Corpus Christi", autoHolidayMariaHimmelfahrt: "Assumption Day", autoHolidayWorldChildrenDay: "World Children's Day", autoHolidayGermanUnity: "German Unity Day", autoHolidayReformationDay: "Reformation Day", autoHolidayAllSaintsDay: "All Saints' Day", autoHolidayRepentanceDay: "Day of Prayer and Repentance", autoHolidayAdvent1: "1st Advent", autoHolidayAdvent2: "2nd Advent", autoHolidayAdvent3: "3rd Advent", autoHolidayAdvent4: "4th Advent", autoHolidayAllAdvent: "All Advent Sundays", autoHolidayEasterPeriod: "Easter (Good Friday–Easter Monday)", autoHolidayChristmasEve: "Christmas Eve", autoHolidayChristmasDay: "Christmas Day", autoHolidayBoxingDay: "Boxing Day", autoHolidayChristmasPeriod: "Christmas (24–26 December)", autoHolidayNewYearsEve: "New Year's Eve",
     drop: "Drop mode on the heating plan", chooseMode: "Activate mode directly", noModes: "No modes have been created yet.", noSchedules: "No heating plans have been created yet.",
     active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode", pauseMode: "Pause mode", targetRequestShort: "Target", targetRequest: "Target set by Climate Planner", currentShort: "Current", next: "Next change", none: "No mode activated yet", connected: "Ready", loading: "Loading …",
     saveError: "Save failed", conflict: "The data changed. Reloading the view.", invalid: "Please check the input.", localTemperature: "Override temperature for this phase", inherited: "Mode temperature",
@@ -75,6 +75,9 @@ class ClimatePlannerPanel extends HTMLElement {
     this.windowLabelSaveTimer = null;
     this.windowLabelSavePending = false;
     this.autoRuleDragRow = null;
+    this.holidayRegionDraft = "national";
+    this.holidayRegionDirty = false;
+    this.holidayRegionSavePending = false;
   }
 
   set hass(value) {
@@ -212,11 +215,11 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += ".mode-palette{position:static;max-height:none;overflow:visible}.mode-palette h2{margin:4px 0}.mode-palette #drag-hint{margin:0 0 8px;font-size:12px}.mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:10px}.mode-palette .mode-card{display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:12px;row-gap:3px;min-height:58px;padding:10px 12px;cursor:grab}.mode-palette .mode-card-top{grid-column:1;grid-row:1}.mode-palette .mode-meta{grid-column:1;grid-row:2;min-width:0;flex-wrap:nowrap}.mode-palette .mode-priority{margin-left:0}.mode-palette .mode-card .actions{grid-column:2;grid-row:1/3;align-self:center;margin:0;flex-wrap:nowrap}.mode-palette .mode-card .actions button{padding:7px 9px;font-size:12px}#overview-top{display:grid;grid-template-columns:minmax(250px,.85fr) minmax(0,2fr);gap:18px;align-items:start;min-height:0}#overview-top.no-settings{grid-template-columns:1fr}#overview-top #modes-section{min-width:0;margin:0}#overview-top .planner-settings{width:auto;max-width:none}main.overview-layout{height:100vh;overflow:hidden}main.overview-layout #schedules-section{display:flex;min-height:0;flex-direction:column}main.overview-layout #schedules-title{flex:none;margin:8px 0 10px}main.overview-layout #schedules{flex:1 1 auto;min-height:0;overflow-y:auto;align-content:start;padding:2px 10px 12px 2px;scrollbar-gutter:stable}@media(max-width:1100px){main.overview-layout{display:grid!important}}@media(max-width:1000px){#overview-top{grid-template-columns:1fr}}@media(max-width:700px){main.overview-layout{height:auto;min-height:100vh;overflow:visible;grid-template-rows:auto!important}main.overview-layout #schedules{overflow:visible}.mode-palette .grid{grid-template-columns:1fr}.mode-palette .mode-meta{flex-wrap:wrap}}";
     style.textContent += ".mode-palette .grid,#schedules{grid-template-columns:repeat(3,minmax(0,1fr));align-items:start}@media(max-width:1100px){.mode-palette .grid,#schedules{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:700px){.mode-palette .grid,#schedules{grid-template-columns:1fr}}";
     style.textContent += ".quick-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:7px}.quick-mode-wrap{width:auto;min-width:0;min-height:54px}.quick-mode-wrap .quick-mode{display:flex;align-items:center;justify-content:center;width:100%;min-width:0;gap:6px;padding:7px 8px 7px 34px;text-align:left}.quick-mode-copy{display:flex;align-items:baseline;gap:5px;min-width:0}.quick-mode-copy strong,.quick-mode-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.quick-mode-copy strong{flex:none}.quick-mode-copy small{flex:none}.quick-mode-check{margin-left:0;flex:none}.quick-mode-dot{width:10px;height:10px;flex:none}.quick-mode-icon{--mdc-icon-size:18px;flex:none}.mode-icon{--mdc-icon-size:20px}.quick-mode-activate ha-icon{--mdc-icon-size:18px}.assignment-toggle ha-icon{--mdc-icon-size:18px}.assignment-settings ha-icon,.assignment-delete ha-icon{--mdc-icon-size:16px}.schedule-toggle{display:flex;align-items:center;justify-content:center}.schedule-toggle ha-icon{--mdc-icon-size:19px}";
-    style.textContent += ".planner-settings{width:fit-content;max-width:100%;padding:10px 12px;border:1px solid var(--divider-color);border-radius:10px;background:var(--card-background-color)}.planner-settings h2{margin:0 0 2px;font-size:15px}.planner-settings p{margin:0 0 6px}.planner-settings-row{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.planner-settings-form{flex:1 1 240px;min-width:0}.planner-settings-form label{min-width:0}.planner-settings-actions{margin:0}.planner-settings-actions button{white-space:nowrap}.window-label-control{min-width:0}.window-label-control ha-form,.window-label-control ha-label-picker{display:block}";
+    style.textContent += ".planner-settings{width:fit-content;max-width:100%;padding:10px 12px;border:1px solid var(--divider-color);border-radius:10px;background:var(--card-background-color)}.planner-settings h2{margin:0 0 2px;font-size:15px}.planner-settings p{margin:0 0 6px}.planner-settings-row{display:flex;align-items:end;gap:10px;flex-wrap:wrap}.planner-settings-form{flex:1 1 240px;min-width:0}.planner-settings-form label{min-width:0}.planner-settings-actions{margin:0}.planner-settings-actions button{white-space:nowrap}.window-label-control{min-width:0}.window-label-control ha-form,.window-label-control ha-label-picker{display:block}.holiday-region-control{margin-top:8px}.holiday-region-control label{gap:4px}.holiday-region-control small{font-size:11px}";
     style.textContent += "#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}#overview-top .mode-palette .mode-card{min-height:0;padding:8px 9px}#overview-top .mode-palette .mode-card h3{font-size:15px}#overview-top .mode-palette .mode-meta{font-size:12px;gap:5px}#overview-top .mode-palette .mode-card .actions button{padding:5px 7px;font-size:11px}";
     style.textContent += "@media(min-width:1001px){#overview-top{grid-template-columns:minmax(320px,390px) minmax(0,1fr)}}#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}#overview-top .mode-palette .mode-card{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:0;row-gap:6px}#overview-top .mode-palette .mode-card-top{grid-column:1;grid-row:1}#overview-top .mode-palette .mode-meta{grid-column:1;grid-row:2;flex-wrap:wrap;line-height:1.2}#overview-top .mode-palette .mode-card .actions{grid-column:1;grid-row:3;align-self:start;justify-content:flex-start}.quick-modes{grid-template-columns:repeat(auto-fit,minmax(178px,1fr))}.quick-mode-wrap{min-height:58px}.quick-mode-wrap .quick-mode{justify-content:flex-start}.quick-mode-copy{display:grid;align-items:start}.quick-mode-copy strong{white-space:normal;overflow-wrap:anywhere;line-height:1.2}.quick-mode-check{margin-left:auto}";
     style.textContent += "#overview-top .mode-palette .grid{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}.compact-mode-row{display:flex;align-items:center;gap:7px;min-height:42px;padding:7px 8px;cursor:grab}.compact-mode-row:focus-visible{cursor:grab}.compact-mode-leading{display:flex;align-items:center;gap:5px;flex:none}.compact-mode-leading .mode-color{margin:0}.compact-mode-leading .mode-icon{--mdc-icon-size:18px}.compact-mode-name{min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.compact-mode-temperature,.compact-mode-priority{white-space:nowrap;font-size:11px}.compact-mode-priority{color:var(--secondary-text-color)}.compact-mode-delete{display:flex;align-items:center;justify-content:center;flex:none;width:26px;height:26px;padding:3px;border:0;border-radius:6px;background:transparent;color:var(--error-color,#db4437)}.compact-mode-delete:hover{background:color-mix(in srgb,var(--error-color,#db4437) 12%,transparent)}.compact-mode-delete ha-icon{--mdc-icon-size:17px}@media(max-width:700px){#overview-top .mode-palette .grid{grid-template-columns:1fr}}";
-    style.textContent += "#overview-top .mode-palette .compact-mode-row{display:flex;grid-template-columns:none;grid-template-rows:none;align-items:center;min-height:36px;padding:5px 7px}#overview-top .mode-palette h2{margin-top:0;margin-bottom:2px}#overview-top .mode-palette #drag-hint{margin-bottom:6px}#overview-top .mode-palette .grid{margin-top:-4px;gap:6px}.compact-mode-row .compact-mode-name{min-width:0}.compact-mode-row .compact-mode-temperature,.compact-mode-row .compact-mode-priority{flex:none}#schedules .schedule-entity-row{grid-template-columns:minmax(0,1fr) max-content}#schedules .schedule-entity-values{width:max-content;min-width:max-content;flex-wrap:nowrap}@media(min-width:1001px){#overview-top .mode-palette{margin-top:-16px}}";
+    style.textContent += "#overview-top .mode-palette .compact-mode-row{display:flex;grid-template-columns:none;grid-template-rows:none;align-items:center;min-height:36px;padding:5px 7px}#overview-top .mode-palette h2{margin-top:0;margin-bottom:2px}#overview-top .mode-palette #drag-hint{margin-bottom:6px}#overview-top .mode-palette .grid{margin-top:-4px;gap:6px}.compact-mode-row .compact-mode-name{min-width:0}.compact-mode-row .compact-mode-temperature,.compact-mode-row .compact-mode-priority{flex:none}#schedules .schedule-entity-row{grid-template-columns:minmax(0,1fr) max-content}#schedules .schedule-entity-values{width:max-content;min-width:max-content;flex-wrap:nowrap}@media(min-width:1001px){#overview-top .mode-palette{position:relative;top:-16px;margin-top:-16px}}";
     this.shadowRoot.querySelector("header").style.gridArea = "header";
     this.$("notice").style.gridArea = "notice";
     summarySection.style.gridArea = "summary";
@@ -226,7 +229,7 @@ class ClimatePlannerPanel extends HTMLElement {
     const settingsSection = document.createElement("section");
     settingsSection.id = "planner-settings";
     settingsSection.className = "planner-settings";
-    settingsSection.innerHTML = '<div class="planner-settings-row"><div class="planner-settings-form"><h2 id="window-settings-title"></h2><p id="window-settings-hint" class="muted"></p><div id="window-label-control" class="window-label-control"></div></div></div>';
+    settingsSection.innerHTML = '<div class="planner-settings-row"><div class="planner-settings-form"><h2 id="window-settings-title"></h2><p id="window-settings-hint" class="muted"></p><div id="window-label-control" class="window-label-control"></div><div id="holiday-region-control" class="holiday-region-control"></div></div></div>';
     overviewTop.prepend(settingsSection);
     this.$("refresh").title = this.t.connected;
     this.$("refresh").onclick = () => this.load();
@@ -322,6 +325,7 @@ class ClimatePlannerPanel extends HTMLElement {
     try {
       this.data = await this._hass.callWS({ type: "climate_planner/data" });
       if (!this.windowLabelDirty) this.windowLabelDraft = this.data.window_label || "";
+      if (!this.holidayRegionDirty) this.holidayRegionDraft = this.data.holiday_region || "national";
       if (!this.data.schedules.some((schedule) => schedule.id === this.selectedSchedule)) {
         this.selectedSchedule = this.data.schedules[0]?.id || "";
       }
@@ -484,6 +488,33 @@ class ClimatePlannerPanel extends HTMLElement {
     select.value = this.windowLabelDraft;
   }
 
+  holidayRegionOptions() {
+    return [
+      ["national", this.t.holidayRegionNational],
+      ["bw", this.t.regionBw], ["by", this.t.regionBy], ["be", this.t.regionBe],
+      ["bb", this.t.regionBb], ["hb", this.t.regionHb], ["hh", this.t.regionHh],
+      ["he", this.t.regionHe], ["mv", this.t.regionMv], ["ni", this.t.regionNi],
+      ["nw", this.t.regionNw], ["rp", this.t.regionRp], ["sl", this.t.regionSl],
+      ["sn", this.t.regionSn], ["st", this.t.regionSt], ["sh", this.t.regionSh],
+      ["th", this.t.regionTh],
+    ];
+  }
+
+  renderHolidayRegionSelect(admin) {
+    const control = this.$("holiday-region-control");
+    if (!control) return;
+    control.hidden = !admin;
+    if (!admin) return;
+    control.innerHTML = `<label><span>${escapeHTML(this.t.holidayRegion)}</span><select data-holiday-region>${this.holidayRegionOptions().map(([value, label]) => `<option value="${value}">${escapeHTML(label)}</option>`).join("")}</select><small class="muted">${escapeHTML(this.t.holidayRegionHint)}</small></label>`;
+    const select = control.querySelector("[data-holiday-region]");
+    select.value = this.holidayRegionDraft;
+    select.addEventListener("change", () => {
+      this.holidayRegionDraft = select.value;
+      this.holidayRegionDirty = this.holidayRegionDraft !== (this.data?.holiday_region || "national");
+      this.saveHolidayRegion();
+    });
+  }
+
   renderWindowSettings(admin) {
     const section = this.$("planner-settings");
     if (!section) return;
@@ -491,6 +522,7 @@ class ClimatePlannerPanel extends HTMLElement {
     if (!admin) return;
     this.$("window-settings-title").textContent = this.t.windowSettings;
     this.$("window-settings-hint").textContent = this.t.windowLabelHint;
+    this.renderHolidayRegionSelect(admin);
     this.updateWindowLabelSaveState();
     const control = this.$("window-label-control");
     if (!control) return;
@@ -518,6 +550,25 @@ class ClimatePlannerPanel extends HTMLElement {
     } finally {
       this.windowLabelSavePending = false;
       if (this.windowLabelDirty && this.windowLabelDraft !== labelId) this.scheduleWindowLabelSave();
+    }
+  }
+
+  async saveHolidayRegion() {
+    if (!this._hass.user?.is_admin || !this.holidayRegionDirty || this.holidayRegionSavePending) return;
+    this.holidayRegionSavePending = true;
+    const region = this.holidayRegionDraft;
+    try {
+      await this._hass.callWS({
+        type: "climate_planner/set_holiday_region",
+        region,
+      });
+      if (this.holidayRegionDraft === region) this.holidayRegionDirty = false;
+      await this.load();
+    } catch (error) {
+      this.notice(error?.code === "unauthorized" ? this.t.invalid : this.t.saveError, true);
+    } finally {
+      this.holidayRegionSavePending = false;
+      if (this.holidayRegionDirty && this.holidayRegionDraft !== region) this.saveHolidayRegion();
     }
   }
 
@@ -1219,20 +1270,26 @@ class ClimatePlannerPanel extends HTMLElement {
   }
 
   autoRuleHolidayOptions() {
-    return [
+    const options = [
       ["new_year", this.t.autoHolidayNewYear], ["epiphany", this.t.autoHolidayEpiphany],
+      ["international_womens_day", this.t.autoHolidayInternationalWomensDay],
       ["good_friday", this.t.autoHolidayGoodFriday], ["easter_monday", this.t.autoHolidayEasterMonday],
+      ["easter_sunday", this.t.autoHolidayEasterSunday], ["whit_sunday", this.t.autoHolidayWhitSunday],
       ["labour_day", this.t.autoHolidayLabourDay], ["ascension", this.t.autoHolidayAscension],
       ["whit_monday", this.t.autoHolidayWhitMonday], ["corpus_christi", this.t.autoHolidayCorpusChristi],
+      ["maria_himmelfahrt", this.t.autoHolidayMariaHimmelfahrt],
+      ["world_children_day", this.t.autoHolidayWorldChildrenDay],
       ["german_unity", this.t.autoHolidayGermanUnity], ["reformation_day", this.t.autoHolidayReformationDay],
-      ["all_saints_day", this.t.autoHolidayAllSaintsDay], ["advent_1", this.t.autoHolidayAdvent1],
-      ["advent_2", this.t.autoHolidayAdvent2], ["advent_3", this.t.autoHolidayAdvent3],
-      ["advent_4", this.t.autoHolidayAdvent4], ["all_advent", this.t.autoHolidayAllAdvent],
-      ["easter_sunday", this.t.autoHolidayEaster], ["easter_period", this.t.autoHolidayEasterPeriod], ["christmas_eve", this.t.autoHolidayChristmasEve],
-      ["christmas_day", this.t.autoHolidayChristmasDay], ["boxing_day", this.t.autoHolidayBoxingDay],
-      ["christmas_period", this.t.autoHolidayChristmasPeriod],
+      ["all_saints_day", this.t.autoHolidayAllSaintsDay], ["repentance_day", this.t.autoHolidayRepentanceDay],
+      ["advent_1", this.t.autoHolidayAdvent1], ["advent_2", this.t.autoHolidayAdvent2],
+      ["advent_3", this.t.autoHolidayAdvent3], ["advent_4", this.t.autoHolidayAdvent4],
+      ["all_advent", this.t.autoHolidayAllAdvent], ["easter_period", this.t.autoHolidayEasterPeriod],
+      ["christmas_eve", this.t.autoHolidayChristmasEve], ["christmas_day", this.t.autoHolidayChristmasDay],
+      ["boxing_day", this.t.autoHolidayBoxingDay], ["christmas_period", this.t.autoHolidayChristmasPeriod],
       ["new_years_eve", this.t.autoHolidayNewYearsEve],
     ];
+    const available = new Set(this.data?.available_holidays || []);
+    return available.size ? options.filter(([value]) => available.has(value)) : options;
   }
 
   autoRuleRecurrenceOptions(selected) {
@@ -1265,7 +1322,11 @@ class ClimatePlannerPanel extends HTMLElement {
       return;
     }
     if (kind === "holiday") {
-      target.innerHTML = `<label>${escapeHTML(this.t.autoHoliday)}<select data-auto-rule-value-control><option value="">${escapeHTML(this.t.autoKindEmpty)}</option>${this.autoRuleHolidayOptions().map(([value, label]) => `<option value="${value}" ${value === storedHoliday ? "selected" : ""}>${escapeHTML(label)}</option>`).join("")}</select></label>`;
+      const holidayOptions = this.autoRuleHolidayOptions();
+      if (storedHoliday && !holidayOptions.some(([value]) => value === storedHoliday)) {
+        holidayOptions.unshift([storedHoliday, `${storedHoliday} (${this.t.unavailableRegion})`]);
+      }
+      target.innerHTML = `<label>${escapeHTML(this.t.autoHoliday)}<select data-auto-rule-value-control><option value="">${escapeHTML(this.t.autoKindEmpty)}</option>${holidayOptions.map(([value, label]) => `<option value="${value}" ${value === storedHoliday ? "selected" : ""}>${escapeHTML(label)}</option>`).join("")}</select></label>`;
       return;
     }
     if (kind === "cycle") {

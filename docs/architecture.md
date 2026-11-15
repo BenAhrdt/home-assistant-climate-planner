@@ -212,6 +212,12 @@ neue Umschaltung aus und halten den bisherigen effektiven Zustand. Ein
 Modewechsel ändert die Absenkung nicht, aktualisiert aber den Mode, dessen
 Temperatur beim Schließen wiederhergestellt wird.
 
+Die Feiertagsberechnung verwendet die globale Einstellung
+`holiday_region`. `national` beschränkt die gesetzlichen Feiertage auf die
+bundesweit geltenden Termine; eine Auswahl der 16 deutschen Bundesländer ergänzt
+die jeweiligen landesweiten Feiertage. Gemeindeabhängige Sonderfälle werden
+nicht aufgelöst.
+
 Sommer- und Winterzeit werden durch die lokale Home-Assistant-Zeitzone und
 aware `datetime`-Werte berücksichtigt. Ein ungültiger oder nicht vorhandener
 Mode-Verweis kann nicht gespeichert werden.

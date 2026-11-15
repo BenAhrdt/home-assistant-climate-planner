@@ -101,6 +101,34 @@ async def ws_set_window_label(hass: HomeAssistant, connection, msg: dict) -> Non
 
 @websocket_api.websocket_command(
     {
+        vol.Required("type"): f"{DOMAIN}/set_holiday_region",
+        vol.Required("region"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_set_holiday_region(hass: HomeAssistant, connection, msg: dict) -> None:
+    """Save the integration-wide German holiday region from the panel."""
+
+    if not connection.user.is_admin:
+        connection.send_error(msg["id"], "unauthorized", "Administrator required")
+        return
+    runtime = _runtime(hass)
+    if runtime is None:
+        connection.send_error(msg["id"], "not_ready", "Climate Planner is not configured")
+        return
+    try:
+        await runtime.async_set_holiday_region(msg["region"])
+    except InvalidData as err:
+        connection.send_error(msg["id"], "invalid_input", err.code)
+    except Exception:
+        _LOGGER.exception("Climate Planner holiday region could not be saved")
+        connection.send_error(msg["id"], "save_failed", "The holiday region could not be saved")
+    else:
+        connection.send_result(msg["id"], {"saved": True, "holiday_region": runtime.holiday_region})
+
+
+@websocket_api.websocket_command(
+    {
         vol.Required("type"): f"{DOMAIN}/activate_mode",
         vol.Required("schedule_id"): str,
         vol.Required("mode_id"): str,
@@ -168,6 +196,7 @@ def register(hass: HomeAssistant) -> None:
         ws_data,
         ws_configure,
         ws_set_window_label,
+        ws_set_holiday_region,
         ws_activate_mode,
         ws_clear_override,
     ):

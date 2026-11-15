@@ -60,9 +60,11 @@ zur Verfügung. Geburtstage werden über „Zyklisch → Jährlich“ angelegt. 
 der 1. bis 4. Advent, alle Adventssonntage sowie die Weihnachtstage werden
 innerhalb der Feiertagsauswahl angeboten; zusätzlich gibt es den Sammeltermin
 „Ostern (Karfreitag–Ostermontag)“ und „Weihnachten (24.–26. Dezember)“.
-Die beweglichen Termine werden lokal berechnet. Die Feiertagsauswahl enthält die
-gängigen deutschen festen und beweglichen Feiertage; eine landesspezifische
-Feiertagskonfiguration gibt es derzeit nicht. Das zuletzt erreichte Ereignis
+Die beweglichen Termine werden lokal berechnet. Unter **Feiertagsregion
+(Deutschland)** wird festgelegt, ob nur bundesweite Feiertage oder zusätzlich
+die gesetzlichen Feiertage eines Bundeslands angeboten und berechnet werden.
+Gemeinde- oder ortsabhängige Sonderfälle, etwa in Teilen Bayerns, Sachsens oder
+Thüringens, werden nicht automatisch berücksichtigt. Das zuletzt erreichte Ereignis
 bestimmt den Aktivierungszustand, wobei bei gleichem Datum **Auto aus** Vorrang
 hat. Die manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar.
 Eine Regel mit dem Anlass **Zyklisch** verwendet ein Intervall und eine
