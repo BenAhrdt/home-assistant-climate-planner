@@ -69,6 +69,7 @@ Planner
         ├── id
         ├── mode_id              # stabile Referenz in modes[]
         ├── enabled
+        ├── continuous?         # Wochentagszeiten für die Zuordnung ignorieren
         ├── auto_rules[]?        # beliebig viele automatische Regelgruppen
         │   ├── id
         │   ├── name              # Bezeichnung der Regel
@@ -76,7 +77,6 @@ Planner
         │   ├── date?             # ISO-Datum für kind=date
         │   ├── holiday?          # unterstützter Feiertag für kind=holiday
         │   ├── recurrence?       # hourly, daily, weekly, monthly, quarterly, yearly
-        │   ├── continuous?       # Auto-ein bis Auto-aus ohne weekday_rules
         │   └── actions           # mindestens on oder off
         │       ├── on?
         │       │   ├── time       # HH:mm
@@ -143,11 +143,14 @@ eine eigene Auto-aus-Regel benötigt. Wird eine Mode-Zuordnung durch eine
 automatische Regel freigeschaltet, beginnt ihre Temperaturwirkung am jeweiligen
 Tag erst mit der erreichten Wochenphase dieses Tages. Eine Tagesphase um
 00:00 erlaubt die sofortige Wirkung bei Auto ein; Phasen vergangener Tage
-werden für diese automatische Freigabe nicht übernommen. Setzt eine Regel
-`continuous: true`, bildet dagegen das automatische Auto-ein-Ereignis die
-Aktivierungsgrenze und das Auto-aus-Ereignis die Deaktivierungsgrenze; die
-Wochentagsphasen werden in diesem Zeitraum nicht benötigt und können leer sein.
-Sie bleiben bei einer späteren Abwahl der Option als Konfiguration erhalten.
+werden für diese automatische Freigabe nicht übernommen. Setzt eine
+Mode-Zuordnung `continuous: true`, bilden dagegen die automatischen Ereignisse
+die Aktivierungs- und Deaktivierungsgrenzen; die Wochentagsphasen werden in
+diesem Zeitraum nicht benötigt und können leer sein. Sie bleiben bei einer
+späteren Abwahl der Option als Konfiguration erhalten. Das frühere
+`continuous`-Feld an einzelnen automatischen Regeln wird bei der Normalisierung
+weiterhin als Abwärtskompatibilität unterstützt und in die zentrale Zuordnung
+übernommen.
 Jede Regel kann optional eine eigene Bezeichnung tragen. Die Reihenfolge der
 Regeln ist die Reihenfolge der Liste und kann im Panel per Drag-and-Drop geändert
 werden; sie wird beim Speichern zusammen mit den Regeln übernommen.

@@ -86,15 +86,17 @@ Mode sofort wirken, muss für den betreffenden Tag **00:00** als Tageszeit
 eingetragen sein. Die automatische Regel und die Tageszeit bilden damit
 gemeinsam die zeitliche Gültigkeit.
 
-Für Feiertage, einmalige Termine und zyklische Regeln gibt es zusätzlich die
-Option **Von Auto ein bis Auto aus durchgehend aktiv**. Ist sie gesetzt, gilt
-die Zuordnung ab dem Auto-ein-Ereignis bis zum Auto-aus-Ereignis unabhängig von
-den Wochentagszeiten. Dafür dürfen auch alle Wochentage abgewählt werden. Die
-bereits gespeicherten Wochentagszeiten werden dabei nicht gelöscht: Wird die
-Option später abgewählt, gelten sie wieder. Ohne diese Option bleiben die
-Wochentagszeiten die zweite notwendige Zeitgrenze nach dem automatischen
-Einschalten; so können beispielsweise mittwochs andere Zeiten als an den
-übrigen Tagen verwendet werden.
+Für eine Mode-Zuordnung gibt es zentral die Option **Wochentagszeiten für
+diese Mode-Zuordnung ignorieren**. Sie eignet sich besonders für Feiertage,
+einmalige Termine und zyklische Regeln: Sobald die automatische Zuordnung
+gültig ist, werden Wochentage und Tageszeiten nicht als zusätzliche Grenze
+ausgewertet. Die Wochentagsfelder werden im Dialog ausgeblendet; die bereits
+gespeicherten Zeiten werden dabei nicht gelöscht. Wird die Option später
+abgewählt, erscheinen sie wieder und gelten erneut. Beim Anlegen der ersten
+Feiertagsregel wird die Option automatisch aktiviert. Ohne diese Option bilden
+die Wochentagszeiten die zweite Zeitgrenze nach dem automatischen Einschalten;
+so können beispielsweise mittwochs andere Zeiten als an den übrigen Tagen
+verwendet werden.
 
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.

@@ -438,7 +438,7 @@ def _candidates(
         mode = mode_by_id.get(assignment["mode_id"])
         if mode is None:
             continue
-        continuous = any(
+        continuous = assignment.get("continuous") is True or any(
             rule.get("continuous") is True
             for rule in assignment.get("auto_rules", [])
             if isinstance(rule, dict)
@@ -615,7 +615,7 @@ def next_activation(
         weekday = WEEKDAYS[day.weekday()]
         for assignment in schedule["assignments"]:
             mode = mode_by_id.get(assignment["mode_id"])
-            continuous = any(
+            continuous = assignment.get("continuous") is True or any(
                 rule.get("continuous") is True
                 for rule in assignment.get("auto_rules", [])
                 if isinstance(rule, dict)
@@ -712,7 +712,7 @@ def week_view(
                 assignment["weekday_rules"].get(weekday, []),
                 key=_phase_time,
             )
-            continuous = any(
+            continuous = assignment.get("continuous") is True or any(
                 rule.get("continuous") is True
                 for rule in assignment.get("auto_rules", [])
                 if isinstance(rule, dict)
@@ -785,11 +785,11 @@ def week_view(
                 boundary
                 for assignment in schedule["assignments"]
                 if mode_by_id.get(assignment["mode_id"]) is not None
-                and any(
+                and (assignment.get("continuous") is True or any(
                     rule.get("continuous") is True
                     for rule in assignment.get("auto_rules", [])
                     if isinstance(rule, dict)
-                )
+                ))
                 for segment in _continuous_auto_segments(
                     assignment, day, zone, holiday_region=holiday_region
                 )

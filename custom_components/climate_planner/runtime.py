@@ -508,7 +508,7 @@ class PlannerRuntime:
             until = next_activation(
                 schedule, self.data["modes"], now, holiday_region=self._holiday_region
             )
-            continuous = any(
+            continuous = assignment.get("continuous") is True or any(
                 rule.get("continuous") is True
                 for rule in assignment.get("auto_rules", [])
                 if isinstance(rule, dict)

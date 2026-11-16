@@ -372,6 +372,7 @@ def _normalize_assignment(
         "id",
         "mode_id",
         "enabled",
+        "continuous",
         "auto_rules",
         "weekday_rules",
     }:
@@ -384,6 +385,13 @@ def _normalize_assignment(
     if mode_id not in mode_ids:
         raise InvalidData("unknown_mode_reference")
     auto_rules = _normalize_auto_rules(raw.get("auto_rules"), phase_ids)
+    continuous = raw.get(
+        "continuous", any(rule.get("continuous") for rule in auto_rules)
+    )
+    if type(continuous) is not bool:
+        raise InvalidData("invalid_assignment_continuous")
+    if continuous and not auto_rules:
+        raise InvalidData("invalid_assignment_continuous")
     result = {
         "id": assignment_id,
         "mode_id": mode_id,
@@ -391,12 +399,14 @@ def _normalize_assignment(
         "weekday_rules": _normalize_weekday_rules(
             raw.get(
                 "weekday_rules",
-                {} if any(rule.get("continuous") for rule in auto_rules) else None,
+                {} if continuous else None,
             ),
             phase_ids,
-            allow_empty=any(rule.get("continuous") for rule in auto_rules),
+            allow_empty=continuous,
         ),
     }
+    if continuous:
+        result["continuous"] = True
     if auto_rules:
         result["auto_rules"] = auto_rules
     return result

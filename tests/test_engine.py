@@ -177,6 +177,7 @@ def test_continuous_auto_rule_uses_auto_period_without_weekday_phases():
         [
             {
                 **assignment("holiday-rule", "holiday"),
+                "continuous": True,
                 "weekday_rules": {},
                 "auto_rules": [
                     {
@@ -184,7 +185,6 @@ def test_continuous_auto_rule_uses_auto_period_without_weekday_phases():
                         "name": "Holiday period",
                         "kind": "date",
                         "date": "2026-11-09",
-                        "continuous": True,
                         "actions": {
                             "on": {"time": "09:00"},
                             "off": {"time": "22:00"},

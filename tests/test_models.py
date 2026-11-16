@@ -157,7 +157,30 @@ def test_continuous_auto_rule_can_omit_weekday_phases_and_preserves_flag():
     normalized = validate_planner(value)["schedules"][0]["assignments"][0]
 
     assert normalized["weekday_rules"] == {}
+    assert normalized["continuous"] is True
     assert normalized["auto_rules"][0]["continuous"] is True
+
+
+def test_continuous_assignment_is_central_and_allows_empty_weekday_phases():
+    value = planner()
+    assignment_value = value["schedules"][0]["assignments"][0]
+    assignment_value["continuous"] = True
+    assignment_value["weekday_rules"] = {}
+    assignment_value["auto_rules"] = [
+        {
+            "id": "holiday",
+            "name": "Feiertag",
+            "kind": "holiday",
+            "holiday": "labour_day",
+            "actions": {"on": {"time": "09:00"}, "off": {"time": "22:00"}},
+        }
+    ]
+
+    normalized = validate_planner(value)["schedules"][0]["assignments"][0]
+
+    assert normalized["continuous"] is True
+    assert normalized["weekday_rules"] == {}
+    assert "continuous" not in normalized["auto_rules"][0]
 
 
 def test_grouped_cyclic_auto_rule_has_independent_action_ranges():
