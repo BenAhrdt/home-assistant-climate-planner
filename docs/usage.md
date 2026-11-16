@@ -33,8 +33,10 @@ bereits, erscheinen stattdessen ein rotes Verbotssymbol und eine rote
 Heizplankachel; ein Ablegen ist dort nicht möglich.
 
 Jeder Mode kann einem Heizplan genau einmal zugeordnet werden. Ein erneutes
-Hinzufügen desselben Modes wird abgewiesen. Die Zuordnung kann innerhalb des
-Heizplans pausiert oder aktiviert werden; das Play/Pause-Symbol an der
+Hinzufügen desselben Modes wird abgewiesen. Eine neu eingefügte Zuordnung ist
+zunächst pausiert und muss über das Play/Pause-Symbol ausdrücklich aktiviert
+werden. Die Zuordnung kann innerhalb des Heizplans pausiert oder aktiviert
+werden; das Play/Pause-Symbol an der
 Mode-Schaltfläche steuert diesen Zustand. Der rote Papierkorb direkt darunter
 entfernt den Mode einschließlich seiner Wochenphasen aus diesem Heizplan, ohne
 den zentralen Mode oder seine Zuordnungen in anderen Heizplänen zu verändern.

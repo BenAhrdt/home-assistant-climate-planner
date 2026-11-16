@@ -1265,7 +1265,7 @@ class ClimatePlannerPanel extends HTMLElement {
         sourceAssignment = null;
       }
       if (!targetAssignment) {
-        targetAssignment = { id: newId("assignment"), mode_id: selectedModeId, enabled: true, weekday_rules: {} };
+        targetAssignment = { id: newId("assignment"), mode_id: selectedModeId, enabled: false, weekday_rules: {} };
         targetSchedule.assignments.push(targetAssignment);
       }
       const displayTemperature = form.elements.target_temperature.value;
@@ -1769,7 +1769,7 @@ class ClimatePlannerPanel extends HTMLElement {
       if (!targetSchedule) return;
       let targetAssignment = assignmentId ? targetSchedule.assignments.find((item) => item.id === assignmentId) : null;
       if (!targetAssignment) {
-        targetAssignment = { id: newId("assignment"), mode_id: form.elements.mode_id.value, enabled: true, weekday_rules: {} };
+        targetAssignment = { id: newId("assignment"), mode_id: form.elements.mode_id.value, enabled: false, weekday_rules: {} };
         targetSchedule.assignments.push(targetAssignment);
       }
       targetAssignment.mode_id = form.elements.mode_id.value;
