@@ -408,15 +408,22 @@ def _candidates(
     mode_by_id = _mode_map(modes)
     mode_order = {mode["id"]: index for index, mode in enumerate(modes)}
     candidates: list[tuple] = []
-    for days_ago in range(days + 1):
-        day = local_now.date() - timedelta(days=days_ago)
-        weekday = WEEKDAYS[day.weekday()]
-        for assignment_index, assignment in enumerate(schedule["assignments"]):
-            if respect_assignment_enabled and not assignment["enabled"]:
-                continue
-            mode = mode_by_id.get(assignment["mode_id"])
-            if mode is None:
-                continue
+    for assignment_index, assignment in enumerate(schedule["assignments"]):
+        # An automatic rule makes the assignment a dated/temporary override.
+        # Its weekly phase must have started on the current local day before
+        # it may win by priority.  Without this guard, a newly auto-enabled
+        # assignment could inherit last week's phase and override the current
+        # mode before today's configured start time.  A phase at 00:00 is the
+        # explicit opt-in for an immediate effect after Auto on.
+        day_offsets = (0,) if assignment.get("auto_rules") else range(days + 1)
+        if respect_assignment_enabled and not assignment["enabled"]:
+            continue
+        mode = mode_by_id.get(assignment["mode_id"])
+        if mode is None:
+            continue
+        for days_ago in day_offsets:
+            day = local_now.date() - timedelta(days=days_ago)
+            weekday = WEEKDAYS[day.weekday()]
             for time_index, phase in enumerate(assignment["weekday_rules"].get(weekday, [])):
                 time_text = _phase_time(phase)
                 occurrence = _at_local(day, time_text, zone)
@@ -443,11 +450,13 @@ def select_active_mode(
     respect_schedule_enabled: bool = True,
     respect_assignment_enabled: bool = True,
 ) -> ActiveMatch | None:
-    """Select the latest matching mode, including the previous weekly cycle.
+    """Select the matching mode while applying automatic-rule day boundaries.
 
     Higher mode priority wins first. Equal priorities use the latest matching
     activation, then configured assignment and mode order as deterministic
-    tie-breakers.
+    tie-breakers. Assignments with automatic rules only use phases already
+    reached on the current local day; a 00:00 phase makes them available
+    immediately after an automatic enable event.
     """
 
     if respect_schedule_enabled and not schedule["enabled"]:

@@ -490,6 +490,66 @@ async def test_auto_dates_apply_in_order_and_manual_toggle_remains_independent(f
 
 
 @pytest.mark.asyncio
+async def test_auto_priority_mode_waits_for_daily_phase_and_returns_after_auto_off(fake_runtime):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    payload = planner_payload()
+    payload["modes"].append(
+        {"id": "mode_birthday", "name": "Birthday", "target_temperature": 22, "priority": 10}
+    )
+    payload["schedules"][0]["assignments"].append(
+        {
+            "id": "assignment_birthday",
+            "mode_id": "mode_birthday",
+            "enabled": False,
+            "weekday_rules": {
+                day: ["07:00"]
+                for day in (
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday",
+                    "saturday",
+                    "sunday",
+                )
+            },
+            "auto_rules": [
+                {
+                    "id": "birthday-window",
+                    "kind": "date",
+                    "name": "Birthday",
+                    "actions": {
+                        "on": {"time": "06:00"},
+                        "off": {"time": "21:30"},
+                    },
+                    "date": "2026-11-20",
+                }
+            ],
+        }
+    )
+    runtime = PlannerRuntime(fake_runtime, "entry")
+    runtime._now = lambda: datetime(2026, 11, 20, 6, 30, tzinfo=ZONE)
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+
+    assert runtime.active["schedule_living"].mode["id"] == "mode_home"
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
+
+    runtime._now = lambda: datetime(2026, 11, 20, 7, 0, tzinfo=ZONE)
+    await runtime.async_evaluate()
+    assert runtime.active["schedule_living"].mode["id"] == "mode_birthday"
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 22.0
+
+    runtime._now = lambda: datetime(2026, 11, 20, 21, 31, tzinfo=ZONE)
+    await runtime.async_evaluate()
+    assert runtime.active["schedule_living"].mode["id"] == "mode_home"
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
 async def test_duplicate_mode_assignments_can_be_activated_independently(fake_runtime):
     fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
     payload = planner_payload()

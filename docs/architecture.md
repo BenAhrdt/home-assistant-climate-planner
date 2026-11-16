@@ -124,7 +124,11 @@ Start- und Enddatum einer zyklischen Regel sind optional. Ohne Startdatum wird
 der aktuelle lokale Tag als Anker verwendet. Das optionale Enddatum begrenzt die
 erzeugten zyklischen Ereignisse einschließlich des Enddatums. Es kehrt die
 Aktion nicht automatisch um; für ein automatisches Abschalten wird weiterhin
-eine eigene Auto-aus-Regel benötigt.
+eine eigene Auto-aus-Regel benötigt. Wird eine Mode-Zuordnung durch eine
+automatische Regel freigeschaltet, beginnt ihre Temperaturwirkung am jeweiligen
+Tag erst mit der erreichten Wochenphase dieses Tages. Eine Tagesphase um
+00:00 erlaubt die sofortige Wirkung bei Auto ein; Phasen vergangener Tage
+werden für diese automatische Freigabe nicht übernommen.
 Jede Regel kann optional eine eigene Bezeichnung tragen. Die Reihenfolge der
 Regeln ist die Reihenfolge der Liste und kann im Panel per Drag-and-Drop geändert
 werden; sie wird beim Speichern zusammen mit den Regeln übernommen.
@@ -159,18 +163,21 @@ den Wert für Eingaben und Anzeigen in die konfigurierte Einheit °C oder °F um
 Beim Aufruf von `climate.set_temperature` konvertiert die Laufzeit ebenfalls
 in die von Home Assistant erwartete Einheit.
 
-Für einen lokalen, zeitzonenbewussten Zeitpunkt werden die aktivierten Regeln
-des aktuellen Tages und der vergangenen sieben Tage betrachtet. Zuerst gewinnt
-der Mode mit der höheren Priorität. Bei gleicher Priorität gewinnt die jüngste
+Für einen lokalen, zeitzonenbewussten Zeitpunkt werden bei normalen
+Mode-Zuordnungen die Regeln des aktuellen Tages und der vergangenen sieben Tage
+betrachtet. So bleibt der letzte Mode aus dem vorherigen Wochenzyklus über
+Mitternacht und am Tagesanfang wirksam. Mode-Zuordnungen mit automatischen
+Regeln bilden eine zeitlich begrenzte Freigabe: Für sie werden nur Phasen des
+aktuellen Tages berücksichtigt, die bereits erreicht sind. Zuerst gewinnt der
+Mode mit der höheren Priorität. Bei gleicher Priorität gewinnt die jüngste
 passende Aktivierung; bei identischem Zeitpunkt entscheiden die konfigurierte
-Zuordnungs- und Mode-Reihenfolge deterministisch. So bleibt der letzte Mode aus
-dem vorherigen Wochenzyklus über Mitternacht und am Tagesanfang wirksam. Pausierte
-Mode-Zuordnungen werden in der normalen Auswahl übersprungen.
+Zuordnungs- und Mode-Reihenfolge deterministisch. Pausierte Mode-Zuordnungen
+werden in der normalen Auswahl übersprungen.
 
 Die drei expliziten Apply-Dienste bilden die ioBroker-Aktionen ab:
 
 - `climate_planner.apply_matched` ignoriert Heizplan- und Zuordnungs-
-  Schalter.
+  Schalter, berücksichtigt aber weiterhin die zeitlich gültige Tagesphase.
 - `climate_planner.apply_enabled_matching` verlangt, dass Heizplan und
   Mode-Zuordnung aktiviert sind.
 - `climate_planner.apply_enabled_mode_matching` ignoriert nur den Heizplan-

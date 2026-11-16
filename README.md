@@ -33,7 +33,9 @@ entities and uses centrally managed modes with target temperatures.
   add another phase to their existing assignment
 - detail-view mode chips also expose the assignment's play/pause state
 - same or individual times for each weekday
-- priority-based, deterministic selection of enabled modes across week changes
+- priority-based, deterministic selection of time-valid enabled modes across
+  week changes; automatic-rule assignments respect the current day's phase
+  start
 - one-time target-temperature application through `climate.set_temperature`
 - point-in-time scheduling without short-interval polling
 - responsive heating-plan and mode overview plus a detail view for each plan

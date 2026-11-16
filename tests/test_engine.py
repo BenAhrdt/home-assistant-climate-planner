@@ -99,6 +99,55 @@ def test_higher_priority_wins_over_a_more_recent_lower_priority_rule():
     assert match is not None and match.mode["id"] == "high"
 
 
+def test_auto_rule_priority_waits_for_current_day_phase():
+    modes = [mode("normal", "Normal", 21), mode("birthday", "Birthday", 22, priority=10)]
+    value = schedule(
+        [
+            assignment("normal-rule", "normal", monday=["00:00"]),
+            {
+                **assignment("birthday-rule", "birthday", monday=["07:00"], tuesday=["05:00"]),
+                "auto_rules": [
+                    {
+                        "id": "birthday-on",
+                        "action": "on",
+                        "kind": "date",
+                        "date": "2026-11-09",
+                    }
+                ],
+            },
+        ]
+    )
+
+    before_phase = select_active_mode(value, modes, datetime(2026, 11, 9, 6, 30, tzinfo=ZONE))
+    assert before_phase is not None and before_phase.mode["id"] == "normal"
+    at_phase = select_active_mode(value, modes, datetime(2026, 11, 9, 7, 0, tzinfo=ZONE))
+    assert at_phase is not None and at_phase.mode["id"] == "birthday"
+    before_tuesday_phase = select_active_mode(
+        value, modes, datetime(2026, 11, 10, 4, 30, tzinfo=ZONE)
+    )
+    assert before_tuesday_phase is not None and before_tuesday_phase.mode["id"] == "normal"
+    at_tuesday_phase = select_active_mode(value, modes, datetime(2026, 11, 10, 5, 0, tzinfo=ZONE))
+    assert at_tuesday_phase is not None and at_tuesday_phase.mode["id"] == "birthday"
+
+
+def test_auto_rule_priority_can_start_immediately_at_midnight():
+    modes = [mode("normal", "Normal", 21), mode("birthday", "Birthday", 22, priority=10)]
+    value = schedule(
+        [
+            assignment("normal-rule", "normal", monday=["00:00"]),
+            {
+                **assignment("birthday-rule", "birthday", monday=["00:00"]),
+                "auto_rules": [
+                    {"id": "birthday-on", "action": "on", "kind": "date", "date": "2026-11-09"}
+                ],
+            },
+        ]
+    )
+
+    match = select_active_mode(value, modes, datetime(2026, 11, 9, 6, 30, tzinfo=ZONE))
+    assert match is not None and match.mode["id"] == "birthday"
+
+
 def test_disabled_mode_is_not_selected():
     modes = [mode("off", "Off", 16), mode("low", "Low", 18)]
     value = schedule(

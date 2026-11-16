@@ -75,7 +75,12 @@ Optional kann ein Enddatum gesetzt werden; die letzte Wiederholung am Enddatum
 ist eingeschlossen. Verfügbar sind stündlich, täglich, wöchentlich, monatlich,
 quartalsweise und jährlich. Das Startdatum ist dabei der Anker: Es bestimmt bei
 wöchentlichen Regeln den Wochentag und bei monatlichen, quartalsweisen sowie
-jährlichen Regeln den Kalendertag.
+jährlichen Regeln den Kalendertag. Eine automatische Regel schaltet die
+Mode-Zuordnung frei; die Temperatur dieser Zuordnung wirkt am jeweiligen Tag
+erst ab der dort eingetragenen Tageszeit. Soll ein automatisch freigeschalteter
+Mode sofort wirken, muss für den betreffenden Tag **00:00** als Tageszeit
+eingetragen sein. Die automatische Regel und die Tageszeit bilden damit
+gemeinsam die zeitliche Gültigkeit.
 
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.
@@ -222,11 +227,23 @@ vorkommen.
 
 ## Zeitverhalten
 
-Ein Mode bleibt ab seiner Aktivierung bis zur nächsten passenden Aktivierung
-aktiv. Nur aktivierte Heizpläne und Mode-Zuordnungen werden in der normalen
+Bei einer normalen Mode-Zuordnung bleibt ein Mode ab seiner Aktivierung bis zur
+nächsten passenden Aktivierung aktiv. Nur aktivierte Heizpläne und
+Mode-Zuordnungen werden in der normalen
 Auswahl berücksichtigt. Bei Überschneidungen gewinnt zunächst die
 höhere Priorität, bei Gleichstand die jüngere Aktivierung und anschließend die
-stabile Konfigurationsreihenfolge.
+stabile Konfigurationsreihenfolge. Die Priorität schaltet einen Mode nicht ein
+und ersetzt keine Uhrzeit: Sie entscheidet nur, welcher bereits zeitlich
+gültige Mode gewinnt. Bei Mode-Zuordnungen mit automatischen Regeln wird nur
+eine bereits erreichte Phase des aktuellen lokalen Tages berücksichtigt.
+
+Beispiel: Ein normaler Mode mit 21 °C hat Priorität 0 und beginnt um 06:00.
+Ein Geburtstags-Mode mit 22 °C hat Priorität 10, wird am Geburtstag per Auto
+ein freigeschaltet und beginnt an diesem Wochentag um 07:00. Bis 07:00 bleiben
+21 °C aktiv; von 07:00 bis Auto aus gewinnt der Geburtstags-Mode mit 22 °C.
+Soll der Geburtstags-Mode direkt bei Auto ein wirken, wird für den Tag 00:00
+eingetragen. Auto aus beendet die Freigabe; danach greift wieder der passende
+Mode mit niedrigerer Priorität.
 
 Wird ein pausierter Heizplan wieder aktiviert, endet eine manuelle
 Mode-Übersteuerung. Climate Planner ermittelt und setzt sofort den Mode, der
@@ -248,11 +265,13 @@ Für Automationen sind folgende Dienste verfügbar:
   Automatik.
 - `climate_planner.apply_matched`, `climate_planner.apply_enabled_matching`
   und `climate_planner.apply_enabled_mode_matching`: explizites Anwenden der
-  jeweils passenden Regel gemäß der beschriebenen Enable-Semantik. Optional
-  kann jeweils `schedule_id` angegeben werden. Der gewählte Mode wird dabei
-  als Laufzeit-Override und nach erfolgreicher Sollwertübergabe als zuletzt
-  aktivierter Mode angezeigt; der Button-State weist zusätzlich die Zahl
-  erfolgreicher Temperatur-Serviceaufrufe aus.
+  jeweils passenden Regel gemäß der beschriebenen Enable-Semantik. Die
+  zeitliche Gültigkeit der Tagesphasen wird auch bei `apply_matched`
+  berücksichtigt; dieser Dienst ignoriert zusätzlich weiterhin alle
+  Enable-Schalter. Optional kann jeweils `schedule_id` angegeben werden. Der
+  gewählte Mode wird dabei als Laufzeit-Override und nach erfolgreicher
+  Sollwertübergabe als zuletzt aktivierter Mode angezeigt; der Button-State
+  weist zusätzlich die Zahl erfolgreicher Temperatur-Serviceaufrufe aus.
 
 Zusätzlich legt die Integration steuerbare Entitäten an:
 
