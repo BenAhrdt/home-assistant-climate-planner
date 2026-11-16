@@ -145,9 +145,10 @@ Tag erst mit der erreichten Wochenphase dieses Tages. Eine Tagesphase um
 00:00 erlaubt die sofortige Wirkung bei Auto ein; Phasen vergangener Tage
 werden für diese automatische Freigabe nicht übernommen. Setzt eine
 Mode-Zuordnung `continuous: true`, bilden dagegen die automatischen Ereignisse
-die Aktivierungs- und Deaktivierungsgrenzen; die Wochentagsphasen werden in
-diesem Zeitraum nicht benötigt und können leer sein. Sie bleiben bei einer
-späteren Abwahl der Option als Konfiguration erhalten. Das frühere
+die Aktivierungs- und Deaktivierungsgrenzen; fehlen automatische Regeln, gilt
+die Zuordnung während ihrer Aktivierung durchgehend. Die Wochentagsphasen
+werden in diesem Zeitraum nicht benötigt und können leer sein. Sie bleiben bei
+einer späteren Abwahl der Option als Konfiguration erhalten. Das frühere
 `continuous`-Feld an einzelnen automatischen Regeln wird bei der Normalisierung
 weiterhin als Abwärtskompatibilität unterstützt und in die zentrale Zuordnung
 übernommen.

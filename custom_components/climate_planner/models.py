@@ -390,8 +390,6 @@ def _normalize_assignment(
     )
     if type(continuous) is not bool:
         raise InvalidData("invalid_assignment_continuous")
-    if continuous and not auto_rules:
-        raise InvalidData("invalid_assignment_continuous")
     result = {
         "id": assignment_id,
         "mode_id": mode_id,

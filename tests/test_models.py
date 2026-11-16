@@ -183,6 +183,19 @@ def test_continuous_assignment_is_central_and_allows_empty_weekday_phases():
     assert "continuous" not in normalized["auto_rules"][0]
 
 
+def test_continuous_assignment_without_auto_rules_is_valid():
+    value = planner()
+    assignment_value = value["schedules"][0]["assignments"][0]
+    assignment_value["continuous"] = True
+    assignment_value["weekday_rules"] = {}
+
+    normalized = validate_planner(value)["schedules"][0]["assignments"][0]
+
+    assert normalized["continuous"] is True
+    assert normalized["weekday_rules"] == {}
+    assert "auto_rules" not in normalized
+
+
 def test_grouped_cyclic_auto_rule_has_independent_action_ranges():
     value = planner()
     value["schedules"][0]["assignments"][0]["auto_rules"] = [
