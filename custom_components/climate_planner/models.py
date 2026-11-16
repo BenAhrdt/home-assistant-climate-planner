@@ -145,7 +145,9 @@ def _normalize_climate_entity_names(value: object, entity_ids: list[str]) -> dic
     return result
 
 
-def _normalize_weekday_rules(value: object, phase_ids: set[str]) -> dict[str, list[dict]]:
+def _normalize_weekday_rules(
+    value: object, phase_ids: set[str], *, allow_empty: bool = False
+) -> dict[str, list[dict]]:
     if not isinstance(value, dict):
         raise InvalidData("invalid_weekday_rules")
     unknown = set(value) - set(WEEKDAYS)
@@ -184,7 +186,7 @@ def _normalize_weekday_rules(value: object, phase_ids: set[str]) -> dict[str, li
             phases.append(phase)
         if phases:
             result[weekday] = phases
-    if not result:
+    if not result and not allow_empty:
         raise InvalidData("missing_weekday")
     return result
 
@@ -217,6 +219,7 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
             "start_date",
             "start_time",
             "end_date",
+            "continuous",
         }:
             raise InvalidData("invalid_auto_rule")
         rule_id = _id(raw_rule.get("id") or new_id("auto_rule"), "invalid_auto_rule_id")
@@ -227,6 +230,11 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
         if kind not in AUTO_RULE_KINDS:
             raise InvalidData("invalid_auto_rule_kind")
         normalized = {"id": rule_id, "kind": kind}
+        continuous = raw_rule.get("continuous", False)
+        if type(continuous) is not bool:
+            raise InvalidData("invalid_auto_rule_continuous")
+        if continuous:
+            normalized["continuous"] = True
         rule_name = raw_rule.get("name")
         if rule_name is not None and rule_name != "":
             if not isinstance(rule_name, str):
@@ -380,13 +388,20 @@ def _normalize_assignment(
     mode_id = _id(raw.get("mode_id"), "invalid_assignment_mode")
     if mode_id not in mode_ids:
         raise InvalidData("unknown_mode_reference")
+    auto_rules = _normalize_auto_rules(raw.get("auto_rules"), phase_ids)
     result = {
         "id": assignment_id,
         "mode_id": mode_id,
         "enabled": _bool(raw.get("enabled"), "invalid_assignment_enabled"),
-        "weekday_rules": _normalize_weekday_rules(raw.get("weekday_rules"), phase_ids),
+        "weekday_rules": _normalize_weekday_rules(
+            raw.get(
+                "weekday_rules",
+                {} if any(rule.get("continuous") for rule in auto_rules) else None,
+            ),
+            phase_ids,
+            allow_empty=any(rule.get("continuous") for rule in auto_rules),
+        ),
     }
-    auto_rules = _normalize_auto_rules(raw.get("auto_rules"), phase_ids)
     if auto_rules:
         result["auto_rules"] = auto_rules
     return result

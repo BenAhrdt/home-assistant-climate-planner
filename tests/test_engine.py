@@ -99,6 +99,29 @@ def test_higher_priority_wins_over_a_more_recent_lower_priority_rule():
     assert match is not None and match.mode["id"] == "high"
 
 
+def test_higher_priority_mode_does_not_carry_into_day_before_first_phase():
+    modes = [mode("base", "Base", 20), mode("off", "Off", 18.5, priority=100)]
+    value = schedule(
+        [
+            assignment("base-rule", "base", sunday=["18:00"], monday=["05:00"]),
+            assignment("off-rule", "off", sunday=["01:00"], monday=["01:00"]),
+        ]
+    )
+
+    before_phase = select_active_mode(value, modes, datetime(2026, 11, 9, 0, 30, tzinfo=ZONE))
+    assert before_phase is not None and before_phase.mode["id"] == "base"
+    at_phase = select_active_mode(value, modes, datetime(2026, 11, 9, 1, 0, tzinfo=ZONE))
+    assert at_phase is not None and at_phase.mode["id"] == "off"
+
+
+def test_mode_with_future_first_phase_is_not_active_without_fallback():
+    modes = [mode("off", "Off", 18.5, priority=100)]
+    value = schedule([assignment("off-rule", "off", sunday=["01:00"], monday=["01:00"])])
+
+    assert select_active_mode(value, modes, datetime(2026, 11, 9, 0, 30, tzinfo=ZONE)) is None
+    assert select_active_mode(value, modes, datetime(2026, 11, 9, 1, 0, tzinfo=ZONE)) is not None
+
+
 def test_auto_rule_priority_waits_for_current_day_phase():
     modes = [mode("normal", "Normal", 21), mode("birthday", "Birthday", 22, priority=10)]
     value = schedule(
@@ -146,6 +169,71 @@ def test_auto_rule_priority_can_start_immediately_at_midnight():
 
     match = select_active_mode(value, modes, datetime(2026, 11, 9, 6, 30, tzinfo=ZONE))
     assert match is not None and match.mode["id"] == "birthday"
+
+
+def test_continuous_auto_rule_uses_auto_period_without_weekday_phases():
+    modes = [mode("holiday", "Holiday", 22)]
+    value = schedule(
+        [
+            {
+                **assignment("holiday-rule", "holiday"),
+                "weekday_rules": {},
+                "auto_rules": [
+                    {
+                        "id": "holiday-period",
+                        "name": "Holiday period",
+                        "kind": "date",
+                        "date": "2026-11-09",
+                        "continuous": True,
+                        "actions": {
+                            "on": {"time": "09:00"},
+                            "off": {"time": "22:00"},
+                        },
+                    }
+                ],
+            }
+        ]
+    )
+
+    assert select_active_mode(value, modes, datetime(2026, 11, 9, 8, 59, tzinfo=ZONE)) is None
+    assert select_active_mode(value, modes, datetime(2026, 11, 9, 9, 0, tzinfo=ZONE)) is not None
+    assert select_active_mode(value, modes, datetime(2026, 11, 9, 21, 59, tzinfo=ZONE)) is not None
+    assert select_active_mode(value, modes, datetime(2026, 11, 9, 22, 0, tzinfo=ZONE)) is None
+
+    view = week_view(value, modes, datetime(2026, 11, 9, 7, tzinfo=ZONE))
+    monday = next(day for day in view["days"] if day["weekday"] == "monday")
+    assert [(segment["start"], segment["end"]) for segment in monday["tracks"][0]["segments"]] == [
+        (540, 1320)
+    ]
+
+
+def test_week_view_shows_future_continuous_auto_period_while_assignment_is_paused():
+    modes = [mode("holiday", "Holiday", 22)]
+    value = schedule(
+        [
+            {
+                **assignment("holiday-rule", "holiday"),
+                "enabled": False,
+                "weekday_rules": {},
+                "auto_rules": [
+                    {
+                        "id": "holiday-period",
+                        "kind": "date",
+                        "date": "2026-11-10",
+                        "continuous": True,
+                        "actions": {"on": {"time": "09:00"}, "off": {"time": "22:00"}},
+                    }
+                ],
+            }
+        ]
+    )
+
+    view = week_view(value, modes, datetime(2026, 11, 9, 7, tzinfo=ZONE))
+    tuesday = next(day for day in view["days"] if day["weekday"] == "tuesday")
+
+    assert [(segment["start"], segment["end"]) for segment in tuesday["tracks"][0]["segments"]] == [
+        (540, 1320)
+    ]
 
 
 def test_disabled_mode_is_not_selected():
@@ -220,6 +308,28 @@ def test_week_view_contains_mode_segments_and_current_marker():
     ]
     assert view["current_weekday"] == "monday"
     assert view["current_minute"] == 420
+
+
+def test_week_view_keeps_parallel_assignments_in_separate_tracks():
+    modes = [mode("base", "Base", 20), mode("off", "Off", 18.5, priority=100)]
+    value = schedule(
+        [
+            assignment("base-rule", "base", monday=["05:00", "18:00"]),
+            assignment("off-rule", "off", monday=["01:00"]),
+        ]
+    )
+
+    view = week_view(value, modes, datetime(2026, 11, 9, 7, 0, tzinfo=ZONE))
+    monday = next(day for day in view["days"] if day["weekday"] == "monday")
+
+    assert [track["assignment_id"] for track in monday["tracks"]] == [
+        "base-rule",
+        "off-rule",
+    ]
+    assert [
+        (segment["start"], segment["end"])
+        for segment in monday["tracks"][1]["segments"]
+    ] == [(60, 1440)]
 
 
 def test_week_view_keeps_last_phase_until_day_end():

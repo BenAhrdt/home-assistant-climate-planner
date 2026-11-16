@@ -51,10 +51,10 @@ danach die zuletzt aktivierte Regel.
 dieser Mode-Zuordnung im Heizplan öffnen. Unter **Automatische Regeln** wird
 zuerst der Name der Regel eingetragen. Im Anschluss werden der **Anlass** und
 mindestens eine Aktion (**Auto ein**, **Auto aus** oder beide) festgelegt.
-Gespeicherte Regeln zeigen in der Übersicht nur ihren Namen; über **Bearbeiten**
-wird die vollständige Regel wieder geöffnet. Über den Griff links lässt sich die
-Reihenfolge per Drag-and-Drop ändern; diese Reihenfolge wird beim Speichern
-beibehalten.
+Gespeicherte Regeln zeigen in der Übersicht zunächst nur ihren Namen; ein Klick
+auf den Regelkopf oder auf **Bearbeiten** öffnet beziehungsweise schließt die
+vollständige Regel wieder. Über den Griff links lässt sich die Reihenfolge per
+Drag-and-Drop ändern; diese Reihenfolge wird beim Speichern beibehalten.
 
 Als Anlass stehen ein einmaliges Datum, ausgewählte Feiertage und **Zyklisch**
 zur Verfügung. Für Auto ein und Auto aus kann jeweils eine eigene Uhrzeit
@@ -68,7 +68,9 @@ Bundeslands angeboten und berechnet werden. Gemeinde- oder ortsabhängige
 Sonderfälle, etwa in Teilen Bayerns, Sachsens oder Thüringens, werden nicht
 automatisch berücksichtigt. Das zuletzt erreichte Ereignis bestimmt den
 Aktivierungszustand; bei gleichem Zeitpunkt hat **Auto aus** Vorrang. Die
-manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar.
+manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar. Wird eine
+bisher pausierte Mode-Zuordnung manuell eingeschaltet, endet dabei eine aktive
+manuelle Mode-Auswahl und die Automatik wird sofort neu ausgewertet.
 
 Eine Regel mit dem Anlass **Zyklisch** verwendet eine Wiederholung. Auto ein und
 Auto aus besitzen dabei jeweils eigene Uhrzeit-, Startdatum- und optionale
@@ -83,6 +85,16 @@ erst ab der dort eingetragenen Tageszeit. Soll ein automatisch freigeschalteter
 Mode sofort wirken, muss für den betreffenden Tag **00:00** als Tageszeit
 eingetragen sein. Die automatische Regel und die Tageszeit bilden damit
 gemeinsam die zeitliche Gültigkeit.
+
+Für Feiertage, einmalige Termine und zyklische Regeln gibt es zusätzlich die
+Option **Von Auto ein bis Auto aus durchgehend aktiv**. Ist sie gesetzt, gilt
+die Zuordnung ab dem Auto-ein-Ereignis bis zum Auto-aus-Ereignis unabhängig von
+den Wochentagszeiten. Dafür dürfen auch alle Wochentage abgewählt werden. Die
+bereits gespeicherten Wochentagszeiten werden dabei nicht gelöscht: Wird die
+Option später abgewählt, gelten sie wieder. Ohne diese Option bleiben die
+Wochentagszeiten die zweite notwendige Zeitgrenze nach dem automatischen
+Einschalten; so können beispielsweise mittwochs andere Zeiten als an den
+übrigen Tagen verwendet werden.
 
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.
@@ -168,6 +180,13 @@ Uhrzeit wird direkt eine weitere Phase derselben Mode-Zuordnung angelegt.
 Neben jedem verwendeten Mode steht außerdem der Play-/Pause-Schalter für diese
 Zuordnung zur Verfügung.
 
+Die Wochenansicht zeigt parallele Mode-Zuordnungen eines Tages in getrennten
+nebeneinanderliegenden Spuren. Eine Spur beginnt erst mit der ersten an diesem
+Tag konfigurierten Phase; ein Mode mit hoher Priorität, dessen erste Phase um
+01:00 beginnt, wird daher nicht bereits für 00:00–01:00 angezeigt oder
+aktiviert. Bei der Laufzeitauswahl kann in diesem Zeitraum weiterhin ein
+niedriger priorisierter Carry-over-Mode des Vortags gültig sein.
+
 Das Duplizieren-Symbol eines Tagesblocks übernimmt die Dauer dieses Blocks und
 setzt das Duplikat direkt davor. Reicht der Platz bis zum Tagesanfang nicht,
 wird die Startzeit so weit nach hinten verschoben, dass der vorherige Mode
@@ -183,11 +202,18 @@ Wochentags-Checkboxen, sodass die Bearbeitung keine weiteren Phasen erzeugt.
 Der globale Mode bleibt dabei unverändert.
 
 Zusätzlich zeigt jede Heizplan-Kachel die dort zugeordneten Modes mit ihrer
-Zieltemperatur. Ein Klick auf einen dieser Modes öffnet **Mode bearbeiten**.
-Die manuelle Aktivierung erfolgt über das Play-Symbol links oben in der
-Mode-Kachel. Sie aktiviert den Mode sofort als manuelle Auswahl für die
-zugeordneten Klima-Entitäten. Die manuelle Auswahl hat Vorrang bis zum
-nächsten geplanten Wechsel; danach übernimmt der Zeitplan wieder automatisch.
+wirksamen Zieltemperatur. Ein Klick auf einen dieser Modes öffnet **Mode
+bearbeiten**. Die dort eingetragene Temperatur überschreibt die zentrale
+Mode-Temperatur für die Phasen dieser Zuordnung; der globale Mode bleibt dabei
+unverändert. Der
+rechte Schalter steuert nur, ob die Mode-Zuordnung in der Automatik verwendet
+wird; das Play-Symbol links oben aktiviert den Mode dagegen sofort als manuelle
+Auswahl für die zugeordneten Klima-Entitäten. Die manuelle Auswahl hat Vorrang
+bis zum nächsten geplanten Wechsel; danach übernimmt der Zeitplan wieder
+automatisch. Wird anschließend eine andere pausierte Mode-Zuordnung über ihren
+rechten Schalter eingeschaltet, endet die manuelle Auswahl ebenfalls sofort und
+die zeitlich passende Zuordnung mit der höchsten Priorität wird angewendet. Das
+funktioniert auch bei pausiertem Heizplan.
 Die Kachel bleibt dabei bewusst kompakt und zeigt den zuletzt erfolgreich vom
 Climate Planner aktivierten Mode. Das gilt auch, wenn eine Automation einen
 Climate-Planner-Dienst oder Aktivierungs-Button verwendet.

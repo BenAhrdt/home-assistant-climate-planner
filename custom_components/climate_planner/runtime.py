@@ -54,6 +54,7 @@ from .const import (
 from .engine import (
     ActiveMatch,
     available_holiday_ids,
+    latest_assignment_phase,
     latest_auto_event,
     next_activation,
     next_auto_date,
@@ -442,12 +443,16 @@ class PlannerRuntime:
             if automatic_date:
                 upcoming_points.append(automatic_date)
             if schedule["enabled"]:
-                upcoming = next_activation(schedule, modes, now)
+                upcoming = next_activation(
+                    schedule, modes, now, holiday_region=self._holiday_region
+                )
                 if upcoming:
                     upcoming_points.append(upcoming)
             next_event = min(upcoming_points) if upcoming_points else None
             next_events[schedule["id"]] = next_event.isoformat() if next_event else None
-            weeks[schedule["id"]] = week_view(schedule, modes, now)
+            weeks[schedule["id"]] = week_view(
+                schedule, modes, now, holiday_region=self._holiday_region
+            )
         climate_entities = await self._async_climate_entities()
         window_labels = self._window_label_options()
         window_label_name = self.window_label_name
@@ -500,12 +505,26 @@ class PlannerRuntime:
             if mode is None or assignment is None:
                 raise InvalidData("unknown_mode_reference")
             now = self._now()
-            until = next_activation(schedule, self.data["modes"], now)
+            until = next_activation(
+                schedule, self.data["modes"], now, holiday_region=self._holiday_region
+            )
+            continuous = any(
+                rule.get("continuous") is True
+                for rule in assignment.get("auto_rules", [])
+                if isinstance(rule, dict)
+            )
+            latest_phase = None if continuous else latest_assignment_phase(assignment, now)
+            target_temperature = mode["target_temperature"]
+            if latest_phase and isinstance(latest_phase[1], dict):
+                target_temperature = latest_phase[1].get(
+                    "target_temperature", target_temperature
+                )
             self._manual_overrides[schedule_id] = {
                 "mode_id": mode_id,
                 "assignment_id": assignment["id"],
                 "activated_at": now,
                 "until": until,
+                "target_temperature": float(target_temperature),
             }
             # An explicit activation must reassert the mode even when its
             # mode/temperature tuple matches the previous automatic result.
@@ -571,11 +590,15 @@ class PlannerRuntime:
             )
             if assignment is None:
                 raise InvalidData("unknown_assignment")
+            was_enabled = assignment["enabled"]
             assignment["enabled"] = enabled
             normalized = validate_planner(candidate)
             normalized["revision"] = self.data["revision"] + 1
             await self.store.async_save(normalized)
             self.data = normalized
+            if enabled and not was_enabled:
+                self._manual_overrides.pop(schedule_id, None)
+                self._applied[schedule_id] = None
         await self.async_evaluate()
 
     async def _async_commit_configuration(self, candidate: dict[str, Any]) -> None:
@@ -766,6 +789,7 @@ class PlannerRuntime:
                     schedule,
                     self.data["modes"],
                     now,
+                    holiday_region=self._holiday_region,
                     respect_schedule_enabled=flags[0],
                     respect_assignment_enabled=flags[1],
                 )
@@ -775,7 +799,12 @@ class PlannerRuntime:
                         "mode_id": match.mode["id"],
                         "assignment_id": match.assignment["id"],
                         "activated_at": now,
-                        "until": next_activation(schedule, self.data["modes"], now),
+                        "until": next_activation(
+                            schedule,
+                            self.data["modes"],
+                            now,
+                            holiday_region=self._holiday_region,
+                        ),
                         "target_temperature": float(target_temperature),
                     }
                     self.active[schedule["id"]] = match
@@ -898,14 +927,30 @@ class PlannerRuntime:
             previous_enabled = {
                 schedule["id"]: schedule["enabled"] for schedule in self.data["schedules"]
             }
+            previous_assignment_enabled = {
+                schedule["id"]: {
+                    assignment["id"]: assignment["enabled"]
+                    for assignment in schedule["assignments"]
+                }
+                for schedule in self.data["schedules"]
+            }
             normalized = validate_planner(candidate)
             normalized["revision"] = self.data["revision"] + 1
             await self.store.async_save(normalized)
             self.data = normalized
             for schedule in normalized["schedules"]:
-                if schedule["enabled"] and previous_enabled.get(schedule["id"]) is False:
-                    self._manual_overrides.pop(schedule["id"], None)
-                    self._applied[schedule["id"]] = None
+                schedule_id = schedule["id"]
+                assignment_was_enabled = previous_assignment_enabled.get(schedule_id, {})
+                assignment_enabled = any(
+                    assignment["enabled"]
+                    and not assignment_was_enabled.get(assignment["id"], False)
+                    for assignment in schedule["assignments"]
+                )
+                if assignment_enabled or (
+                    schedule["enabled"] and previous_enabled.get(schedule_id) is False
+                ):
+                    self._manual_overrides.pop(schedule_id, None)
+                    self._applied[schedule_id] = None
         await self._async_refresh_window_tracking()
         await self.async_evaluate()
         return self.data["revision"]
@@ -1173,17 +1218,23 @@ class PlannerRuntime:
                 match = (
                     self._manual_match(schedule, modes, override, now)
                     if override
-                    else select_active_mode(schedule, modes, now)
+                    else select_active_mode(
+                        schedule, modes, now, holiday_region=self._holiday_region
+                    )
                 )
                 if override and match is None:
                     self._manual_overrides.pop(schedule["id"], None)
-                    match = select_active_mode(schedule, modes, now)
+                    match = select_active_mode(
+                        schedule, modes, now, holiday_region=self._holiday_region
+                    )
                 self.active[schedule["id"]] = match
                 automatic_date = next_auto_date(schedule, now, holiday_region=self._holiday_region)
                 if automatic_date:
                     next_points.append(automatic_date)
                 if schedule["enabled"]:
-                    upcoming = next_activation(schedule, modes, now)
+                    upcoming = next_activation(
+                        schedule, modes, now, holiday_region=self._holiday_region
+                    )
                     if upcoming:
                         next_points.append(upcoming)
                 desired = None

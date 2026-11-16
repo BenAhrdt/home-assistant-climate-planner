@@ -324,6 +324,28 @@ async def test_central_mode_temperature_change_reapplies_active_mode(fake_runtim
 
 
 @pytest.mark.asyncio
+async def test_manual_assignment_activation_uses_phase_temperature_override(fake_runtime):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    payload = planner_payload()
+    payload["schedules"][0]["assignments"][0]["weekday_rules"]["monday"] = [
+        {"id": "phase_home", "time": "00:00", "target_temperature": 22.5}
+    ]
+    runtime = PlannerRuntime(fake_runtime, "entry")
+    runtime._now = lambda: datetime(2026, 11, 16, 12, tzinfo=ZONE)
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+    fake_runtime.services.calls.clear()
+
+    await runtime.async_activate_mode("schedule_living", "mode_home", "assignment_home")
+
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 22.5
+    assert runtime._last_activated["schedule_living"]["target_temperature"] == 22.5
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
 async def test_multiple_climate_entities_receive_same_temperature(fake_runtime):
     fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
     fake_runtime.states.values["climate.bedroom"] = SimpleNamespace(state="heat")
@@ -402,6 +424,53 @@ async def test_manual_mode_activation_is_allowed_when_schedule_is_paused(fake_ru
     assert "schedule_living" not in runtime._manual_overrides
     assert len(fake_runtime.services.calls) == 2
     assert runtime._last_activated["schedule_living"]["mode_id"] == "mode_home"
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
+async def test_enabling_assignment_clears_manual_override_and_reselects_mode(fake_runtime):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    payload = planner_payload()
+    payload["modes"].append(
+        {"id": "mode_off", "name": "Off", "target_temperature": 18.5, "priority": 100}
+    )
+    payload["schedules"][0]["assignments"].append(
+        {
+            "id": "assignment_off",
+            "mode_id": "mode_off",
+            "enabled": False,
+            "weekday_rules": {
+                day: ["01:00"]
+                for day in (
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday",
+                    "saturday",
+                    "sunday",
+                )
+            },
+        }
+    )
+    runtime = PlannerRuntime(fake_runtime, "entry")
+    runtime._now = lambda: datetime(2026, 11, 16, 20, tzinfo=ZONE)
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+    await runtime.async_activate_mode("schedule_living", "mode_home")
+    fake_runtime.services.calls.clear()
+
+    changed = deepcopy(runtime.data)
+    changed["schedules"][0]["assignments"][1]["enabled"] = True
+    await runtime.async_replace(
+        {**changed, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+
+    assert "schedule_living" not in runtime._manual_overrides
+    assert runtime.active["schedule_living"].mode["id"] == "mode_off"
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 18.5
     await runtime.async_shutdown()
 
 
@@ -486,6 +555,46 @@ async def test_auto_dates_apply_in_order_and_manual_toggle_remains_independent(f
 
     await runtime.async_set_assignment_enabled("schedule_living", "assignment_home", False)
     assert runtime.data["schedules"][0]["assignments"][0]["enabled"] is False
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
+async def test_manual_mode_activation_applies_paused_plan_and_assignment(fake_runtime):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    payload = planner_payload()
+    payload["schedules"][0]["enabled"] = False
+    payload["modes"] = [{"id": "mode_off", "name": "Off", "target_temperature": 18.5}]
+    payload["schedules"][0]["assignments"] = [
+        {
+            "id": "assignment_off",
+            "mode_id": "mode_off",
+            "enabled": False,
+            "weekday_rules": {
+                day: ["01:00"]
+                for day in (
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday",
+                    "saturday",
+                    "sunday",
+                )
+            },
+        }
+    ]
+    runtime = PlannerRuntime(fake_runtime, "entry")
+    runtime._now = lambda: datetime(2026, 11, 16, 20, tzinfo=ZONE)
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+    fake_runtime.services.calls.clear()
+
+    await runtime.async_activate_mode("schedule_living", "mode_off", "assignment_off")
+
+    assert runtime.active["schedule_living"].mode["id"] == "mode_off"
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 18.5
     await runtime.async_shutdown()
 
 

@@ -39,7 +39,9 @@ Feedback-Regelkreise sind nicht Bestandteil dieser Integration.
   gehalten, erhält Vorrang bis zum nächsten geplanten Aktivierungszeitpunkt
   und wird danach automatisch verworfen. Sie kann auch bei pausierter
   automatischer Heizplan-Auswertung gesetzt werden und wird nicht als
-  dauerhafte Planänderung gespeichert.
+  dauerhafte Planänderung gespeichert. Wird eine bisher pausierte Mode-
+  Zuordnung eingeschaltet, endet ein aktiver manueller Override und die
+  zeitgesteuerte Auswahl wird sofort neu bewertet.
 - Der benutzerdefinierte Panel-Code nutzt ausschließlich das authentifizierte
   Home-Assistant-WebSocket und den vorhandenen `panel_custom`-Mechanismus.
 
@@ -74,6 +76,7 @@ Planner
         │   ├── date?             # ISO-Datum für kind=date
         │   ├── holiday?          # unterstützter Feiertag für kind=holiday
         │   ├── recurrence?       # hourly, daily, weekly, monthly, quarterly, yearly
+        │   ├── continuous?       # Auto-ein bis Auto-aus ohne weekday_rules
         │   └── actions           # mindestens on oder off
         │       ├── on?
         │       │   ├── time       # HH:mm
@@ -97,9 +100,21 @@ nächste Zeitgrenze mitverschoben, damit die bisherige Blockdauer erhalten
 bleibt; die Laufzeit wendet weiterhin nur die konfigurierten Aktivierungszeiten
 an.
 
+Die Wochenansicht liefert zusätzlich pro aktivierter Mode-Zuordnung eine eigene
+Spur, damit parallele Zuordnungen desselben Tages nebeneinander statt als eine
+gemeinsame Gewinner-Timeline sichtbar sind. Diese Spuren verwenden nur die
+Phasen des jeweiligen Tages und übernehmen keine Phase des Vortags vor der
+ersten Tagesphase.
+
 Die Umstellung von `climate_entity_id` auf `climate_entity_ids` bleibt innerhalb
 von Schema 1 abwärtskompatibel: Beim Laden wird ein früherer Einzelwert in eine
 Liste überführt und anschließend kanonisch gespeichert.
+
+Eine Temperatur-Übersteuerung an einer Phase gehört zur jeweiligen
+Mode-Zuordnung im Heizplan und verändert den globalen Mode nicht. Die
+Heizplankachel zeigt diese Zuordnungstemperatur an, sofern sie für alle Phasen
+gleich ist; bei einer manuellen Aktivierung wird die aktuell gültige
+Phasen-Übersteuerung ebenfalls verwendet.
 
 Der WebSocket-Snapshot ergänzt die gespeicherten Entity-IDs nur für die Anzeige
 um Namen von Integration, Bereich und Gerät aus den entsprechenden
@@ -128,7 +143,11 @@ eine eigene Auto-aus-Regel benötigt. Wird eine Mode-Zuordnung durch eine
 automatische Regel freigeschaltet, beginnt ihre Temperaturwirkung am jeweiligen
 Tag erst mit der erreichten Wochenphase dieses Tages. Eine Tagesphase um
 00:00 erlaubt die sofortige Wirkung bei Auto ein; Phasen vergangener Tage
-werden für diese automatische Freigabe nicht übernommen.
+werden für diese automatische Freigabe nicht übernommen. Setzt eine Regel
+`continuous: true`, bildet dagegen das automatische Auto-ein-Ereignis die
+Aktivierungsgrenze und das Auto-aus-Ereignis die Deaktivierungsgrenze; die
+Wochentagsphasen werden in diesem Zeitraum nicht benötigt und können leer sein.
+Sie bleiben bei einer späteren Abwahl der Option als Konfiguration erhalten.
 Jede Regel kann optional eine eigene Bezeichnung tragen. Die Reihenfolge der
 Regeln ist die Reihenfolge der Liste und kann im Panel per Drag-and-Drop geändert
 werden; sie wird beim Speichern zusammen mit den Regeln übernommen.
@@ -172,7 +191,10 @@ aktuellen Tages berücksichtigt, die bereits erreicht sind. Zuerst gewinnt der
 Mode mit der höheren Priorität. Bei gleicher Priorität gewinnt die jüngste
 passende Aktivierung; bei identischem Zeitpunkt entscheiden die konfigurierte
 Zuordnungs- und Mode-Reihenfolge deterministisch. Pausierte Mode-Zuordnungen
-werden in der normalen Auswahl übersprungen.
+werden in der normalen Auswahl übersprungen. Beginnt eine höher priorisierte
+Zuordnung am aktuellen Tag erst später, wird ihr Carry-over aus dem Vortag bis
+zu dieser ersten Tagesphase nicht vorgezogen; ein niedriger priorisierter
+Carry-over kann in dieser Zeit weiter gültig bleiben.
 
 Die drei expliziten Apply-Dienste bilden die ioBroker-Aktionen ab:
 
@@ -204,7 +226,9 @@ Polling noch automatische Nachregelung.
 Beim Übergang eines Heizplans von pausiert zu aktiviert wird ein vorhandener
 manueller Override beendet, der zu diesem Zeitpunkt passende Zeitplan-Mode
 sofort ausgewertet und dessen Sollwert erneut angewendet. Dies gilt für das
-Panel und den Home-Assistant-Switch gleichermaßen.
+Panel und den Home-Assistant-Switch gleichermaßen. Das Einschalten einer
+bisher pausierten Mode-Zuordnung hat dieselbe Wirkung auf einen manuellen
+Override, ohne den Heizplan-Schalter zu verändern.
 
 Für die Fensterabsenkung wird das Home-Assistant-Label zentral im Panel unter
 „Allgemeine Einstellungen“ ausgewählt; die deutsche Feiertagsregion wird dort

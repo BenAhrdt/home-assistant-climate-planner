@@ -309,13 +309,13 @@ def _cycle_occurrences(
     return [max(occurrences)] if occurrences else []
 
 
-def latest_auto_event(
+def _latest_auto_event_details(
     assignment: dict,
     now: datetime,
     *,
     holiday_region: str = DEFAULT_HOLIDAY_REGION,
-) -> tuple[str, bool] | None:
-    """Return the latest reached date, holiday, or cyclic rule event."""
+) -> tuple[datetime, str, bool] | None:
+    """Return the latest reached automatic event with its occurrence."""
 
     local_now = _local_now(now)
     zone = local_now.tzinfo
@@ -339,7 +339,22 @@ def latest_auto_event(
                 events.append((occurrence, tie_breaker, index + 1, marker, enabled))
     if not events:
         return None
-    _occurrence, _tie_breaker, _index, marker, enabled = max(events)
+    occurrence, _tie_breaker, _index, marker, enabled = max(events)
+    return occurrence, marker, enabled
+
+
+def latest_auto_event(
+    assignment: dict,
+    now: datetime,
+    *,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
+) -> tuple[str, bool] | None:
+    """Return the latest reached date, holiday, or cyclic rule event."""
+
+    details = _latest_auto_event_details(assignment, now, holiday_region=holiday_region)
+    if details is None:
+        return None
+    _occurrence, marker, enabled = details
     return marker, enabled
 
 
@@ -399,6 +414,7 @@ def _candidates(
     now: datetime,
     *,
     days: int,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
     respect_schedule_enabled: bool = True,
     respect_assignment_enabled: bool = True,
 ) -> list[tuple]:
@@ -421,6 +437,44 @@ def _candidates(
         mode = mode_by_id.get(assignment["mode_id"])
         if mode is None:
             continue
+        continuous = any(
+            rule.get("continuous") is True
+            for rule in assignment.get("auto_rules", [])
+            if isinstance(rule, dict)
+        )
+        if continuous:
+            details = _latest_auto_event_details(
+                assignment, local_now, holiday_region=holiday_region
+            )
+            has_auto_on = any(
+                action == "on"
+                for rule in assignment.get("auto_rules", [])
+                if isinstance(rule, dict)
+                for action, _config in _auto_rule_actions(rule)
+            )
+            if details is None and has_auto_on:
+                continue
+            if details is not None and not details[2]:
+                continue
+            occurrence = details[0] if details is not None else _at_local(
+                local_now.date(), "00:00", zone
+            )
+            phase = {
+                "id": details[1] if details is not None else f"continuous:{assignment['id']}",
+                "time": occurrence.strftime("%H:%M"),
+            }
+            candidates.append(
+                (
+                    occurrence,
+                    assignment_index,
+                    -1,
+                    mode_order.get(mode["id"], -1),
+                    mode,
+                    assignment,
+                    phase,
+                )
+            )
+            continue
         for days_ago in day_offsets:
             day = local_now.date() - timedelta(days=days_ago)
             weekday = WEEKDAYS[day.weekday()]
@@ -442,11 +496,31 @@ def _candidates(
     return candidates
 
 
+def latest_assignment_phase(
+    assignment: dict, now: datetime
+) -> tuple[datetime, dict | str] | None:
+    """Return the latest phase of one assignment that has already started."""
+
+    local_now = _local_now(now)
+    zone = local_now.tzinfo
+    assert zone is not None
+    latest: tuple[datetime, dict | str] | None = None
+    for days_ago in range(8):
+        day = local_now.date() - timedelta(days=days_ago)
+        weekday = WEEKDAYS[day.weekday()]
+        for phase in assignment["weekday_rules"].get(weekday, []):
+            occurrence = _at_local(day, _phase_time(phase), zone)
+            if occurrence <= local_now and (latest is None or occurrence > latest[0]):
+                latest = (occurrence, phase)
+    return latest
+
+
 def select_active_mode(
     schedule: dict,
     modes: list[dict],
     now: datetime,
     *,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
     respect_schedule_enabled: bool = True,
     respect_assignment_enabled: bool = True,
 ) -> ActiveMatch | None:
@@ -456,7 +530,9 @@ def select_active_mode(
     activation, then configured assignment and mode order as deterministic
     tie-breakers. Assignments with automatic rules only use phases already
     reached on the current local day; a 00:00 phase makes them available
-    immediately after an automatic enable event.
+    immediately after an automatic enable event. A higher-priority assignment
+    whose first phase today is still in the future cannot win early through a
+    carry-over from the previous day.
     """
 
     if respect_schedule_enabled and not schedule["enabled"]:
@@ -466,11 +542,45 @@ def select_active_mode(
         modes,
         now,
         days=7,
+        holiday_region=holiday_region,
         respect_schedule_enabled=respect_schedule_enabled,
         respect_assignment_enabled=respect_assignment_enabled,
     )
     if not candidates:
         return None
+    local_now = _local_now(now)
+    local_minutes = local_now.hour * 60 + local_now.minute + local_now.second / 60
+    weekday = WEEKDAYS[local_now.weekday()]
+    first_phase_today = {
+        assignment["id"]: min(
+            int(_phase_time(phase)[:2]) * 60 + int(_phase_time(phase)[3:])
+            for phase in assignment["weekday_rules"].get(weekday, [])
+        )
+        for assignment in schedule["assignments"]
+        if assignment["weekday_rules"].get(weekday)
+    }
+    future_assignments = {
+        assignment_id
+        for assignment_id, first_start in first_phase_today.items()
+        if first_start > local_minutes
+    }
+    if future_assignments:
+        def is_carryover(item: tuple) -> bool:
+            return item[0].date() < local_now.date() and item[5]["id"] in future_assignments
+
+        fallback_candidates = [item for item in candidates if not is_carryover(item)]
+        if not fallback_candidates:
+            return None
+        fallback_priority = min(
+            item[4].get("priority", 0) for item in fallback_candidates
+        )
+        candidates = [
+            item
+            for item in candidates
+            if not (is_carryover(item) and item[4].get("priority", 0) > fallback_priority)
+        ]
+        if not candidates:
+            return None
     occurrence, _assignment_index, _time_index, _mode_index, mode, assignment, phase = max(
         candidates,
         key=lambda item: (
@@ -484,7 +594,13 @@ def select_active_mode(
     return ActiveMatch(mode=mode, assignment=assignment, phase=phase, occurrence=occurrence)
 
 
-def next_activation(schedule: dict, modes: list[dict], now: datetime) -> datetime | None:
+def next_activation(
+    schedule: dict,
+    modes: list[dict],
+    now: datetime,
+    *,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
+) -> datetime | None:
     """Return the next configured activation strictly after ``now``."""
 
     local_now = _local_now(now)
@@ -497,21 +613,86 @@ def next_activation(schedule: dict, modes: list[dict], now: datetime) -> datetim
         weekday = WEEKDAYS[day.weekday()]
         for assignment in schedule["assignments"]:
             mode = mode_by_id.get(assignment["mode_id"])
-            if not assignment["enabled"] or mode is None:
+            continuous = any(
+                rule.get("continuous") is True
+                for rule in assignment.get("auto_rules", [])
+                if isinstance(rule, dict)
+            )
+            if mode is None or (not continuous and not assignment["enabled"]):
                 continue
-            for phase in assignment["weekday_rules"].get(weekday, []):
-                time_text = _phase_time(phase)
-                occurrence = _at_local(day, time_text, zone)
-                if occurrence > local_now:
-                    occurrences.append(occurrence)
+            if not continuous:
+                for phase in assignment["weekday_rules"].get(weekday, []):
+                    time_text = _phase_time(phase)
+                    occurrence = _at_local(day, time_text, zone)
+                    if occurrence > local_now:
+                        occurrences.append(occurrence)
+            if offset == 0 and continuous:
+                occurrences.extend(
+                    event[0]
+                    for event in _next_auto_events(
+                        assignment, local_now, holiday_region=holiday_region
+                    )
+                )
     return min(occurrences) if occurrences else None
 
 
-def week_view(schedule: dict, modes: list[dict], now: datetime) -> dict:
+def _continuous_auto_segments(
+    assignment: dict,
+    day: date,
+    zone: tzinfo,
+    *,
+    holiday_region: str,
+) -> list[dict]:
+    """Return one day's segments for an assignment with continuous auto mode."""
+
+    day_start = _at_local(day, "00:00", zone)
+    day_end = day_start + timedelta(days=1)
+    details = _latest_auto_event_details(assignment, day_start, holiday_region=holiday_region)
+    has_auto_on = any(
+        action == "on"
+        for rule in assignment.get("auto_rules", [])
+        if isinstance(rule, dict)
+        for action, _config in _auto_rule_actions(rule)
+    )
+    active = details[2] if details is not None else not has_auto_on and assignment["enabled"]
+    events = sorted(
+        event
+        for event in _next_auto_events(
+            assignment, day_start - timedelta(seconds=1), holiday_region=holiday_region
+        )
+        if day_start <= event[0] < day_end
+    )
+    segments: list[dict] = []
+    cursor = 0
+    for occurrence, _tie_breaker, _index, _marker, enabled in events:
+        minute = max(0, min(1440, int((occurrence - day_start).total_seconds() // 60)))
+        if enabled and not active:
+            active = True
+            cursor = minute
+        elif not enabled and active:
+            if minute > cursor:
+                segments.append({"start": cursor, "end": minute})
+            active = False
+            cursor = minute
+    if active and cursor < 1440:
+        segments.append({"start": cursor, "end": 1440})
+    return segments
+
+
+def week_view(
+    schedule: dict,
+    modes: list[dict],
+    now: datetime,
+    *,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
+) -> dict:
     """Build display segments for Monday through Sunday in the HA time zone.
 
     A final phase without a following boundary extends to the fixed day end.
-    Actual climate changes remain driven by configured activation start times.
+    The returned per-assignment tracks use only the phases of each displayed
+    day. Continuous automatic assignments instead use their automatic event
+    period. Actual climate changes remain driven by configured activation
+    start times.
     """
 
     local_now = _local_now(now)
@@ -522,12 +703,98 @@ def week_view(schedule: dict, modes: list[dict], now: datetime) -> dict:
         day = local_now.date() - timedelta(days=local_now.weekday()) + timedelta(days=weekday_index)
         day_start = _at_local(day, "00:00", zone)
         mode_by_id = _mode_map(modes)
+        tracks: list[dict] = []
+        for assignment in schedule["assignments"]:
+            mode = mode_by_id.get(assignment["mode_id"])
+            phases = sorted(
+                assignment["weekday_rules"].get(weekday, []),
+                key=_phase_time,
+            )
+            continuous = any(
+                rule.get("continuous") is True
+                for rule in assignment.get("auto_rules", [])
+                if isinstance(rule, dict)
+            )
+            if mode is None or (not continuous and not assignment["enabled"]):
+                continue
+            auto_segments = (
+                _continuous_auto_segments(
+                    assignment, day, zone, holiday_region=holiday_region
+                )
+                if continuous
+                else []
+            )
+            if continuous and not auto_segments:
+                continue
+            if not continuous and not phases:
+                continue
+            track_segments = []
+            phase_segments = (
+                [(segment["start"], segment["end"], None) for segment in auto_segments]
+                if continuous
+                else [
+                    (
+                        int(_phase_time(phase)[:2]) * 60 + int(_phase_time(phase)[3:]),
+                        (
+                            int(_phase_time(phases[phase_index + 1])[:2]) * 60
+                            + int(_phase_time(phases[phase_index + 1])[3:])
+                            if phase_index + 1 < len(phases)
+                            else 1440
+                        ),
+                        phase,
+                    )
+                    for phase_index, phase in enumerate(phases)
+                ]
+            )
+            for start, end, phase in phase_segments:
+                track_segments.append(
+                    {
+                        "start": start,
+                        "end": end,
+                        "mode_id": mode["id"],
+                        "mode_name": mode["name"],
+                        "target_temperature": (
+                            phase.get("target_temperature", mode["target_temperature"])
+                            if isinstance(phase, dict)
+                            else mode["target_temperature"]
+                        ),
+                        "color": mode.get("color"),
+                        "icon": mode.get("icon"),
+                        "phase_id": phase.get("id") if isinstance(phase, dict) else None,
+                        "assignment_id": assignment["id"],
+                    }
+                )
+            tracks.append(
+                {
+                    "assignment_id": assignment["id"],
+                    "mode_id": mode["id"],
+                    "mode_name": mode["name"],
+                    "color": mode.get("color"),
+                    "icon": mode.get("icon"),
+                    "segments": track_segments,
+                }
+            )
         points = sorted(
             {
                 int(_phase_time(phase)[:2]) * 60 + int(_phase_time(phase)[3:])
                 for assignment in schedule["assignments"]
                 if assignment["enabled"] and mode_by_id.get(assignment["mode_id"]) is not None
                 for phase in assignment["weekday_rules"].get(weekday, [])
+            }
+            | {
+                boundary
+                for assignment in schedule["assignments"]
+                if mode_by_id.get(assignment["mode_id"]) is not None
+                and any(
+                    rule.get("continuous") is True
+                    for rule in assignment.get("auto_rules", [])
+                    if isinstance(rule, dict)
+                )
+                for segment in _continuous_auto_segments(
+                    assignment, day, zone, holiday_region=holiday_region
+                )
+                for boundary in (segment["start"], segment["end"])
+                if boundary < 1440
             }
         )
         segments: list[dict] = []
@@ -548,6 +815,7 @@ def week_view(schedule: dict, modes: list[dict], now: datetime) -> dict:
                 schedule,
                 modes,
                 _day_start + timedelta(minutes=start),
+                holiday_region=holiday_region,
                 respect_schedule_enabled=False,
             )
             if not match:
@@ -576,7 +844,7 @@ def week_view(schedule: dict, modes: list[dict], now: datetime) -> dict:
             append_segment(cursor, point)
             cursor = point
         append_segment(cursor, 1440)
-        days.append({"weekday": weekday, "segments": segments})
+        days.append({"weekday": weekday, "segments": segments, "tracks": tracks})
     current_minute = None
     if schedule["enabled"]:
         current_minute = local_now.hour * 60 + local_now.minute + local_now.second / 60
