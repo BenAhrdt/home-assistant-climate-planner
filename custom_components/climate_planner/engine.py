@@ -84,10 +84,7 @@ def available_holiday_ids(region: str = DEFAULT_HOLIDAY_REGION) -> tuple[str, ..
         for holiday in AUTO_RULE_HOLIDAYS
         if (
             holiday in HOLIDAY_NATIONAL
-            or (
-                holiday not in HOLIDAY_STATE_AVAILABILITY
-                and holiday not in {"whit_sunday"}
-            )
+            or (holiday not in HOLIDAY_STATE_AVAILABILITY and holiday not in {"whit_sunday"})
             or region in HOLIDAY_STATE_AVAILABILITY.get(holiday, frozenset())
         )
     )
@@ -208,14 +205,20 @@ def _auto_rule_events(
                 matches = event_date >= current_date if future_only else event_date <= current_date
                 if matches:
                     marker = f"auto_rule:{rule.get('id', index)}:{action}:{event_date}"
-                    events.append((event_date, action_time, tie_breaker, index + 1, marker, enabled))
+                    events.append(
+                        (event_date, action_time, tie_breaker, index + 1, marker, enabled)
+                    )
                 continue
             for year in years:
                 for event_date in _auto_rule_dates(rule, year, holiday_region=holiday_region):
-                    matches = event_date >= current_date if future_only else event_date <= current_date
+                    matches = (
+                        event_date >= current_date if future_only else event_date <= current_date
+                    )
                     if matches:
                         marker = f"auto_rule:{rule.get('id', index)}:{action}:{event_date}"
-                        events.append((event_date, action_time, tie_breaker, index + 1, marker, enabled))
+                        events.append(
+                            (event_date, action_time, tie_breaker, index + 1, marker, enabled)
+                        )
     return events
 
 
@@ -265,9 +268,7 @@ def _cycle_occurrences(
     )
     start = _at_local(anchor_date, _auto_action_time(action_config), zone)
     end_date = (
-        date.fromisoformat(action_config["end_date"])
-        if action_config.get("end_date")
-        else None
+        date.fromisoformat(action_config["end_date"]) if action_config.get("end_date") else None
     )
     recurrence = rule["recurrence"]
     if recurrence in {"hourly", "daily", "weekly"}:
@@ -456,8 +457,8 @@ def _candidates(
                 continue
             if details is not None and not details[2]:
                 continue
-            occurrence = details[0] if details is not None else _at_local(
-                local_now.date(), "00:00", zone
+            occurrence = (
+                details[0] if details is not None else _at_local(local_now.date(), "00:00", zone)
             )
             phase = {
                 "id": details[1] if details is not None else f"continuous:{assignment['id']}",
@@ -496,9 +497,7 @@ def _candidates(
     return candidates
 
 
-def latest_assignment_phase(
-    assignment: dict, now: datetime
-) -> tuple[datetime, dict | str] | None:
+def latest_assignment_phase(assignment: dict, now: datetime) -> tuple[datetime, dict | str] | None:
     """Return the latest phase of one assignment that has already started."""
 
     local_now = _local_now(now)
@@ -565,15 +564,14 @@ def select_active_mode(
         if first_start > local_minutes
     }
     if future_assignments:
+
         def is_carryover(item: tuple) -> bool:
             return item[0].date() < local_now.date() and item[5]["id"] in future_assignments
 
         fallback_candidates = [item for item in candidates if not is_carryover(item)]
         if not fallback_candidates:
             return None
-        fallback_priority = min(
-            item[4].get("priority", 0) for item in fallback_candidates
-        )
+        fallback_priority = min(item[4].get("priority", 0) for item in fallback_candidates)
         candidates = [
             item
             for item in candidates
@@ -718,9 +716,7 @@ def week_view(
             if mode is None or (not continuous and not assignment["enabled"]):
                 continue
             auto_segments = (
-                _continuous_auto_segments(
-                    assignment, day, zone, holiday_region=holiday_region
-                )
+                _continuous_auto_segments(assignment, day, zone, holiday_region=holiday_region)
                 if continuous
                 else []
             )

@@ -269,9 +269,7 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
                 normalized["start_time"] = start_time
                 if start_date:
                     normalized["start_date"] = start_date
-                end_date = _optional_date(
-                    raw_rule.get("end_date"), "invalid_auto_rule_end_date"
-                )
+                end_date = _optional_date(raw_rule.get("end_date"), "invalid_auto_rule_end_date")
                 if end_date and start_date and end_date < start_date:
                     raise InvalidData("invalid_auto_rule_end_date")
                 if end_date:
@@ -279,10 +277,7 @@ def _normalize_auto_rules(value: object, seen: set[str]) -> list[dict]:
         if "actions" in raw_rule:
             if "name" not in normalized:
                 raise InvalidData("invalid_auto_rule_name")
-            if any(
-                key in raw_rule
-                for key in ("action", "start_date", "start_time", "end_date")
-            ):
+            if any(key in raw_rule for key in ("action", "start_date", "start_time", "end_date")):
                 raise InvalidData("invalid_auto_rule")
             raw_actions = raw_rule.get("actions")
             if (

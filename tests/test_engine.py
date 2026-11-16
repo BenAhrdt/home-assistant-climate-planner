@@ -326,10 +326,9 @@ def test_week_view_keeps_parallel_assignments_in_separate_tracks():
         "base-rule",
         "off-rule",
     ]
-    assert [
-        (segment["start"], segment["end"])
-        for segment in monday["tracks"][1]["segments"]
-    ] == [(60, 1440)]
+    assert [(segment["start"], segment["end"]) for segment in monday["tracks"][1]["segments"]] == [
+        (60, 1440)
+    ]
 
 
 def test_week_view_keeps_last_phase_until_day_end():

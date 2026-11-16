@@ -516,9 +516,7 @@ class PlannerRuntime:
             latest_phase = None if continuous else latest_assignment_phase(assignment, now)
             target_temperature = mode["target_temperature"]
             if latest_phase and isinstance(latest_phase[1], dict):
-                target_temperature = latest_phase[1].get(
-                    "target_temperature", target_temperature
-                )
+                target_temperature = latest_phase[1].get("target_temperature", target_temperature)
             self._manual_overrides[schedule_id] = {
                 "mode_id": mode_id,
                 "assignment_id": assignment["id"],
