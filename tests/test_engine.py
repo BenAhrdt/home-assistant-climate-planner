@@ -95,6 +95,12 @@ def test_week_view_resolves_same_priority_modes_into_one_day_sequence():
         (1080, 1439, "sleep"),
         (1439, 1440, "play"),
     ]
+    assert len(monday["priority_tracks"]) == 1
+    assert [(segment["start"], segment["end"], segment["mode_id"]) for segment in monday["priority_tracks"][0]["segments"]] == [
+        (0, 1080, "play"),
+        (1080, 1439, "sleep"),
+        (1439, 1440, "play"),
+    ]
 
 
 def test_same_activation_time_uses_later_assignment_deterministically():
@@ -227,6 +233,9 @@ def test_continuous_auto_rule_uses_auto_period_without_weekday_phases():
     assert [(segment["start"], segment["end"]) for segment in monday["tracks"][0]["segments"]] == [
         (540, 1320)
     ]
+    assert [(segment["start"], segment["end"]) for segment in monday["priority_tracks"][0]["segments"]] == [
+        (540, 1320)
+    ]
 
 
 def test_week_view_shows_future_continuous_auto_period_while_assignment_is_paused():
@@ -350,6 +359,10 @@ def test_week_view_keeps_parallel_assignments_in_separate_tracks():
     ]
     assert [(segment["start"], segment["end"]) for segment in monday["tracks"][1]["segments"]] == [
         (60, 1440)
+    ]
+    assert [lane["priority"] for lane in monday["priority_tracks"]] == [0, 100]
+    assert [(segment["start"], segment["end"], segment["mode_id"]) for segment in monday["priority_tracks"][1]["segments"]] == [
+        (60, 1440, "off")
     ]
 
 

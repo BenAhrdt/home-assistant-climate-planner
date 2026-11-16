@@ -1075,29 +1075,35 @@ class ClimatePlannerPanel extends HTMLElement {
     const schedule = this.data.schedules.find((item) => item.id === this.selectedSchedule);
     const admin = Boolean(this._hass.user?.is_admin);
     const days = view?.days.map((day) => {
-      const resolvedSegments = day.segments || [];
-      const segments = resolvedSegments.map((segment, segmentIndex) => {
-        const startText = `${String(Math.floor(segment.start / 60)).padStart(2, "0")}:${String(segment.start % 60).padStart(2, "0")}`;
-        const endText = `${String(Math.floor(segment.end / 60)).padStart(2, "0")}:${String(segment.end % 60).padStart(2, "0")}`;
-        const phaseStartsHere = this.phaseStartsSegment(schedule, day.weekday, segment);
-        const phaseId = phaseStartsHere ? segment.phase_id || "" : "";
-        const duplicate = admin && phaseStartsHere
-          ? `<button type="button" class="segment-duplicate" data-duplicate-phase aria-label="${escapeHTML(this.t.duplicate)}" title="${escapeHTML(this.t.duplicate)}" draggable="false"><ha-icon icon="mdi:content-copy" aria-hidden="true"></ha-icon></button>`
-          : "";
-        const transitionPhaseId = phaseStartsHere && schedule ? this.phaseForSegmentStart(schedule, day.weekday, segment) : "";
-        const previousSegment = resolvedSegments[segmentIndex - 1];
-        const nextSegment = resolvedSegments[segmentIndex + 1];
-        const minimumStart = previousSegment ? previousSegment.start + 15 : 0;
-        const maximumStart = nextSegment ? nextSegment.start - 15 : 1439;
-        const transition = admin && transitionPhaseId
-          ? `<span class="transition-handle" data-phase-id="${escapeHTML(transitionPhaseId)}" data-segment-day="${escapeHTML(day.weekday)}" data-min-start="${minimumStart}" data-max-start="${maximumStart}" style="top:${(segment.start / 1440) * 100}%" tabindex="0" title="${escapeHTML(this.t.transition)}" draggable="false"></span>`
-          : "";
-        return `<div class="segment" draggable="${admin && Boolean(phaseId)}" data-phase-id="${escapeHTML(phaseId)}" data-segment-day="${escapeHTML(day.weekday)}" data-segment-start="${segment.start}" data-segment-end="${segment.end}" style="top:${(segment.start / 1440) * 100}%;height:${((segment.end - segment.start) / 1440) * 100}%;${segment.color ? `border-left-color:${escapeHTML(segment.color)};background:color-mix(in srgb,${escapeHTML(segment.color)} 20%,var(--card-background-color))` : ""}">${duplicate}<div class="segment-head">${segment.icon ? `<ha-icon class="segment-icon" icon="${escapeHTML(segment.icon)}"></ha-icon>` : ""}<strong>${escapeHTML(segment.mode_name)}</strong></div><small>${escapeHTML(this.temperatureText(segment.target_temperature))}</small><small class="segment-time">${escapeHTML(startText)}–${escapeHTML(endText)}</small></div>${transition}`;
+      const laneTracks = Array.isArray(day.priority_tracks) && day.priority_tracks.length
+        ? day.priority_tracks
+        : [{ priority: 0, segments: day.segments || [] }];
+      const lanes = laneTracks.map((laneTrack) => {
+        const resolvedSegments = laneTrack.segments || [];
+        const segments = resolvedSegments.map((segment, segmentIndex) => {
+          const startText = `${String(Math.floor(segment.start / 60)).padStart(2, "0")}:${String(segment.start % 60).padStart(2, "0")}`;
+          const endText = `${String(Math.floor(segment.end / 60)).padStart(2, "0")}:${String(segment.end % 60).padStart(2, "0")}`;
+          const phaseStartsHere = this.phaseStartsSegment(schedule, day.weekday, segment);
+          const phaseId = phaseStartsHere ? segment.phase_id || "" : "";
+          const duplicate = admin && phaseStartsHere
+            ? `<button type="button" class="segment-duplicate" data-duplicate-phase aria-label="${escapeHTML(this.t.duplicate)}" title="${escapeHTML(this.t.duplicate)}" draggable="false"><ha-icon icon="mdi:content-copy" aria-hidden="true"></ha-icon></button>`
+            : "";
+          const transitionPhaseId = phaseStartsHere && schedule ? this.phaseForSegmentStart(schedule, day.weekday, segment) : "";
+          const previousSegment = resolvedSegments[segmentIndex - 1];
+          const nextSegment = resolvedSegments[segmentIndex + 1];
+          const minimumStart = previousSegment ? previousSegment.start + 15 : 0;
+          const maximumStart = nextSegment ? nextSegment.start - 15 : 1439;
+          const transition = admin && transitionPhaseId
+            ? `<span class="transition-handle" data-phase-id="${escapeHTML(transitionPhaseId)}" data-segment-day="${escapeHTML(day.weekday)}" data-min-start="${minimumStart}" data-max-start="${maximumStart}" style="top:${(segment.start / 1440) * 100}%" tabindex="0" title="${escapeHTML(this.t.transition)}" draggable="false"></span>`
+            : "";
+          return `<div class="segment" draggable="${admin && Boolean(phaseId)}" data-phase-id="${escapeHTML(phaseId)}" data-segment-day="${escapeHTML(day.weekday)}" data-segment-start="${segment.start}" data-segment-end="${segment.end}" style="top:${(segment.start / 1440) * 100}%;height:${((segment.end - segment.start) / 1440) * 100}%;${segment.color ? `border-left-color:${escapeHTML(segment.color)};background:color-mix(in srgb,${escapeHTML(segment.color)} 20%,var(--card-background-color))` : ""}">${duplicate}<div class="segment-head">${segment.icon ? `<ha-icon class="segment-icon" icon="${escapeHTML(segment.icon)}"></ha-icon>` : ""}<strong>${escapeHTML(segment.mode_name)}</strong></div><small>${escapeHTML(this.temperatureText(segment.target_temperature))}</small><small class="segment-time">${escapeHTML(startText)}–${escapeHTML(endText)}</small></div>${transition}`;
+        }).join("");
+        return `<div class="day-lane" data-priority="${escapeHTML(String(laneTrack.priority ?? 0))}">${segments}</div>`;
       }).join("");
       const nowLine = view.current_weekday === day.weekday && view.current_minute != null
         ? `<div class="now-line" style="top:${(view.current_minute / 1440) * 100}%" title="now"></div>`
         : "";
-      return `<section class="day-column"><h3>${escapeHTML(this.t[day.weekday])}</h3><div class="day-track" data-drop-day="${escapeHTML(day.weekday)}"><div class="drop-indicator" hidden><span></span></div><div class="day-lanes"><div class="day-lane" data-assignment-id="resolved">${segments}</div></div>${nowLine}<div class="time-labels"><span style="top:0">00:00</span><span style="top:25%">06:00</span><span style="top:50%">12:00</span><span style="top:75%">18:00</span></div></div></section>`;
+      return `<section class="day-column"><h3>${escapeHTML(this.t[day.weekday])}</h3><div class="day-track" data-drop-day="${escapeHTML(day.weekday)}"><div class="drop-indicator" hidden><span></span></div><div class="day-lanes">${lanes}</div>${nowLine}<div class="time-labels"><span style="top:0">00:00</span><span style="top:25%">06:00</span><span style="top:50%">12:00</span><span style="top:75%">18:00</span></div></div></section>`;
     }).join("") || "";
     const minimumDayWidth = 150;
     const usedModes = [];

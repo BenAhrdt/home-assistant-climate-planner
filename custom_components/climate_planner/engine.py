@@ -681,6 +681,90 @@ def _continuous_auto_segments(
     return segments
 
 
+def _priority_week_segments(
+    schedule: dict,
+    assignments: list[dict],
+    modes: list[dict],
+    day: date,
+    zone: tzinfo,
+    *,
+    holiday_region: str,
+) -> list[dict]:
+    """Resolve one priority lane into sequential segments for one day."""
+
+    mode_by_id = _mode_map(modes)
+    points: set[int] = set()
+    for assignment in assignments:
+        mode = mode_by_id.get(assignment["mode_id"])
+        continuous = assignment.get("continuous") is True or any(
+            rule.get("continuous") is True
+            for rule in assignment.get("auto_rules", [])
+            if isinstance(rule, dict)
+        )
+        if mode is None or (not continuous and not assignment["enabled"]):
+            continue
+        if continuous:
+            auto_segments = _continuous_auto_segments(
+                assignment, day, zone, holiday_region=holiday_region
+            )
+            points.update(
+                boundary
+                for segment in auto_segments
+                for boundary in (segment["start"], segment["end"])
+                if boundary < 1440
+            )
+        else:
+            points.update(
+                int(_phase_time(phase)[:2]) * 60 + int(_phase_time(phase)[3:])
+                for phase in assignment["weekday_rules"].get(
+                    WEEKDAYS[day.weekday()], []
+                )
+            )
+
+    lane_schedule = {**schedule, "assignments": assignments}
+    day_start = _at_local(day, "00:00", zone)
+    segments: list[dict] = []
+
+    def append_segment(start: int, end: int) -> None:
+        if end <= start:
+            return
+        match = select_active_mode(
+            lane_schedule,
+            modes,
+            day_start + timedelta(minutes=start),
+            holiday_region=holiday_region,
+            respect_schedule_enabled=False,
+            respect_assignment_enabled=False,
+        )
+        if not match:
+            return
+        mode = match.mode
+        segments.append(
+            {
+                "start": start,
+                "end": end,
+                "mode_id": mode["id"],
+                "mode_name": mode["name"],
+                "target_temperature": (
+                    match.phase.get("target_temperature", mode["target_temperature"])
+                    if isinstance(match.phase, dict)
+                    else mode["target_temperature"]
+                ),
+                "color": mode.get("color"),
+                "icon": mode.get("icon"),
+                "phase_id": match.phase.get("id") if isinstance(match.phase, dict) else None,
+                "assignment_id": match.assignment["id"],
+            }
+        )
+
+    cursor = 0
+    for point in sorted(points):
+        append_segment(cursor, point)
+        cursor = point
+    append_segment(cursor, 1440)
+    return segments
+
+
 def week_view(
     schedule: dict,
     modes: list[dict],
@@ -692,9 +776,11 @@ def week_view(
 
     A final phase without a following boundary extends to the fixed day end.
     The returned per-assignment tracks use only the phases of each displayed
-    day. Continuous automatic assignments instead use their automatic event
-    period. Actual climate changes remain driven by configured activation
-    start times.
+    day. ``priority_tracks`` additionally resolves assignments with the same
+    priority into one sequential lane while keeping each priority level in its
+    own lane. Continuous automatic assignments instead use their automatic
+    event period. Actual climate changes remain driven by configured
+    activation start times.
     """
 
     local_now = _local_now(now)
@@ -774,6 +860,35 @@ def week_view(
                     "segments": track_segments,
                 }
             )
+        priority_groups: dict[int, list[dict]] = {}
+        for assignment in schedule["assignments"]:
+            mode = mode_by_id.get(assignment["mode_id"])
+            continuous = assignment.get("continuous") is True or any(
+                rule.get("continuous") is True
+                for rule in assignment.get("auto_rules", [])
+                if isinstance(rule, dict)
+            )
+            if mode is None or (not continuous and not assignment["enabled"]):
+                continue
+            priority = int(mode.get("priority", 0))
+            priority_groups.setdefault(priority, []).append(assignment)
+        priority_tracks: list[dict] = []
+        for priority, priority_assignments in sorted(priority_groups.items()):
+            priority_segments = _priority_week_segments(
+                schedule,
+                priority_assignments,
+                modes,
+                day,
+                zone,
+                holiday_region=holiday_region,
+            )
+            if priority_segments:
+                priority_tracks.append(
+                    {
+                        "priority": priority,
+                        "segments": priority_segments,
+                    }
+                )
         points = sorted(
             {
                 int(_phase_time(phase)[:2]) * 60 + int(_phase_time(phase)[3:])
@@ -844,7 +959,14 @@ def week_view(
             append_segment(cursor, point)
             cursor = point
         append_segment(cursor, 1440)
-        days.append({"weekday": weekday, "segments": segments, "tracks": tracks})
+        days.append(
+            {
+                "weekday": weekday,
+                "segments": segments,
+                "tracks": tracks,
+                "priority_tracks": priority_tracks,
+            }
+        )
     current_minute = None
     if schedule["enabled"]:
         current_minute = local_now.hour * 60 + local_now.minute + local_now.second / 60
