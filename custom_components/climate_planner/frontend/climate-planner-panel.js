@@ -62,6 +62,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.detailOpen = false;
     this.dialogKind = null;
     this.dialogContext = null;
+    this.dialogBackdropMouseDown = false;
     this.dragActive = false;
     this.phaseResizeActive = false;
     this.pendingRender = false;
@@ -244,7 +245,15 @@ class ClimatePlannerPanel extends HTMLElement {
     this.$("refresh").onclick = () => this.load();
     this.$("add-mode").onclick = () => this.openModeDialog();
     this.$("add-schedule").onclick = () => this.openScheduleDialog();
-    this.$("dialog").addEventListener("click", (event) => { if (event.target === this.$("dialog")) this.closeDialog(); });
+    const dialog = this.$("dialog");
+    dialog.addEventListener("mousedown", (event) => {
+      this.dialogBackdropMouseDown = event.target === dialog;
+    });
+    dialog.addEventListener("mouseup", (event) => {
+      const close = this.dialogBackdropMouseDown && event.target === dialog;
+      this.dialogBackdropMouseDown = false;
+      if (close) this.closeDialog();
+    });
   }
 
   notice(message, error = false) {
@@ -2166,7 +2175,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.openModeScheduleDialog(scheduleId, assignmentId, draggedModeId, initialWeekday, initialTime);
   }
 
-  closeDialog() { const dialog = this.$("dialog"); if (dialog.open) dialog.close(); dialog.innerHTML = ""; this.dialogKind = null; this.dialogContext = null; }
+  closeDialog() { const dialog = this.$("dialog"); if (dialog.open) dialog.close(); dialog.innerHTML = ""; this.dialogKind = null; this.dialogContext = null; this.dialogBackdropMouseDown = false; }
 }
 
 if (!customElements.get("climate-planner-panel")) customElements.define("climate-planner-panel", ClimatePlannerPanel);
