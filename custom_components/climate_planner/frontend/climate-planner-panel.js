@@ -1075,39 +1075,31 @@ class ClimatePlannerPanel extends HTMLElement {
     const schedule = this.data.schedules.find((item) => item.id === this.selectedSchedule);
     const admin = Boolean(this._hass.user?.is_admin);
     const days = view?.days.map((day) => {
-      const tracks = Array.isArray(day.tracks) && day.tracks.length
-        ? day.tracks
-        : [{ assignment_id: "legacy", segments: day.segments || [] }];
-      const lanes = tracks.map((track) => {
-        const trackSegments = track.segments || [];
-        const segments = trackSegments.map((segment, segmentIndex) => {
-          const startText = `${String(Math.floor(segment.start / 60)).padStart(2, "0")}:${String(segment.start % 60).padStart(2, "0")}`;
-          const endText = `${String(Math.floor(segment.end / 60)).padStart(2, "0")}:${String(segment.end % 60).padStart(2, "0")}`;
-          const duplicate = admin && this.phaseStartsSegment(schedule, day.weekday, segment)
-            ? `<button type="button" class="segment-duplicate" data-duplicate-phase aria-label="${escapeHTML(this.t.duplicate)}" title="${escapeHTML(this.t.duplicate)}" draggable="false"><ha-icon icon="mdi:content-copy" aria-hidden="true"></ha-icon></button>`
-            : "";
-          const transitionPhaseId = schedule ? this.phaseForSegmentStart(schedule, day.weekday, segment) : "";
-          const previousSegment = trackSegments[segmentIndex - 1];
-          const nextSegment = trackSegments[segmentIndex + 1];
-          const minimumStart = previousSegment ? previousSegment.start + 15 : 0;
-          const maximumStart = nextSegment ? nextSegment.start - 15 : 1439;
-          const transition = admin && transitionPhaseId
-            ? `<span class="transition-handle" data-phase-id="${escapeHTML(transitionPhaseId)}" data-segment-day="${escapeHTML(day.weekday)}" data-min-start="${minimumStart}" data-max-start="${maximumStart}" style="top:${(segment.start / 1440) * 100}%" tabindex="0" title="${escapeHTML(this.t.transition)}" draggable="false"></span>`
-            : "";
-          return `<div class="segment" draggable="${admin && Boolean(segment.phase_id)}" data-phase-id="${escapeHTML(segment.phase_id || "")}" data-segment-day="${escapeHTML(day.weekday)}" data-segment-start="${segment.start}" data-segment-end="${segment.end}" style="top:${(segment.start / 1440) * 100}%;height:${((segment.end - segment.start) / 1440) * 100}%;${segment.color ? `border-left-color:${escapeHTML(segment.color)};background:color-mix(in srgb,${escapeHTML(segment.color)} 20%,var(--card-background-color))` : ""}">${duplicate}<div class="segment-head">${segment.icon ? `<ha-icon class="segment-icon" icon="${escapeHTML(segment.icon)}"></ha-icon>` : ""}<strong>${escapeHTML(segment.mode_name)}</strong></div><small>${escapeHTML(this.temperatureText(segment.target_temperature))}</small><small class="segment-time">${escapeHTML(startText)}–${escapeHTML(endText)}</small></div>${transition}`;
-        }).join("");
-        return `<div class="day-lane" data-assignment-id="${escapeHTML(track.assignment_id || "")}">${segments}</div>`;
+      const resolvedSegments = day.segments || [];
+      const segments = resolvedSegments.map((segment, segmentIndex) => {
+        const startText = `${String(Math.floor(segment.start / 60)).padStart(2, "0")}:${String(segment.start % 60).padStart(2, "0")}`;
+        const endText = `${String(Math.floor(segment.end / 60)).padStart(2, "0")}:${String(segment.end % 60).padStart(2, "0")}`;
+        const phaseStartsHere = this.phaseStartsSegment(schedule, day.weekday, segment);
+        const phaseId = phaseStartsHere ? segment.phase_id || "" : "";
+        const duplicate = admin && phaseStartsHere
+          ? `<button type="button" class="segment-duplicate" data-duplicate-phase aria-label="${escapeHTML(this.t.duplicate)}" title="${escapeHTML(this.t.duplicate)}" draggable="false"><ha-icon icon="mdi:content-copy" aria-hidden="true"></ha-icon></button>`
+          : "";
+        const transitionPhaseId = phaseStartsHere && schedule ? this.phaseForSegmentStart(schedule, day.weekday, segment) : "";
+        const previousSegment = resolvedSegments[segmentIndex - 1];
+        const nextSegment = resolvedSegments[segmentIndex + 1];
+        const minimumStart = previousSegment ? previousSegment.start + 15 : 0;
+        const maximumStart = nextSegment ? nextSegment.start - 15 : 1439;
+        const transition = admin && transitionPhaseId
+          ? `<span class="transition-handle" data-phase-id="${escapeHTML(transitionPhaseId)}" data-segment-day="${escapeHTML(day.weekday)}" data-min-start="${minimumStart}" data-max-start="${maximumStart}" style="top:${(segment.start / 1440) * 100}%" tabindex="0" title="${escapeHTML(this.t.transition)}" draggable="false"></span>`
+          : "";
+        return `<div class="segment" draggable="${admin && Boolean(phaseId)}" data-phase-id="${escapeHTML(phaseId)}" data-segment-day="${escapeHTML(day.weekday)}" data-segment-start="${segment.start}" data-segment-end="${segment.end}" style="top:${(segment.start / 1440) * 100}%;height:${((segment.end - segment.start) / 1440) * 100}%;${segment.color ? `border-left-color:${escapeHTML(segment.color)};background:color-mix(in srgb,${escapeHTML(segment.color)} 20%,var(--card-background-color))` : ""}">${duplicate}<div class="segment-head">${segment.icon ? `<ha-icon class="segment-icon" icon="${escapeHTML(segment.icon)}"></ha-icon>` : ""}<strong>${escapeHTML(segment.mode_name)}</strong></div><small>${escapeHTML(this.temperatureText(segment.target_temperature))}</small><small class="segment-time">${escapeHTML(startText)}–${escapeHTML(endText)}</small></div>${transition}`;
       }).join("");
       const nowLine = view.current_weekday === day.weekday && view.current_minute != null
         ? `<div class="now-line" style="top:${(view.current_minute / 1440) * 100}%" title="now"></div>`
         : "";
-      return `<section class="day-column"><h3>${escapeHTML(this.t[day.weekday])}</h3><div class="day-track" data-drop-day="${escapeHTML(day.weekday)}"><div class="drop-indicator" hidden><span></span></div><div class="day-lanes">${lanes}</div>${nowLine}<div class="time-labels"><span style="top:0">00:00</span><span style="top:25%">06:00</span><span style="top:50%">12:00</span><span style="top:75%">18:00</span></div></div></section>`;
+      return `<section class="day-column"><h3>${escapeHTML(this.t[day.weekday])}</h3><div class="day-track" data-drop-day="${escapeHTML(day.weekday)}"><div class="drop-indicator" hidden><span></span></div><div class="day-lanes"><div class="day-lane" data-assignment-id="resolved">${segments}</div></div>${nowLine}<div class="time-labels"><span style="top:0">00:00</span><span style="top:25%">06:00</span><span style="top:50%">12:00</span><span style="top:75%">18:00</span></div></div></section>`;
     }).join("") || "";
-    const maxLaneCount = view?.days.reduce(
-      (maximum, day) => Math.max(maximum, Array.isArray(day.tracks) ? day.tracks.length : 1),
-      1,
-    ) || 1;
-    const minimumDayWidth = Math.max(150, maxLaneCount * 110);
+    const minimumDayWidth = 150;
     const usedModes = [];
     schedule?.assignments.forEach((assignment) => {
       const mode = this.mode(assignment.mode_id);
@@ -1155,7 +1147,7 @@ class ClimatePlannerPanel extends HTMLElement {
       };
     });
     target.querySelector("[data-add-assignment]")?.addEventListener("click", () => this.openAssignmentDialog(this.selectedSchedule));
-    target.querySelectorAll(".segment[data-phase-id]").forEach((segment) => {
+    target.querySelectorAll('.segment[data-phase-id]:not([data-phase-id=""])').forEach((segment) => {
       segment.addEventListener("click", (event) => {
         if (Date.now() < this.suppressPhaseClickUntil) {
           this.suppressPhaseClickUntil = 0;
@@ -1238,8 +1230,7 @@ class ClimatePlannerPanel extends HTMLElement {
   timeAtDrop(event, track, offsetMinutes = 0) {
     const rect = track.getBoundingClientRect();
     const minutes = Math.max(0, Math.min(1439, ((event.clientY - rect.top) / rect.height) * 1440 - offsetMinutes));
-    const snapped = Math.round(minutes / 15) * 15;
-    const value = Math.min(1439, snapped);
+    const value = Math.round(minutes);
     return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
   }
 
@@ -1275,7 +1266,7 @@ class ClimatePlannerPanel extends HTMLElement {
   }
 
   timeFromMinutes(minutes) {
-    const value = Math.max(0, Math.min(1439, Math.round(minutes / 15) * 15));
+    const value = Math.max(0, Math.min(1439, Math.round(minutes)));
     return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
   }
 

@@ -75,6 +75,28 @@ def test_latest_matching_mode_and_weekday_wrap():
     assert match is not None and match.mode["id"] == "comfort"
 
 
+def test_week_view_resolves_same_priority_modes_into_one_day_sequence():
+    modes = [mode("play", "Play", 21.5), mode("sleep", "Sleep", 20)]
+    value = schedule(
+        [
+            assignment("play-rule", "play", monday=["23:59"], tuesday=["23:59"]),
+            assignment("sleep-rule", "sleep", monday=["18:00"], tuesday=["18:00"]),
+        ]
+    )
+
+    monday = next(
+        day
+        for day in week_view(value, modes, datetime(2026, 11, 9, 12, tzinfo=ZONE))["days"]
+        if day["weekday"] == "monday"
+    )
+
+    assert [(segment["start"], segment["end"], segment["mode_id"]) for segment in monday["segments"]] == [
+        (0, 1080, "play"),
+        (1080, 1439, "sleep"),
+        (1439, 1440, "play"),
+    ]
+
+
 def test_same_activation_time_uses_later_assignment_deterministically():
     modes = [mode("first", "First", 19), mode("second", "Second", 20)]
     value = schedule(
