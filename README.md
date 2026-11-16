@@ -14,6 +14,8 @@ entities and uses centrally managed modes with target temperatures.
 - per-plan mode state with play/pause and configurable priority
 - any number of heating plans and mode assignments
 - complete heating-plan duplication with new stable IDs and a paused copy
+- JSON export/import for the complete configuration or an individual heating
+  plan, including used modes and per-phase target-temperature overrides
 - multiple climate entities per plan through the native searchable Home
   Assistant entity picker; integration, area and device remain visible
 - display of the climate entity's actual target and current temperature, with

@@ -26,7 +26,8 @@ const labels = {
     sameTime: "Gleiche Uhrzeit", individualTime: "Individuelle Uhrzeiten", weekdays: "Wochentage", addTime: "Weitere Zeit", removeTime: "Zeit entfernen", autoRules: "Automatische Regeln", autoDailyStartHint: "Wenn du hier eine automatische Regel anlegst, schaltet sie die Zuordnung frei. Die Temperatur wirkt an diesem Tag erst ab der eingetragenen Tageszeit. Soll der Mode sofort bei Auto ein wirken, wähle 00:00 Uhr.", addAutoRule: "Weitere Regel", removeAutoRule: "Regel entfernen", autoAction: "Aktion", autoActionEmpty: "Aktion auswählen", autoOn: "Auto ein", autoOff: "Auto aus", autoKind: "Anlass", autoKindEmpty: "Anlass auswählen", autoKindDate: "Einmaliges Datum", autoKindHoliday: "Feiertag", autoKindCycle: "Zyklisch", autoRuleName: "Name", autoRuleNamePlaceholder: "z. B. Mittwochs lang", autoDrag: "Regel verschieben", autoRuleIncomplete: "Bitte Name, Anlass und mindestens Auto ein oder Auto aus ausfüllen.", autoRuleCollapse: "Einklappen", autoRuleEndBeforeStart: "Das Enddatum darf nicht vor dem Startdatum liegen.", autoRecurrence: "Wiederholung", recurrenceHourly: "Stündlich", recurrenceDaily: "Täglich", recurrenceWeekly: "Wöchentlich", recurrenceMonthly: "Monatlich", recurrenceQuarterly: "Quartalsweise", recurrenceYearly: "Jährlich", autoStartDate: "Startdatum (optional)", autoEndDate: "Enddatum (optional)", autoStartTime: "Startzeit", autoOnTime: "Uhrzeit Auto ein", autoOffTime: "Uhrzeit Auto aus", autoOnStartDate: "Startdatum Auto ein", autoOnEndDate: "Enddatum Auto ein", autoOffStartDate: "Startdatum Auto aus", autoOffEndDate: "Enddatum Auto aus", autoCycleHint: "Ohne Startdatum wird der aktuelle Tag als Anker verwendet.", autoContinuous: "Von Auto ein bis Auto aus durchgehend aktiv", autoContinuousHint: "Dann sind Wochentagszeiten für diesen Zeitraum nicht erforderlich; vorhandene Zeiten bleiben gespeichert.", autoDate: "Datum", autoHoliday: "Feiertag", autoRecurringHint: "Wiederholt sich jährlich.", autoCalculatedHint: "Wird automatisch berechnet.", autoHolidayNewYear: "Neujahr", autoHolidayEpiphany: "Heilige Drei Könige", autoHolidayInternationalWomensDay: "Internationaler Frauentag", autoHolidayGoodFriday: "Karfreitag", autoHolidayEasterSaturday: "Ostersamstag", autoHolidayEasterMonday: "Ostermontag", autoHolidayEasterSunday: "Ostersonntag", autoHolidayWhitSunday: "Pfingstsonntag", autoHolidayLabourDay: "Tag der Arbeit", autoHolidayAscension: "Christi Himmelfahrt", autoHolidayWhitMonday: "Pfingstmontag", autoHolidayCorpusChristi: "Fronleichnam", autoHolidayMariaHimmelfahrt: "Mariä Himmelfahrt", autoHolidayWorldChildrenDay: "Weltkindertag", autoHolidayGermanUnity: "Tag der Deutschen Einheit", autoHolidayReformationDay: "Reformationstag", autoHolidayAllSaintsDay: "Allerheiligen", autoHolidayRepentanceDay: "Buß- und Bettag", autoHolidayAdvent1: "1. Advent", autoHolidayAdvent2: "2. Advent", autoHolidayAdvent3: "3. Advent", autoHolidayAdvent4: "4. Advent", autoHolidayAllAdvent: "Alle Adventssonntage", autoHolidayEasterPeriod: "Ostern (Karfreitag–Ostermontag)", autoHolidayChristmasEve: "Heiligabend", autoHolidayChristmasDay: "1. Weihnachtsfeiertag", autoHolidayBoxingDay: "2. Weihnachtsfeiertag", autoHolidayChristmasPeriod: "Weihnachten (24.–26. Dezember)", autoHolidayNewYearsEve: "Silvester",
     time: "Uhrzeit", bulkTime: "Uhrzeit für ausgewählte Tage", weekday: "Wochentag", transition: "Übergang verschieben", phase: "Phase", duplicate: "Duplizieren", placeDuplicate: "Duplikat platzieren", duplicateTimeOccupied: "Eine Stunde vor diesem Mode liegt bereits ein Wechsel. Bitte eine andere Uhrzeit wählen.", duplicateNoRoom: "Vor diesem Mode ist nicht genug Platz für die Duplikatdauer. Der vorherige Mode behält mindestens eine Stunde.", selectAllDays: "Alle anwählen", clearAllDays: "Alle abwählen", copySuffix: "Kopie", defaultDuration: "Richtwert: 8 Stunden · letzter Block bis 24:00", drop: "Mode auf die Heizplankachel ziehen", dropTimeline: "Mode auf einen Tag und eine Uhrzeit ziehen · Richtwert 8 h · letzter Block bis 24:00 · Alt/Strg/Cmd = kopieren", chooseMode: "Mode direkt aktivieren", noModes: "Noch keine Modes angelegt.",
     noSchedules: "Noch keine Heizpläne angelegt.", active: "Aktiver Mode", lastActivated: "Zuletzt aktiviert", external: "extern", manual: "Manuell", automatic: "Automatik verwenden", manualUntil: "Automatik ab", activateSchedule: "Heizplan aktivieren", pauseSchedule: "Heizplan pausieren", activateMode: "Mode direkt aktivieren", activateAssignment: "Mode-Zuordnung für Automatik aktivieren", pauseMode: "Mode-Zuordnung pausieren", targetRequestShort: "Soll", targetRequest: "Aktueller Sollwert der Klima-Entität", currentShort: "Ist", next: "Nächster Wechsel",
-    none: "Noch kein Mode aktiviert", refresh: "Aktualisieren", loading: "Wird geladen …",
+    none: "Noch kein Mode aktiviert", refresh: "Aktualisieren", exportAll: "Alles exportieren", exportSchedule: "Heizplan exportieren", import: "Importieren", loading: "Wird geladen …",
+    importTitle: "Climate-Planner-Import", importHint: "Ordne jeden importierten Heizplan mindestens einer vorhandenen Climate-Entität zu. Beim vollständigen Import wird die aktuelle Konfiguration ersetzt; ein einzelner Heizplan wird zusätzlich angelegt und zunächst pausiert.", importEntities: "Ziel-Entitäten", importNoSelection: "Bitte wähle für jeden Heizplan mindestens eine Climate-Entität.", importInvalid: "Die Datei ist kein gültiger Climate-Planner-Export.", importReplaceConfirm: "Die aktuelle Climate-Planner-Konfiguration wird durch den vollständigen Import ersetzt. Fortfahren?", importSettingsSkipped: "Die exportierten globalen Einstellungen konnten nicht vollständig übernommen werden.", imported: "Import abgeschlossen.", importedSchedule: "Heizplan importiert und pausiert.",
     saveError: "Speichern fehlgeschlagen", conflict: "Die Daten wurden geändert. Ansicht wird neu geladen.",
     invalid: "Bitte prüfe die Eingaben.", localTemperature: "Temperatur für diese Phase überschreiben", inherited: "Mode-Temperatur", deleteMode: "Mode wirklich löschen? Zugehörige Zuordnungen werden entfernt.", deletePhase: "Phase wirklich löschen?",
     deleteSchedule: "Heizplan wirklich löschen?", deleteAssignment: "Mode aus diesem Heizplan entfernen? Alle zugehörigen Phasen werden gelöscht.", modeAlreadyAssigned: "Dieser Mode ist bereits in diesem Heizplan enthalten.",
@@ -42,7 +43,8 @@ const labels = {
     icon: "Icon (optional, e.g. mdi:leaf)", hexColor: "Hex color", iconPlaceholder: "mdi:leaf", climate: "Climate entities", entityDisplayName: "Display name (optional)", entityDisplayNamePlaceholder: "Name in this heating plan", enabled: "Enabled", generalSettings: "General settings", windowSettings: "Window detection", windowLabel: "Window label", noWindowLabel: "No label", windowLabelHint: "Central selection for window contacts in all heating plans.", saveWindowLabel: "Save", holidayRegion: "Holiday region (Germany)", holidayRegionHint: "Filters regional public holidays. Local exceptions are not included.", holidayRegionNational: "Nationwide holidays only", unavailableRegion: "not active in this region", regionBw: "Baden-Württemberg", regionBy: "Bavaria", regionBe: "Berlin", regionBb: "Brandenburg", regionHb: "Bremen", regionHh: "Hamburg", regionHe: "Hesse", regionMv: "Mecklenburg-Western Pomerania", regionNi: "Lower Saxony", regionNw: "North Rhine-Westphalia", regionRp: "Rhineland-Palatinate", regionSl: "Saarland", regionSn: "Saxony", regionSt: "Saxony-Anhalt", regionSh: "Schleswig-Holstein", regionTh: "Thuringia", windowDetection: "Use window detection", windowDetectionOff: "Window detection disabled", enableWindowDetection: "Enable window detection", disableWindowDetection: "Disable window detection", windowOpenTemperature: "Setback temperature with window open", windowOpenTemperatureHint: "Default: 18.5 °C; applies to windows with the centrally selected label in the same area as the climate entity.", windowOpen: "Window open – setback active",
     sameTime: "Same time", individualTime: "Individual times", weekdays: "Weekdays", addTime: "Add another time", removeTime: "Remove time", autoRules: "Automatic rules", autoDailyStartHint: "When you add an automatic rule here, it enables the mode assignment. On that day, the temperature takes effect only after the configured daily time. To apply the mode immediately with Auto on, choose 00:00.", addAutoRule: "Add another rule", removeAutoRule: "Remove rule", autoAction: "Action", autoActionEmpty: "Select action", autoOn: "Auto on", autoOff: "Auto off", autoKind: "Occasion", autoKindEmpty: "Select occasion", autoKindDate: "One-time date", autoKindHoliday: "Holiday", autoKindCycle: "Cyclic", autoRuleName: "Name", autoRuleNamePlaceholder: "e.g. Wednesday long", autoDrag: "Move rule", autoRuleIncomplete: "Please enter a name, occasion, and at least Auto on or Auto off.", autoRuleCollapse: "Collapse", autoRuleEndBeforeStart: "The end date must not be before the start date.", autoRecurrence: "Repeat", recurrenceHourly: "Hourly", recurrenceDaily: "Daily", recurrenceWeekly: "Weekly", recurrenceMonthly: "Monthly", recurrenceQuarterly: "Quarterly", recurrenceYearly: "Yearly", autoStartDate: "Start date (optional)", autoEndDate: "End date (optional)", autoStartTime: "Start time", autoOnTime: "Auto on time", autoOffTime: "Auto off time", autoOnStartDate: "Auto on start date", autoOnEndDate: "Auto on end date", autoOffStartDate: "Auto off start date", autoOffEndDate: "Auto off end date", autoCycleHint: "Without a start date, the current day is used as the anchor.", autoContinuous: "Active continuously from Auto on to Auto off", autoContinuousHint: "Weekday times are not required during this period; existing times remain saved.", autoDate: "Date", autoHoliday: "Holiday", autoRecurringHint: "Repeats every year.", autoCalculatedHint: "Calculated automatically.", autoHolidayNewYear: "New Year's Day", autoHolidayEpiphany: "Epiphany", autoHolidayInternationalWomensDay: "International Women's Day", autoHolidayGoodFriday: "Good Friday", autoHolidayEasterSaturday: "Holy Saturday", autoHolidayEasterMonday: "Easter Monday", autoHolidayEasterSunday: "Easter Sunday", autoHolidayWhitSunday: "Whit Sunday", autoHolidayLabourDay: "Labour Day", autoHolidayAscension: "Ascension Day", autoHolidayWhitMonday: "Whit Monday", autoHolidayCorpusChristi: "Corpus Christi", autoHolidayMariaHimmelfahrt: "Assumption Day", autoHolidayWorldChildrenDay: "World Children's Day", autoHolidayGermanUnity: "German Unity Day", autoHolidayReformationDay: "Reformation Day", autoHolidayAllSaintsDay: "All Saints' Day", autoHolidayRepentanceDay: "Day of Prayer and Repentance", autoHolidayAdvent1: "1st Advent", autoHolidayAdvent2: "2nd Advent", autoHolidayAdvent3: "3rd Advent", autoHolidayAdvent4: "4th Advent", autoHolidayAllAdvent: "All Advent Sundays", autoHolidayEasterPeriod: "Easter (Good Friday–Easter Monday)", autoHolidayChristmasEve: "Christmas Eve", autoHolidayChristmasDay: "Christmas Day", autoHolidayBoxingDay: "Boxing Day", autoHolidayChristmasPeriod: "Christmas (24–26 December)", autoHolidayNewYearsEve: "New Year's Eve",
     drop: "Drop mode on the heating plan", chooseMode: "Activate mode directly", noModes: "No modes have been created yet.", noSchedules: "No heating plans have been created yet.",
-    active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode directly", activateAssignment: "Enable mode assignment for automatic schedule", pauseMode: "Pause mode assignment", targetRequestShort: "Target", targetRequest: "Current target temperature of the climate entity", currentShort: "Current", next: "Next change", none: "No mode activated yet", refresh: "Refresh", loading: "Loading …",
+    active: "Active mode", lastActivated: "Last activated", external: "external", manual: "Manual", automatic: "Use schedule", manualUntil: "Automatic from", activateSchedule: "Activate heating plan", pauseSchedule: "Pause heating plan", activateMode: "Activate mode directly", activateAssignment: "Enable mode assignment for automatic schedule", pauseMode: "Pause mode assignment", targetRequestShort: "Target", targetRequest: "Current target temperature of the climate entity", currentShort: "Current", next: "Next change", none: "No mode activated yet", refresh: "Refresh", exportAll: "Export everything", exportSchedule: "Export heating plan", import: "Import", loading: "Loading …",
+    importTitle: "Climate Planner import", importHint: "Assign every imported heating plan to at least one existing climate entity. A full import replaces the current configuration; an individual heating plan is added and initially paused.", importEntities: "Target entities", importNoSelection: "Select at least one climate entity for every heating plan.", importInvalid: "The file is not a valid Climate Planner export.", importReplaceConfirm: "The current Climate Planner configuration will be replaced by the full import. Continue?", importSettingsSkipped: "The exported global settings could not be applied completely.", imported: "Import completed.", importedSchedule: "Heating plan imported and paused.",
     saveError: "Save failed", conflict: "The data changed. Reloading the view.", invalid: "Please check the input.", localTemperature: "Override temperature for this phase", inherited: "Mode temperature",
     deleteMode: "Delete this mode? Its assignments will be removed.", deleteSchedule: "Delete this heating plan?",
     deleteAssignment: "Remove this mode from the heating plan? All of its phases will be deleted.", modeAlreadyAssigned: "This mode is already part of this heating plan.", deletePhase: "Delete this phase?", missingDay: "Select at least one weekday.",
@@ -168,7 +170,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.shadowRoot.innerHTML = `<style>
       :host{display:block;min-height:100vh;color:var(--primary-text-color);background:var(--primary-background-color);font-family:var(--paper-font-body1_-_font-family,system-ui,sans-serif)}
       *{box-sizing:border-box}main{max-width:1500px;margin:auto;padding:24px}header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:16px}h1{font-size:26px;flex:1;margin:0}h2{font-size:20px;margin:26px 0 12px}h3{font-size:17px;margin:0 0 8px}button,input,select{font:inherit;color:inherit}button{cursor:pointer;border:1px solid var(--divider-color);background:var(--card-background-color);border-radius:8px;padding:9px 13px}button.primary{color:var(--text-primary-color,#fff);background:var(--primary-color);border-color:var(--primary-color)}button.danger{color:var(--error-color,#db4437)}button:disabled{opacity:.55;cursor:not-allowed}input,select{width:100%;padding:9px;border:1px solid var(--divider-color);border-radius:7px;background:var(--card-background-color)}label{display:grid;gap:5px;font-size:13px}.muted{color:var(--secondary-text-color)}.error{color:var(--error-color,#db4437)}.notice{min-height:24px;padding:8px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{background:var(--ha-card-background,var(--card-background-color));border:1px solid var(--divider-color);border-radius:var(--ha-card-border-radius,12px);padding:16px;overflow-wrap:anywhere}.card.dragging{opacity:.55}.card.drop-target{border:2px dashed var(--primary-color);background:color-mix(in srgb,var(--primary-color) 10%,var(--card-background-color))}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.mode-color{width:14px;height:14px;display:inline-block;border-radius:50%;vertical-align:-2px;margin-right:6px;border:1px solid var(--divider-color)}.mode-meta{display:flex;align-items:center;gap:8px;color:var(--secondary-text-color);font-size:13px}.assignment{border-top:1px solid var(--divider-color);padding-top:10px;margin-top:10px}.assignment:first-child{border-top:0;padding-top:0}.assignment .actions{margin-top:8px}.status-dot{font-size:18px;color:var(--success-color,#43a047)}.status-dot.off{color:var(--secondary-text-color)}.drop-zone{border:1px dashed var(--divider-color);border-radius:8px;padding:10px;text-align:center;color:var(--secondary-text-color);margin-top:12px}.drop-zone:focus,.drop-zone:hover{border-color:var(--primary-color);color:var(--primary-text-color)}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.full{grid-column:1/-1}.days{display:grid;grid-template-columns:repeat(7,minmax(70px,1fr));gap:7px}.day-check{display:flex;align-items:center;gap:5px;padding:7px;border:1px solid var(--divider-color);border-radius:7px}.day-check input{width:auto}.time-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:10px}.time-fields[hidden]{display:none}.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}.dialog-form{min-width:min(720px,90vw)}dialog{color:var(--primary-text-color);background:var(--card-background-color);border:1px solid var(--divider-color);border-radius:12px;max-width:calc(100vw - 24px)}dialog::backdrop{background:rgba(0,0,0,.45)}fieldset{border:0;padding:0;margin:12px 0}legend{font-weight:600;margin-bottom:8px}.week-controls{display:flex;gap:12px;align-items:end;flex-wrap:wrap}.week-controls label{min-width:260px}.week-scroll{overflow-x:auto;padding-bottom:10px}.week-grid{display:grid;grid-template-columns:repeat(7,minmax(150px,1fr));gap:8px;min-width:1050px}.day-column{position:relative}.day-column h3{text-align:center;background:var(--secondary-background-color);padding:8px;border-radius:7px;font-size:14px}.day-track{height:720px;position:relative;border:1px solid var(--divider-color);border-radius:7px;background:repeating-linear-gradient(to bottom,transparent 0,transparent calc(25% - 1px),var(--divider-color) 25%);overflow:hidden}.segment{position:absolute;left:3px;right:3px;border-radius:6px;padding:5px;font-size:12px;overflow:hidden;border-left:4px solid var(--primary-color);background:color-mix(in srgb,var(--primary-color) 20%,var(--card-background-color))}.segment strong,.segment small{display:block}.now-line{position:absolute;left:0;right:0;height:2px;background:var(--error-color,#db4437);z-index:2}.time-labels{position:absolute;inset:0;pointer-events:none;color:var(--secondary-text-color);font-size:10px}.time-labels span{position:absolute;left:4px}.empty{padding:14px;text-align:center;color:var(--secondary-text-color)}:focus-visible{outline:3px solid var(--primary-color);outline-offset:2px}@media(max-width:700px){main{padding:14px}h1{font-size:22px}.form-grid,.time-fields{grid-template-columns:1fr}.days{grid-template-columns:repeat(2,1fr)}.full{grid-column:auto}}
-    </style><main><header><ha-icon icon="mdi:calendar-clock"></ha-icon><h1>Climate Planner</h1><button id="refresh" class="primary">↻</button><button id="add-mode" class="primary"></button><button id="add-schedule"></button></header><div id="notice" class="notice" role="status" aria-live="polite"></div><section id="overview-top"><section id="general-settings"><h2 id="general-settings-title"></h2><div class="settings-grid"><section id="planner-settings" class="planner-settings"><h2 id="window-settings-title"></h2><p id="window-settings-hint" class="muted"></p><div id="window-label-control" class="window-label-control"></div></section><section id="holiday-settings" class="planner-settings"><h2 id="holiday-region-title"></h2><p id="holiday-region-hint" class="muted"></p><div id="holiday-region-control" class="holiday-region-control"></div></section></div></section><section><h2 id="modes-title"></h2><p id="drag-hint" class="muted"></p><div id="modes" class="grid"></div></section></section><section><h2 id="schedules-title"></h2><div id="schedules" class="grid"></div></section><section><h2 id="week-title"></h2><div id="week"></div></section><dialog id="dialog"></dialog></main>`;
+    </style><main><header><ha-icon icon="mdi:calendar-clock"></ha-icon><h1>Climate Planner</h1><button id="refresh" class="primary">↻</button><button id="export-all"></button><button id="import-file"></button><input id="import-file-input" type="file" accept="application/json,.json" hidden><button id="add-mode" class="primary"></button><button id="add-schedule"></button></header><div id="notice" class="notice" role="status" aria-live="polite"></div><section id="overview-top"><section id="general-settings"><h2 id="general-settings-title"></h2><div class="settings-grid"><section id="planner-settings" class="planner-settings"><h2 id="window-settings-title"></h2><p id="window-settings-hint" class="muted"></p><div id="window-label-control" class="window-label-control"></div></section><section id="holiday-settings" class="planner-settings"><h2 id="holiday-region-title"></h2><p id="holiday-region-hint" class="muted"></p><div id="holiday-region-control" class="holiday-region-control"></div></section></div></section><section><h2 id="modes-title"></h2><p id="drag-hint" class="muted"></p><div id="modes" class="grid"></div></section></section><section><h2 id="schedules-title"></h2><div id="schedules" class="grid"></div></section><section><h2 id="week-title"></h2><div id="week"></div></section><dialog id="dialog"></dialog></main>`;
     const style = this.shadowRoot.querySelector("style");
     const overviewTop = this.$("overview-top");
     const modesSection = this.$("modes-title").closest("section");
@@ -231,6 +233,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += "main.overview-layout{height:auto;min-height:100vh;overflow:visible}main.overview-layout #schedules-section{display:block}main.overview-layout #schedules{overflow:visible;min-height:0}#overview-top .mode-palette .grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}#overview-top .mode-palette .compact-mode-name{white-space:nowrap;overflow:visible;text-overflow:clip}@media(max-width:1100px){#overview-top .mode-palette .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){#overview-top .mode-palette .grid{grid-template-columns:1fr}}#schedules .quick-modes{display:grid;grid-template-columns:1fr;gap:6px}#schedules .quick-mode-wrap{width:100%;min-width:0;min-height:0;height:42px}#schedules .quick-mode-wrap .quick-mode{width:100%;min-height:42px;height:100%;padding:5px 8px 5px 34px;gap:8px}#schedules .quick-mode-copy{display:flex;align-items:center;flex:1;min-width:0;gap:10px;overflow:visible}#schedules .quick-mode-copy strong{flex:0 1 auto;min-width:0;white-space:nowrap;overflow:visible;text-overflow:clip;overflow-wrap:normal;line-height:1.2}#schedules .quick-mode-copy small{flex:none;white-space:nowrap;font-size:11px}.quick-mode-priority{color:var(--secondary-text-color)}#schedules .assignment-tools{display:flex;align-items:stretch;align-self:stretch;flex:none;border-left:1px solid var(--divider-color)}#schedules .assignment-toggle,#schedules .assignment-settings,#schedules .assignment-delete{height:100%;min-width:30px;padding:5px 7px;border:0;border-radius:0}#schedules .assignment-delete{border-top:0;border-left:1px solid var(--divider-color)}";
     style.textContent += ".notice{height:auto;min-height:0;padding:0;max-width:min(320px,35vw);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--secondary-text-color)}.notice.error{color:var(--error-color,#db4437)}";
     style.textContent += ".dialog-form .form-grid{align-items:start}.dialog-form .form-grid>label{align-self:start}";
+    style.textContent += ".import-mapping{display:grid;gap:12px;max-height:min(60vh,620px);overflow:auto}.import-mapping-card{padding:10px;border:1px solid var(--divider-color);border-radius:8px;background:var(--secondary-background-color)}.import-mapping-card h3{margin:0 0 4px}.import-mapping-card p{margin:0 0 8px}.import-entity-list{display:grid;gap:5px}.import-entity-option{display:flex;align-items:flex-start;gap:7px;padding:6px;border:1px solid var(--divider-color);border-radius:6px;background:var(--card-background-color)}.import-entity-option input{width:auto;margin-top:3px}.import-entity-copy{display:grid;gap:1px;min-width:0}.import-entity-copy strong,.import-entity-copy small{overflow-wrap:anywhere}.import-entity-copy small{color:var(--secondary-text-color)}";
     style.textContent += ".field-label-with-info{display:inline-flex;align-items:center;gap:5px}.field-info{position:relative;display:inline-flex;align-items:center;color:var(--secondary-text-color);cursor:help}.field-info ha-icon{--mdc-icon-size:16px}.field-info-tooltip{position:absolute;z-index:20;left:0;top:calc(100% + 7px);display:none;width:min(360px,70vw);padding:9px 10px;border:1px solid var(--divider-color);border-radius:7px;background:var(--card-background-color);box-shadow:0 4px 16px rgba(0,0,0,.2);color:var(--primary-text-color);font-size:12px;font-weight:400;line-height:1.35;white-space:normal}.field-info:hover .field-info-tooltip,.field-info:focus .field-info-tooltip,.field-info:focus-within .field-info-tooltip{display:block}.auto-rules-hint{display:block;margin:-2px 0 2px;color:var(--secondary-text-color);font-size:12px;line-height:1.35}";
     style.textContent += ".schedule-card-top{position:relative;padding-right:38px}.schedule-card-icon-tools{position:absolute;top:0;right:0;display:grid;gap:4px}";
     style.textContent += "main.overview-layout{row-gap:0;padding-top:8px}main.overview-layout #overview-top{margin-top:-32px}main.overview-layout #schedules-section{margin-top:-60px}main.overview-layout #schedules-title{margin-top:0}";
@@ -245,6 +248,9 @@ class ClimatePlannerPanel extends HTMLElement {
     weekSection.style.gridArea = "week";
     this.$("refresh").title = this.t.refresh;
     this.$("refresh").onclick = () => this.load();
+    this.$("export-all").onclick = () => this.exportAll();
+    this.$("import-file").onclick = () => this.$("import-file-input").click();
+    this.$("import-file-input").onchange = (event) => this.importFile(event.target.files?.[0]);
     this.$("add-mode").onclick = () => this.openModeDialog();
     this.$("add-schedule").onclick = () => this.openScheduleDialog();
     const dialog = this.$("dialog");
@@ -374,6 +380,208 @@ class ClimatePlannerPanel extends HTMLElement {
       else this.notice(error?.code === "invalid_input" ? `${this.t.invalid} (${error.message || ""})` : this.t.saveError, true);
       return false;
     }
+  }
+
+  exportSettings() {
+    return {
+      window_label: this.data?.window_label || "",
+      holiday_region: this.data?.holiday_region || "national",
+    };
+  }
+
+  exportDocument(kind, schedules, modes) {
+    return {
+      format: "climate_planner_export",
+      format_version: 1,
+      export_kind: kind,
+      exported_at: new Date().toISOString(),
+      settings: this.exportSettings(),
+      modes: structuredClone(modes),
+      schedules: structuredClone(schedules),
+    };
+  }
+
+  downloadJson(filename, payload) {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = globalThis.document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.append(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 0);
+  }
+
+  exportFilenamePart(value) {
+    return String(value || "climate-planner")
+      .normalize("NFKD").replace(/[^\w.-]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 80) || "climate-planner";
+  }
+
+  exportAll() {
+    if (!this._hass.user?.is_admin || !this.data) return;
+    const document = this.exportDocument("all", this.data.schedules, this.data.modes);
+    this.downloadJson(`climate-planner-${new Date().toISOString().slice(0, 10)}.json`, document);
+    this.notice(this.t.exportAll);
+  }
+
+  exportSchedule(scheduleId) {
+    if (!this._hass.user?.is_admin || !this.data) return;
+    const schedule = this.data.schedules.find((item) => item.id === scheduleId);
+    if (!schedule) return;
+    const modeIds = new Set((schedule.assignments || []).map((assignment) => assignment.mode_id));
+    const modes = this.data.modes.filter((mode) => modeIds.has(mode.id));
+    if (modes.length !== modeIds.size) {
+      this.notice(this.t.invalid, true);
+      return;
+    }
+    const document = this.exportDocument("schedule", [schedule], modes);
+    this.downloadJson(`climate-planner-${this.exportFilenamePart(schedule.name)}.json`, document);
+    this.notice(this.t.exportSchedule);
+  }
+
+  validImportDocument(document) {
+    if (!document || document.format !== "climate_planner_export" || document.format_version !== 1
+      || !["all", "schedule"].includes(document.export_kind)
+      || !Array.isArray(document.modes) || !Array.isArray(document.schedules)) return false;
+    const modeIds = new Set();
+    for (const mode of document.modes) {
+      if (!mode || typeof mode.id !== "string" || !mode.id || modeIds.has(mode.id)) return false;
+      modeIds.add(mode.id);
+    }
+    const scheduleIds = new Set();
+    for (const schedule of document.schedules) {
+      if (!schedule || typeof schedule.id !== "string" || !schedule.id || scheduleIds.has(schedule.id)
+        || !Array.isArray(schedule.assignments)) return false;
+      scheduleIds.add(schedule.id);
+      for (const assignment of schedule.assignments) {
+        if (!assignment || typeof assignment.mode_id !== "string" || !modeIds.has(assignment.mode_id)) return false;
+      }
+    }
+    return document.export_kind === "schedule" ? document.schedules.length === 1 : true;
+  }
+
+  async importFile(file) {
+    const input = this.$("import-file-input");
+    if (input) input.value = "";
+    if (!file || !this._hass.user?.is_admin) return;
+    try {
+      const document = JSON.parse(await file.text());
+      if (!this.validImportDocument(document)) throw new Error("invalid export");
+      if (!this.data.climate_entities?.length && document.schedules.length) {
+        this.notice(this.t.noClimate, true);
+        return;
+      }
+      this.openImportDialog(document);
+    } catch (_) {
+      this.notice(this.t.importInvalid, true);
+    }
+  }
+
+  importEntityMarkup(entity, checked) {
+    const detail = [entity.integration, entity.area_name, entity.device_name].filter(Boolean).join(" · ");
+    return `<label class="import-entity-option"><input type="checkbox" data-import-entity="${escapeHTML(entity.entity_id)}" ${checked ? "checked" : ""}><span class="import-entity-copy"><strong>${escapeHTML(entity.label || entity.entity_id)}</strong><small>${escapeHTML(detail || entity.entity_id)}</small></span></label>`;
+  }
+
+  openImportDialog(document) {
+    const dialog = this.$("dialog");
+    this.dialogKind = "import";
+    this.dialogContext = document;
+    const entities = this.data.climate_entities || [];
+    const schedules = document.schedules.map((schedule) => {
+      const sourceIds = schedule.climate_entity_ids || [];
+      const sourceNames = schedule.climate_entity_names || {};
+      const sourceText = sourceIds.length
+        ? sourceIds.map((id) => sourceNames[id] || id).join(", ")
+        : this.t.noClimate;
+      const options = entities.map((entity) => this.importEntityMarkup(entity, sourceIds.includes(entity.entity_id))).join("");
+      return `<section class="import-mapping-card" data-import-schedule="${escapeHTML(schedule.id)}"><h3>${escapeHTML(schedule.name)}</h3><p class="muted">${escapeHTML(sourceText)}</p><fieldset><legend>${escapeHTML(this.t.importEntities)}</legend><div class="import-entity-list">${options}</div></fieldset></section>`;
+    }).join("");
+    dialog.innerHTML = `<form method="dialog" class="dialog-form"><h2>${escapeHTML(this.t.importTitle)}</h2><p class="muted">${escapeHTML(this.t.importHint)}</p>${schedules ? `<div class="import-mapping">${schedules}</div>` : `<p>${escapeHTML(this.t.noSchedules)}</p>`}<div class="dialog-actions"><button type="button" data-cancel>${escapeHTML(this.t.cancel)}</button><button class="primary" type="submit">${escapeHTML(this.t.import)}</button></div></form>`;
+    dialog.querySelector("[data-cancel]").onclick = () => this.closeDialog();
+    dialog.querySelector("form").onsubmit = async (event) => {
+      event.preventDefault();
+      const mappings = new Map();
+      dialog.querySelectorAll("[data-import-schedule]").forEach((card) => {
+        mappings.set(card.dataset.importSchedule, [...card.querySelectorAll("[data-import-entity]:checked")].map((input) => input.dataset.importEntity));
+      });
+      if ([...mappings.values()].some((ids) => !ids.length)) {
+        this.notice(this.t.importNoSelection, true);
+        return;
+      }
+      await this.applyImport(document, mappings);
+    };
+    dialog.showModal();
+  }
+
+  mapImportedSchedule(schedule, entityIds, entityLookup, modeIdMap = null, disabled = false) {
+    const mapped = structuredClone(schedule);
+    mapped.climate_entity_ids = [...entityIds];
+    const sourceNames = schedule.climate_entity_names || {};
+    mapped.climate_entity_names = Object.fromEntries(entityIds.map((entityId) => {
+      const entity = entityLookup.get(entityId);
+      return [entityId, sourceNames[entityId] || entity?.name || entity?.label || ""];
+    }).filter(([, name]) => name));
+    if (modeIdMap) {
+      mapped.id = newId("schedule");
+      mapped.enabled = disabled ? false : mapped.enabled;
+      mapped.assignments = (schedule.assignments || []).map((assignment) => ({
+        ...structuredClone(assignment),
+        id: newId("assignment"),
+        mode_id: modeIdMap.get(assignment.mode_id),
+        weekday_rules: Object.fromEntries(Object.entries(assignment.weekday_rules || {}).map(([weekday, phases]) => [
+          weekday,
+          phases.map((phase) => (typeof phase === "string"
+            ? { id: newId("phase"), time: phase }
+            : { ...phase, id: newId("phase") })),
+        ])),
+      }));
+    }
+    return mapped;
+  }
+
+  async applyImportedSettings(settings) {
+    if (!settings || typeof settings !== "object") return true;
+    let skipped = false;
+    const knownLabels = new Set((this.data.window_labels || []).map((item) => item.id));
+    if (typeof settings.window_label === "string") {
+      if (!settings.window_label || knownLabels.has(settings.window_label)) {
+        try { await this._hass.callWS({ type: "climate_planner/set_window_label", label_id: settings.window_label }); } catch (_) { skipped = true; }
+      } else skipped = true;
+    }
+    const knownRegions = new Set(this.holidayRegionOptions().map(([region]) => region));
+    if (typeof settings.holiday_region === "string") {
+      if (knownRegions.has(settings.holiday_region)) {
+        try { await this._hass.callWS({ type: "climate_planner/set_holiday_region", region: settings.holiday_region }); } catch (_) { skipped = true; }
+      } else skipped = true;
+    }
+    if (settings.window_label !== undefined || settings.holiday_region !== undefined) await this.load();
+    return !skipped;
+  }
+
+  async applyImport(document, mappings) {
+    if (document.export_kind === "all" && !window.confirm(this.t.importReplaceConfirm)) return;
+    const entityLookup = new Map((this.data.climate_entities || []).map((entity) => [entity.entity_id, entity]));
+    if (document.export_kind === "all") {
+      const schedules = document.schedules.map((schedule) => this.mapImportedSchedule(schedule, mappings.get(schedule.id) || [], entityLookup));
+      if (!await this.save({ modes: structuredClone(document.modes), schedules })) return;
+      const settingsApplied = await this.applyImportedSettings(document.settings);
+      this.notice(settingsApplied ? this.t.imported : this.t.importSettingsSkipped, !settingsApplied);
+      return;
+    }
+    const modeIdMap = new Map(document.modes.map((mode) => [mode.id, newId("mode")]));
+    const modes = document.modes.map((mode) => ({ ...structuredClone(mode), id: modeIdMap.get(mode.id) }));
+    const schedules = document.schedules.map((schedule) => this.mapImportedSchedule(
+      schedule, mappings.get(schedule.id) || [], entityLookup, modeIdMap, true,
+    ));
+    const next = this.cloneData();
+    next.modes.push(...modes);
+    next.schedules.push(...schedules);
+    if (!await this.save(next)) return;
+    this.selectedSchedule = schedules[0]?.id || this.selectedSchedule;
+    this.storageSet("climate-planner-schedule", this.selectedSchedule);
+    this.render();
+    this.notice(this.t.importedSchedule);
   }
 
   updateWindowLabelSaveState() {
@@ -612,6 +820,10 @@ class ClimatePlannerPanel extends HTMLElement {
     this.$("modes-section").hidden = detail;
     this.$("week-section").hidden = !detail;
     this.renderWindowSettings(admin && !detail);
+    this.$("export-all").textContent = this.t.exportAll;
+    this.$("export-all").hidden = !admin;
+    this.$("import-file").textContent = this.t.import;
+    this.$("import-file").hidden = !admin;
     this.$("add-mode").textContent = this.t.addMode;
     this.$("add-mode").hidden = !admin;
     this.$("add-schedule").textContent = this.t.addSchedule;
@@ -779,7 +991,8 @@ class ClimatePlannerPanel extends HTMLElement {
       const windowDetectionToggleIcon = windowDetectionEnabled ? "mdi:window-open-variant" : "mdi:window-closed-variant";
       const windowDetectionToggle = admin ? `<button type="button" class="schedule-toggle window-detection-toggle ${windowDetectionEnabled ? "" : "off"}" data-action="toggle-window-detection" data-schedule="${escapeHTML(schedule.id)}" aria-pressed="${windowDetectionEnabled}" aria-label="${escapeHTML(windowDetectionEnabled ? this.t.disableWindowDetection : this.t.enableWindowDetection)}" title="${escapeHTML(windowDetectionEnabled ? this.t.disableWindowDetection : this.t.enableWindowDetection)}"><ha-icon icon="${windowDetectionToggleIcon}" aria-hidden="true"></ha-icon></button>` : "";
       const scheduleDuplicate = admin ? `<button type="button" class="schedule-duplicate" data-action="duplicate-schedule" data-id="${escapeHTML(schedule.id)}" aria-label="${escapeHTML(this.t.duplicate)}" title="${escapeHTML(this.t.duplicate)}"><ha-icon icon="mdi:content-copy" aria-hidden="true"></ha-icon></button>` : "";
-      return `<article class="card schedule-card compact ${schedule.id === this.selectedSchedule ? "selected" : ""}" data-schedule-card="${escapeHTML(schedule.id)}"><div class="schedule-card-top"><div><h3>${escapeHTML(schedule.name)} <span class="status-dot ${schedule.enabled ? "" : "off"}" aria-label="${escapeHTML(schedule.enabled ? this.t.enabled : this.t.unavailable)}">${schedule.enabled ? "●" : "○"}</span></h3><div class="schedule-entities">${this.climateEntityRows(schedule.climate_entity_ids, lastActivated?.target_temperature, schedule)}</div></div><div class="schedule-card-top-tools"><span class="muted schedule-count">${phases.length} ${this.t.phase}</span>${admin ? `<div class="schedule-card-icon-tools">${scheduleToggle}${windowDetectionToggle}${scheduleDuplicate}</div>` : ""}</div></div><div class="schedule-summary"><span><strong>${this.t.lastActivated}:</strong> ${lastActivatedMarkup}</span><span class="muted"><strong>${this.t.next}:</strong> ${escapeHTML(this.formatDate(this.data.next_events?.[schedule.id]))}</span>${windowStatusMarkup}</div>${modeButtons}<div class="actions"><button data-action="open-schedule-details" data-schedule="${escapeHTML(schedule.id)}">${this.t.details}</button>${admin ? `<button data-action="edit-schedule" data-id="${escapeHTML(schedule.id)}">${this.t.edit}</button><button class="danger" data-action="delete-schedule" data-id="${escapeHTML(schedule.id)}">${this.t.remove}</button>` : ""}</div></article>`;
+      const scheduleExport = admin ? `<button type="button" class="schedule-export" data-action="export-schedule" data-id="${escapeHTML(schedule.id)}" aria-label="${escapeHTML(this.t.exportSchedule)}" title="${escapeHTML(this.t.exportSchedule)}"><ha-icon icon="mdi:export-variant" aria-hidden="true"></ha-icon></button>` : "";
+      return `<article class="card schedule-card compact ${schedule.id === this.selectedSchedule ? "selected" : ""}" data-schedule-card="${escapeHTML(schedule.id)}"><div class="schedule-card-top"><div><h3>${escapeHTML(schedule.name)} <span class="status-dot ${schedule.enabled ? "" : "off"}" aria-label="${escapeHTML(schedule.enabled ? this.t.enabled : this.t.unavailable)}">${schedule.enabled ? "●" : "○"}</span></h3><div class="schedule-entities">${this.climateEntityRows(schedule.climate_entity_ids, lastActivated?.target_temperature, schedule)}</div></div><div class="schedule-card-top-tools"><span class="muted schedule-count">${phases.length} ${this.t.phase}</span>${admin ? `<div class="schedule-card-icon-tools">${scheduleToggle}${windowDetectionToggle}${scheduleDuplicate}${scheduleExport}</div>` : ""}</div></div><div class="schedule-summary"><span><strong>${this.t.lastActivated}:</strong> ${lastActivatedMarkup}</span><span class="muted"><strong>${this.t.next}:</strong> ${escapeHTML(this.formatDate(this.data.next_events?.[schedule.id]))}</span>${windowStatusMarkup}</div>${modeButtons}<div class="actions"><button data-action="open-schedule-details" data-schedule="${escapeHTML(schedule.id)}">${this.t.details}</button>${admin ? `<button data-action="edit-schedule" data-id="${escapeHTML(schedule.id)}">${this.t.edit}</button><button class="danger" data-action="delete-schedule" data-id="${escapeHTML(schedule.id)}">${this.t.remove}</button>` : ""}</div></article>`;
     }).join("");
     target.querySelectorAll("[data-schedule-card]").forEach((card) => {
       card.addEventListener("dragover", (event) => {
@@ -1868,6 +2081,7 @@ class ClimatePlannerPanel extends HTMLElement {
     if (action === "clear-override") return this.clearManualOverride(scheduleId);
     if (action === "open-schedule-details") return this.openScheduleDetails(scheduleId || id);
     if (action === "duplicate-schedule") return this.duplicateSchedule(id);
+    if (action === "export-schedule") return this.exportSchedule(id);
     if (action === "edit-schedule") return this.openScheduleDialog(id);
     if (action === "delete-schedule") return this.deleteSchedule(id);
     if (action === "toggle-window-detection") return this.toggleWindowDetection(scheduleId);

@@ -152,6 +152,23 @@ Phasen erhalten neue stabile IDs. Die Kopie heißt zunächst `<Name> (Kopie)`
 und ist aus Sicherheitsgründen pausiert, damit sie nicht sofort parallel zum
 Original dieselben Thermostate steuert.
 
+Als Administrator können die Schaltflächen **Alles exportieren** und
+**Importieren** die vollständige Climate-Planner-Konfiguration als JSON sichern
+und wiederherstellen. Auf jeder Heizplankachel gibt es außerdem einen Export
+für genau diesen Heizplan; dabei werden nur die verwendeten Modes mitgenommen.
+Die gespeicherten Phasen werden unverändert exportiert. Das schließt lokale
+`target_temperature`-Überschreibungen ein, auch wenn sie von der zentralen
+Mode-Temperatur abweichen.
+
+Beim Import werden die Heizpläne zunächst nicht gespeichert. Für jeden Plan
+werden vorhandene Climate-Entitäten ausgewählt oder neu zugeordnet. Erst wenn
+jeder importierte Plan mindestens eine Ziel-Entität besitzt, kann der Import
+abgeschlossen werden; ein vorhandener Heizplan ist dafür nicht erforderlich.
+Ein vollständiger Import ersetzt die aktuelle Konfiguration nach einer
+Bestätigung. Ein Einzelimport fügt den Plan und seine Modes hinzu, vergibt
+neue IDs und bleibt zunächst pausiert, damit die neuen Zielgeräte nicht
+unbeabsichtigt sofort gesteuert werden.
+
 Ein Heizplan kann pro Wochentag mehrere Phasen enthalten. Die erste Ansicht
 zeigt Heizpläne und Modes als Kacheln; ausschließlich **Details öffnen** öffnet
 die Wochen-Timeline. Die übrige Kachelfläche löst keinen Ansichtswechsel aus,
