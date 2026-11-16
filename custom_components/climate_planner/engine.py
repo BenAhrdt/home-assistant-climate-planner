@@ -550,18 +550,22 @@ def select_active_mode(
     local_now = _local_now(now)
     local_minutes = local_now.hour * 60 + local_now.minute + local_now.second / 60
     weekday = WEEKDAYS[local_now.weekday()]
+    mode_by_id = _mode_map(modes)
     first_phase_today = {
-        assignment["id"]: min(
-            int(_phase_time(phase)[:2]) * 60 + int(_phase_time(phase)[3:])
-            for phase in assignment["weekday_rules"].get(weekday, [])
+        assignment["id"]: (
+            min(
+                int(_phase_time(phase)[:2]) * 60 + int(_phase_time(phase)[3:])
+                for phase in assignment["weekday_rules"].get(weekday, [])
+            ),
+            mode_by_id.get(assignment["mode_id"], {}).get("priority", 0),
         )
         for assignment in schedule["assignments"]
-        if assignment["weekday_rules"].get(weekday) and assignment.get("auto_rules")
+        if assignment["weekday_rules"].get(weekday)
     }
     future_assignments = {
         assignment_id
-        for assignment_id, first_start in first_phase_today.items()
-        if first_start > local_minutes
+        for assignment_id, (first_start, priority) in first_phase_today.items()
+        if first_start > local_minutes and priority > 0
     }
     if future_assignments:
 
