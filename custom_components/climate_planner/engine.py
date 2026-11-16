@@ -556,8 +556,7 @@ def select_active_mode(
             for phase in assignment["weekday_rules"].get(weekday, [])
         )
         for assignment in schedule["assignments"]
-        if assignment["weekday_rules"].get(weekday)
-        and assignment.get("auto_rules")
+        if assignment["weekday_rules"].get(weekday) and assignment.get("auto_rules")
     }
     future_assignments = {
         assignment_id
