@@ -238,7 +238,7 @@ def test_continuous_auto_rule_uses_auto_period_without_weekday_phases():
     ]
 
 
-def test_week_view_shows_future_continuous_auto_period_while_assignment_is_paused():
+def test_week_view_hides_future_continuous_auto_period_while_assignment_is_paused():
     modes = [mode("holiday", "Holiday", 22)]
     value = schedule(
         [
@@ -262,9 +262,8 @@ def test_week_view_shows_future_continuous_auto_period_while_assignment_is_pause
     view = week_view(value, modes, datetime(2026, 11, 9, 7, tzinfo=ZONE))
     tuesday = next(day for day in view["days"] if day["weekday"] == "tuesday")
 
-    assert [(segment["start"], segment["end"]) for segment in tuesday["tracks"][0]["segments"]] == [
-        (540, 1320)
-    ]
+    assert tuesday["tracks"] == []
+    assert tuesday["priority_tracks"] == []
 
 
 def test_disabled_mode_is_not_selected():

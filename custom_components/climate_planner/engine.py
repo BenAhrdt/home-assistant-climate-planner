@@ -701,7 +701,7 @@ def _priority_week_segments(
             for rule in assignment.get("auto_rules", [])
             if isinstance(rule, dict)
         )
-        if mode is None or (not continuous and not assignment["enabled"]):
+        if mode is None or not assignment["enabled"]:
             continue
         if continuous:
             auto_segments = _continuous_auto_segments(
@@ -734,7 +734,6 @@ def _priority_week_segments(
             day_start + timedelta(minutes=start),
             holiday_region=holiday_region,
             respect_schedule_enabled=False,
-            respect_assignment_enabled=False,
         )
         if not match:
             return
@@ -803,7 +802,7 @@ def week_view(
                 for rule in assignment.get("auto_rules", [])
                 if isinstance(rule, dict)
             )
-            if mode is None or (not continuous and not assignment["enabled"]):
+            if mode is None or not assignment["enabled"]:
                 continue
             auto_segments = (
                 _continuous_auto_segments(assignment, day, zone, holiday_region=holiday_region)
@@ -863,12 +862,7 @@ def week_view(
         priority_groups: dict[int, list[dict]] = {}
         for assignment in schedule["assignments"]:
             mode = mode_by_id.get(assignment["mode_id"])
-            continuous = assignment.get("continuous") is True or any(
-                rule.get("continuous") is True
-                for rule in assignment.get("auto_rules", [])
-                if isinstance(rule, dict)
-            )
-            if mode is None or (not continuous and not assignment["enabled"]):
+            if mode is None or not assignment["enabled"]:
                 continue
             priority = int(mode.get("priority", 0))
             priority_groups.setdefault(priority, []).append(assignment)
