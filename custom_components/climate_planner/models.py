@@ -385,9 +385,7 @@ def _normalize_assignment(
     if mode_id not in mode_ids:
         raise InvalidData("unknown_mode_reference")
     auto_rules = _normalize_auto_rules(raw.get("auto_rules"), phase_ids)
-    continuous = raw.get(
-        "continuous", any(rule.get("continuous") for rule in auto_rules)
-    )
+    continuous = raw.get("continuous", any(rule.get("continuous") for rule in auto_rules))
     if type(continuous) is not bool:
         raise InvalidData("invalid_assignment_continuous")
     result = {

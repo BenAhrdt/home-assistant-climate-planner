@@ -716,9 +716,7 @@ def _priority_week_segments(
         else:
             points.update(
                 int(_phase_time(phase)[:2]) * 60 + int(_phase_time(phase)[3:])
-                for phase in assignment["weekday_rules"].get(
-                    WEEKDAYS[day.weekday()], []
-                )
+                for phase in assignment["weekday_rules"].get(WEEKDAYS[day.weekday()], [])
             )
 
     lane_schedule = {**schedule, "assignments": assignments}
@@ -894,11 +892,14 @@ def week_view(
                 boundary
                 for assignment in schedule["assignments"]
                 if mode_by_id.get(assignment["mode_id"]) is not None
-                and (assignment.get("continuous") is True or any(
-                    rule.get("continuous") is True
-                    for rule in assignment.get("auto_rules", [])
-                    if isinstance(rule, dict)
-                ))
+                and (
+                    assignment.get("continuous") is True
+                    or any(
+                        rule.get("continuous") is True
+                        for rule in assignment.get("auto_rules", [])
+                        if isinstance(rule, dict)
+                    )
+                )
                 for segment in _continuous_auto_segments(
                     assignment, day, zone, holiday_region=holiday_region
                 )
