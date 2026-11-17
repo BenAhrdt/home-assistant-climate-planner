@@ -81,6 +81,23 @@ def test_window_detection_can_be_disabled_per_schedule():
     assert normalized["schedules"][0]["window_open_enabled"] is False
 
 
+def test_window_open_delay_defaults_to_five_seconds_and_accepts_configured_value():
+    value = planner()
+    assert validate_planner(value)["schedules"][0]["window_open_delay_seconds"] == 5
+
+    value["schedules"][0]["window_open_delay_seconds"] = 300
+    assert validate_planner(value)["schedules"][0]["window_open_delay_seconds"] == 300
+
+
+@pytest.mark.parametrize("invalid_delay", [-1, 1801, True, 5.0])
+def test_window_open_delay_rejects_values_outside_integer_range(invalid_delay):
+    value = planner()
+    value["schedules"][0]["window_open_delay_seconds"] = invalid_delay
+
+    with pytest.raises(InvalidData, match="invalid_window_open_delay_seconds"):
+        validate_planner(value)
+
+
 def test_legacy_global_mode_pause_is_migrated_to_assignments():
     value = planner()
     value["modes"][0].update({"enabled": False, "priority": 7})

@@ -64,6 +64,7 @@ Planner
     ├── climate_entity_ids[]    # eine oder mehrere climate.<object_id>
     ├── window_open_enabled     # Fensterabsenkung für diesen Heizplan
     ├── window_open_temperature # Absenktemperatur bei offenem Fenster in °C
+    ├── window_open_delay_seconds # Öffnungsverzögerung, 0 bis 1800 Sekunden
     ├── enabled
     └── assignments[]
         ├── id
@@ -244,7 +245,9 @@ Grundeinstellungen“ als Select-Entitäten verfügbar. Die Mode-Bibliothek und
 ihre skalaren Werte werden dort ebenfalls als Text- und Number-Entitäten
 angeboten. Je Heizplan gibt es zusätzlich Text- und Number-Entitäten für Name,
 Klima-Entitätsliste, Anzeigenamen und Absenktemperatur; `window_open_enabled`
-ist standardmäßig `true` und kann über einen Switch deaktiviert werden.
+ist standardmäßig `true` und kann über einen Switch deaktiviert werden. Die
+Öffnungsverzögerung wird ausschließlich im Heizplan-Dialog eingestellt und
+nicht als eigene Entität angeboten.
 Konfigurations-Sensoren stellen die vollständigen globalen, planbezogenen und
 zuordnungsbezogenen Daten einschließlich Wochenphasen und automatischer Regeln
 als Attribute bereit.
@@ -257,10 +260,11 @@ Ein Fensterkontakt wird nur dann einer
 Climate-Entität zugeordnet, wenn beide im selben Home-Assistant-Bereich liegen.
 Dadurch können Climate-Entitäten aus mehreren Bereichen im selben Heizplan
 unabhängig behandelt werden. Mindestens ein sicher offener Kontakt im Bereich
-löst nach fünf Sekunden die Absenkung aus; erst wenn alle Kontakte sicher
-geschlossen sind, wird nach zehn Sekunden die Temperatur des aktuell aktiven
-Modes wieder angewendet. Unbekannte oder nicht verfügbare Kontakte lösen keine
-neue Umschaltung aus und halten den bisherigen effektiven Zustand. Ein
+löst nach der planbezogenen Öffnungsverzögerung die Absenkung aus; standardmäßig
+sind das fünf Sekunden. Erst wenn alle Kontakte sicher geschlossen sind, wird
+nach einer festen internen Verzögerung von fünf Sekunden die Temperatur des
+aktuell aktiven Modes wieder angewendet. Unbekannte oder nicht verfügbare
+Kontakte lösen keine neue Umschaltung aus und halten den bisherigen effektiven Zustand. Ein
 Modewechsel ändert die Absenkung nicht, aktualisiert aber den Mode, dessen
 Temperatur beim Schließen wiederhergestellt wird.
 

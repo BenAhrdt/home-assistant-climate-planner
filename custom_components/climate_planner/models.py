@@ -19,6 +19,9 @@ from .const import (
     DEFAULT_WINDOW_OPEN_TEMPERATURE,
     STORAGE_VERSION,
     WEEKDAYS,
+    WINDOW_OPEN_DELAY_MAX_SECONDS,
+    WINDOW_OPEN_DELAY_MIN_SECONDS,
+    WINDOW_OPEN_DELAY_SECONDS,
 )
 
 ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,79}$")
@@ -94,6 +97,16 @@ def _priority(value: object) -> int:
         or not -1_000_000 <= value <= 1_000_000
     ):
         raise InvalidData("invalid_mode_priority")
+    return value
+
+
+def _window_open_delay_seconds(value: object) -> int:
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, int)
+        or not WINDOW_OPEN_DELAY_MIN_SECONDS <= value <= WINDOW_OPEN_DELAY_MAX_SECONDS
+    ):
+        raise InvalidData("invalid_window_open_delay_seconds")
     return value
 
 
@@ -420,6 +433,7 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
         "window_label",
         "window_open_enabled",
         "window_open_temperature",
+        "window_open_delay_seconds",
         "enabled",
         "assignments",
     }:
@@ -458,6 +472,9 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
     window_open_temperature = _temperature(
         raw.get("window_open_temperature", DEFAULT_WINDOW_OPEN_TEMPERATURE)
     )
+    window_open_delay_seconds = _window_open_delay_seconds(
+        raw.get("window_open_delay_seconds", WINDOW_OPEN_DELAY_SECONDS)
+    )
     result = {
         "id": schedule_id,
         "name": _string(raw.get("name"), "invalid_schedule_name"),
@@ -466,6 +483,7 @@ def _normalize_schedule(raw: object, mode_ids: set[str], seen: set[str]) -> dict
             raw.get("window_open_enabled", True), "invalid_window_open_enabled"
         ),
         "window_open_temperature": window_open_temperature,
+        "window_open_delay_seconds": window_open_delay_seconds,
         "enabled": _bool(raw.get("enabled"), "invalid_schedule_enabled"),
         "assignments": [
             _normalize_assignment(item, mode_ids, assignment_ids, phase_ids) for item in assignments

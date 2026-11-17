@@ -176,6 +176,7 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
         {
             "climate_entity_ids": ["climate.living", "climate.bedroom"],
             "window_open_temperature": 18.5,
+            "window_open_delay_seconds": 30,
         }
     )
     payload["schedules"][0].pop("climate_entity_id")
@@ -190,7 +191,7 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
     await runtime._async_window_state_changed(
         SimpleNamespace(data={"entity_id": "binary_sensor.living_window"})
     )
-    assert delayed[-1][0] == 5
+    assert delayed[-1][0] == 30
     assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
     await delayed[-1][1](datetime.now(tz=ZONE))
     assert {call[2]["temperature"] for call in fake_runtime.services.calls[-2:]} == {18.5, 21.0}
@@ -207,7 +208,7 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
     await runtime._async_window_state_changed(
         SimpleNamespace(data={"entity_id": "binary_sensor.living_window"})
     )
-    assert delayed[-1][0] == 10
+    assert delayed[-1][0] == 5
     await delayed[-1][1](datetime.now(tz=ZONE))
     assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
     await runtime.async_set_window_open_enabled("schedule_living", False)

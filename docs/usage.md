@@ -140,13 +140,16 @@ Wird ein Label in Home Assistant umbenannt, bleibt diese ID erhalten
 und es muss nichts neu angelegt oder ausgewählt werden. Nur beim Löschen und
 anschließenden Neuerstellen entsteht eine neue ID.
 
-Mindestens ein sicher offenes Fenster löst nach fünf Sekunden die Absenkung aus.
-Sind alle zugeordneten Fenster sicher geschlossen, wird nach zehn Sekunden die
-Temperatur des aktuell aktiven Modes wiederhergestellt. Unbekannte oder nicht
-verfügbare Fensterzustände lösen keine neue Umschaltung aus; der bisherige
-effektive Zustand bleibt erhalten. Ein Modewechsel während eines offenen
-Fensters hält die Absenkung aufrecht und wird beim späteren Schließen
-berücksichtigt.
+Mindestens ein sicher offenes Fenster löst nach der im Heizplan eingestellten
+Verzögerung die Absenkung aus. Die Verzögerung kann zwischen 0 und 1800
+Sekunden liegen; das Panel bietet dafür 5, 10, 30, 60, 120, 300, 600, 900 und
+1800 Sekunden als Vorschläge an. Standardmäßig beträgt sie fünf Sekunden. Sind
+alle zugeordneten Fenster sicher geschlossen, wird die Temperatur des aktuell
+aktiven Modes intern nach fünf Sekunden wiederhergestellt; diese
+Schließverzögerung ist nicht einstellbar. Unbekannte oder nicht verfügbare
+Fensterzustände lösen keine neue Umschaltung aus; der bisherige effektive
+Zustand bleibt erhalten. Ein Modewechsel während eines offenen Fensters hält
+die Absenkung aufrecht und wird beim späteren Schließen berücksichtigt.
 
 Mit dem Duplizieren-Symbol rechts oben, direkt unter Play/Pause, wird ein
 vollständiger Heizplan einschließlich Klima-Entitäten, Mode-Zuordnungen,

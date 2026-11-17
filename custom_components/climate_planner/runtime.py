@@ -1137,7 +1137,11 @@ class PlannerRuntime:
             return
         if pending:
             pending[1]()
-        delay = WINDOW_OPEN_DELAY_SECONDS if desired else WINDOW_CLOSE_DELAY_SECONDS
+        delay = (
+            schedule.get("window_open_delay_seconds", WINDOW_OPEN_DELAY_SECONDS)
+            if desired
+            else WINDOW_CLOSE_DELAY_SECONDS
+        )
 
         async def apply_transition(_when) -> None:
             active_pending = self._window_pending.get(target)
