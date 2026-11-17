@@ -1127,6 +1127,9 @@ class PlannerRuntime:
         matching_windows = self._window_target_entities.get(target, set())
         desired = self._window_aggregate_state(matching_windows)
         current = self._window_overrides.get(schedule_id, {}).get(climate_entity_id, False)
+        schedule = next(
+            (item for item in self.data["schedules"] if item["id"] == schedule_id), {}
+        )
         pending = self._window_pending.get(target)
         if desired is None or desired == current:
             if pending:
