@@ -271,6 +271,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += "#schedules .quick-mode-copy{display:grid;grid-template-columns:minmax(0,1fr) 76px;align-items:center;gap:8px}#schedules .quick-mode-details{width:76px;min-width:76px;text-align:left}#schedules .quick-mode-copy strong{min-width:0}#schedules .quick-mode-copy .quick-mode-details small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}";
     style.textContent += "#overview-top .mode-palette .compact-mode-copy{display:grid;grid-template-columns:minmax(0,1fr) 76px;align-items:center;gap:8px}#overview-top .mode-palette .compact-mode-details{width:76px;min-width:76px;text-align:left}#overview-top .mode-palette .compact-mode-details>span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}";
     style.textContent += "#schedules .quick-mode-check{width:16px;min-width:16px;margin-left:0;text-align:center}";
+    style.textContent += "#schedules .schedule-summary{display:grid;grid-template-columns:minmax(0,1fr);gap:4px 18px}#schedules .schedule-summary>.muted{grid-column:1/-1}";
     style.textContent += "#schedules{align-items:stretch}#schedules .schedule-card{display:flex;flex-direction:column}#schedules .schedule-card>.actions{margin-top:auto;padding-top:12px}";
     const header = this.shadowRoot.querySelector("header");
     const notice = this.$("notice");
