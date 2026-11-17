@@ -978,17 +978,29 @@ class PlannerRuntime:
             self._timer_unsub()
             self._timer_unsub = None
 
-    def _clear_window_tracking(self) -> None:
+    @staticmethod
+    def _cancel_window_pending(
+        pending: dict[tuple[str, str], tuple[bool, Any, float]],
+    ) -> None:
+        for _desired, unsubscribe, _due_at in pending.values():
+            unsubscribe()
+
+    def _clear_window_tracking(
+        self, *, preserve_pending: bool = False
+    ) -> dict[tuple[str, str], tuple[bool, Any, float]]:
         """Cancel window listeners and delayed open/close transitions."""
 
         if self._window_unsub:
             self._window_unsub()
             self._window_unsub = None
-        for _desired, unsubscribe, _due_at in self._window_pending.values():
-            unsubscribe()
+        pending = dict(self._window_pending)
+        if not preserve_pending:
+            self._cancel_window_pending(pending)
+            pending.clear()
         self._window_pending.clear()
         self._window_entity_targets.clear()
         self._window_target_entities.clear()
+        return pending
 
     def _setup_window_registry_listeners(self) -> None:
         """Refresh area and label matching when Home Assistant registries change."""
@@ -1066,7 +1078,7 @@ class PlannerRuntime:
         """Resolve labelled windows to climate entities by Home Assistant area."""
 
         previous_overrides = self._window_overrides
-        self._clear_window_tracking()
+        previous_pending = self._clear_window_tracking(preserve_pending=True)
         self._window_overrides = {}
         try:
             entity_registry = er.async_get(self.hass)
@@ -1074,6 +1086,7 @@ class PlannerRuntime:
             window_states = self.hass.states.async_all("binary_sensor")
         except Exception:  # noqa: BLE001
             _LOGGER.debug("Could not initialize window tracking", exc_info=True)
+            self._cancel_window_pending(previous_pending)
             return
 
         window_metadata = {}
@@ -1129,8 +1142,16 @@ class PlannerRuntime:
                 self._async_window_state_changed,
             )
         for target, matching_windows in self._window_target_entities.items():
-            if self._window_aggregate_state(matching_windows) is not None:
+            aggregate = self._window_aggregate_state(matching_windows)
+            pending = previous_pending.pop(target, None)
+            current = self._window_overrides[target[0]].get(target[1], False)
+            if pending and aggregate == pending[0] and current != aggregate:
+                self._window_pending[target] = pending
+            elif pending:
+                pending[1]()
+            if aggregate is not None and target not in self._window_pending:
                 self._schedule_window_transition(target)
+        self._cancel_window_pending(previous_pending)
 
     async def _async_window_state_changed(self, event) -> None:
         """Debounce a changed labelled window before reapplying temperatures."""

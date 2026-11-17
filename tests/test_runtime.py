@@ -273,6 +273,10 @@ async def test_already_open_window_uses_open_delay_after_tracking_refresh(
     )
 
     assert delayed[-1][0] == 60
+    pending_callback = delayed[-1][1]
+    await runtime._async_refresh_window_tracking()
+    assert delayed[-1][1] is pending_callback
+    assert len(delayed) == 1
     assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
     await delayed[-1][1](datetime.now(tz=ZONE))
     assert fake_runtime.services.calls[-1][2]["temperature"] == 18.5

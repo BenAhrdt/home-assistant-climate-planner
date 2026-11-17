@@ -202,6 +202,10 @@ class ClimatePlannerPanel extends HTMLElement {
     return Number.isFinite(dueAt) ? Math.max(0, Math.ceil(dueAt - Date.now() / 1000)) : null;
   }
 
+  windowOpenCountdownText(seconds) {
+    return seconds > 60 ? `${Math.ceil(seconds / 60)} min` : `${seconds} s`;
+  }
+
   syncWindowCountdownTimer() {
     const hasPendingWindow = Object.values(this.data?.window_pending || {}).some(
       (pending) => (pending?.open_entity_ids || []).length > 0
@@ -1239,7 +1243,7 @@ class ClimatePlannerPanel extends HTMLElement {
       const windowOpening = Boolean((pendingWindow?.open_entity_ids || []).length && countdownSeconds !== null);
       let windowStatusMarkup = "";
       if (windowOpening) {
-        windowStatusMarkup = `<span class="window-status window-countdown">${escapeHTML(this.t.windowOpening)} ${countdownSeconds} s</span>`;
+        windowStatusMarkup = `<span class="window-status window-countdown">${escapeHTML(this.t.windowOpening)} ${this.windowOpenCountdownText(countdownSeconds)}</span>`;
       } else if (windowOpen) {
         windowStatusMarkup = `<span class="window-status">${escapeHTML(this.t.windowOpen)}</span>`;
       } else if (!windowDetectionEnabled) {
@@ -2826,7 +2830,7 @@ class ClimatePlannerPanel extends HTMLElement {
       const currentDelay = Number(windowOpenDelayInput.value);
       windowOpenDelaySuggestions.innerHTML = windowOpenDelayValues.map((value) => {
         const selected = currentDelay === value;
-        return `<button type="button" class="delay-suggestion${selected ? " selected" : ""}" data-delay-value="${value}" role="option" aria-selected="${selected}"><span class="delay-suggestion-value">${value}</span> <span class="delay-suggestion-unit">s</span></button>`;
+        return `<button type="button" class="delay-suggestion${selected ? " selected" : ""}" data-delay-value="${value}" role="option" aria-selected="${selected}"><span class="delay-suggestion-value">${escapeHTML(this.windowOpenCountdownText(value))}</span></button>`;
       }).join("");
       windowOpenDelaySuggestions.querySelectorAll("[data-delay-value]").forEach((button) => {
         button.addEventListener("pointerdown", (event) => event.preventDefault());
