@@ -203,6 +203,7 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
     assert (
         snapshot["window_pending"]["schedule_living"]["due_at"] > datetime.now(tz=ZONE).timestamp()
     )
+    assert snapshot["window_pending"]["schedule_living"]["remaining_seconds"] > 0
     await delayed[-1][1](datetime.now(tz=ZONE))
     assert {call[2]["temperature"] for call in fake_runtime.services.calls[-2:]} == {18.5, 21.0}
     assert runtime._window_overrides["schedule_living"]["climate.living"] is True

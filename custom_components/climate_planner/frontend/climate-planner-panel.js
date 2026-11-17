@@ -78,6 +78,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.scheduleRenderTimer = null;
     this.windowCountdownTimer = null;
     this.windowCountdownRefreshAt = 0;
+    this.windowCountdownReferenceAt = 0;
     this.loadInFlight = null;
     this.loadQueued = false;
     this.saveQueue = Promise.resolve();
@@ -115,6 +116,7 @@ class ClimatePlannerPanel extends HTMLElement {
     clearInterval(this.windowCountdownTimer);
     this.windowCountdownTimer = null;
     this.windowCountdownRefreshAt = 0;
+    this.windowCountdownReferenceAt = 0;
     clearTimeout(this.scheduleRenderTimer);
     this.scheduleRenderTimer = null;
     this.removeModeDragCursor();
@@ -200,6 +202,13 @@ class ClimatePlannerPanel extends HTMLElement {
   }
 
   windowOpenCountdownSeconds(pending) {
+    const remainingSeconds = Number(pending?.remaining_seconds);
+    if (Number.isFinite(remainingSeconds)) {
+      const elapsed = this.windowCountdownReferenceAt
+        ? (Date.now() - this.windowCountdownReferenceAt) / 1000
+        : 0;
+      return Math.max(0, Math.ceil(remainingSeconds - elapsed));
+    }
     const dueAt = Number(pending?.due_at);
     return Number.isFinite(dueAt) ? Math.max(0, Math.ceil(dueAt - Date.now() / 1000)) : null;
   }
@@ -585,6 +594,7 @@ class ClimatePlannerPanel extends HTMLElement {
     if (this.data) this.notice(this.t.loading);
     try {
       this.data = await this._hass.callWS({ type: "climate_planner/data" });
+      this.windowCountdownReferenceAt = Date.now();
       if (!this.windowLabelDirty) this.windowLabelDraft = this.data.window_label || "";
       if (!this.holidayRegionDirty) this.holidayRegionDraft = this.data.holiday_region || "national";
       if (!this.data.schedules.some((schedule) => schedule.id === this.selectedSchedule)) {

@@ -469,6 +469,7 @@ class PlannerRuntime:
             for schedule in schedules
         }
         window_pending: dict[str, dict[str, Any]] = {}
+        now_timestamp = now.timestamp()
         for (schedule_id, climate_entity_id), (
             desired,
             _unsubscribe,
@@ -478,10 +479,17 @@ class PlannerRuntime:
                 continue
             pending = window_pending.setdefault(
                 schedule_id,
-                {"open_entity_ids": [], "due_at": due_at},
+                {
+                    "open_entity_ids": [],
+                    "due_at": due_at,
+                    "remaining_seconds": max(0.0, due_at - now_timestamp),
+                },
             )
             pending["open_entity_ids"].append(climate_entity_id)
             pending["due_at"] = min(pending["due_at"], due_at)
+            pending["remaining_seconds"] = min(
+                pending["remaining_seconds"], max(0.0, due_at - now_timestamp)
+            )
         for pending in window_pending.values():
             pending["open_entity_ids"].sort()
         return {
