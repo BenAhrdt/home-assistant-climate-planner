@@ -1198,6 +1198,9 @@ class PlannerRuntime:
                 return
             self._window_overrides.setdefault(schedule_id, {})[climate_entity_id] = desired
             self.hass.bus.async_fire(EVENT_UPDATED, {"entry_id": self.entry_id})
+            # Let the panel and planner entities observe the transition before
+            # the climate service call performed by the full evaluation.
+            await asyncio.sleep(0)
             await self.async_evaluate()
 
         unsubscribe = async_call_later(self.hass, delay, apply_transition)
