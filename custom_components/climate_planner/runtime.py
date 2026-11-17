@@ -1197,6 +1197,7 @@ class PlannerRuntime:
             ):
                 return
             self._window_overrides.setdefault(schedule_id, {})[climate_entity_id] = desired
+            self.hass.bus.async_fire(EVENT_UPDATED, {"entry_id": self.entry_id})
             await self.async_evaluate()
 
         unsubscribe = async_call_later(self.hass, delay, apply_transition)
