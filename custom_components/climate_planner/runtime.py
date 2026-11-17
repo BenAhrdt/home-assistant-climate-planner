@@ -1115,11 +1115,10 @@ class PlannerRuntime:
                 self._window_target_entities[target] = matching_windows
                 for window_entity_id in matching_windows:
                     self._window_entity_targets.setdefault(window_entity_id, set()).add(target)
-                aggregate = self._window_aggregate_state(matching_windows)
-                schedule_overrides[climate_entity_id] = (
-                    previous_overrides.get(schedule_id, {}).get(climate_entity_id, False)
-                    if aggregate is None
-                    else aggregate
+                # Keep the effective override across a registry/config refresh.
+                # Reconcile a known sensor state through the same debounce path below.
+                schedule_overrides[climate_entity_id] = previous_overrides.get(schedule_id, {}).get(
+                    climate_entity_id, False
                 )
             self._window_overrides[schedule_id] = schedule_overrides
 
@@ -1129,6 +1128,9 @@ class PlannerRuntime:
                 list(self._window_entity_targets),
                 self._async_window_state_changed,
             )
+        for target, matching_windows in self._window_target_entities.items():
+            if self._window_aggregate_state(matching_windows) is not None:
+                self._schedule_window_transition(target)
 
     async def _async_window_state_changed(self, event) -> None:
         """Debounce a changed labelled window before reapplying temperatures."""

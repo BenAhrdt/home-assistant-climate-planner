@@ -180,7 +180,7 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
         {
             "climate_entity_ids": ["climate.living", "climate.bedroom"],
             "window_open_temperature": 18.5,
-            "window_open_delay_seconds": 30,
+            "window_open_delay_seconds": 60,
         }
     )
     payload["schedules"][0].pop("climate_entity_id")
@@ -195,7 +195,7 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
     await runtime._async_window_state_changed(
         SimpleNamespace(data={"entity_id": "binary_sensor.living_window"})
     )
-    assert delayed[-1][0] == 30
+    assert delayed[-1][0] == 60
     assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
     monkeypatch.setattr(runtime, "_async_climate_entities", no_climate_entities)
     snapshot = await runtime.snapshot()
@@ -224,6 +224,58 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
     await runtime.async_set_window_open_enabled("schedule_living", False)
     assert runtime.data["schedules"][0]["window_open_enabled"] is False
     assert runtime._window_target_entities == {}
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
+async def test_already_open_window_uses_open_delay_after_tracking_refresh(
+    fake_runtime, monkeypatch
+):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    fake_runtime.states.values["binary_sensor.living_window"] = SimpleNamespace(
+        entity_id="binary_sensor.living_window", state="on"
+    )
+    entries = {
+        "climate.living": SimpleNamespace(area_id="living", device_id=None, labels=set()),
+        "binary_sensor.living_window": SimpleNamespace(
+            area_id="living", device_id=None, labels={"fenster"}
+        ),
+    }
+    monkeypatch.setattr(
+        runtime_module.er,
+        "async_get",
+        lambda _hass: SimpleNamespace(async_get=entries.get),
+    )
+    monkeypatch.setattr(
+        runtime_module.dr,
+        "async_get",
+        lambda _hass: SimpleNamespace(async_get=lambda _device_id: None),
+    )
+    monkeypatch.setattr(
+        runtime_module,
+        "async_track_state_change_event",
+        lambda *_args, **_kwargs: lambda: None,
+    )
+    delayed = []
+
+    def fake_call_later(_hass, delay, callback):
+        delayed.append((delay, callback))
+        return lambda: None
+
+    monkeypatch.setattr(runtime_module, "async_call_later", fake_call_later)
+    payload = planner_payload()
+    payload["schedules"][0]["window_open_delay_seconds"] = 60
+    runtime = PlannerRuntime(fake_runtime, "entry", options={CONF_WINDOW_LABEL: "fenster"})
+
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+
+    assert delayed[-1][0] == 60
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
+    await delayed[-1][1](datetime.now(tz=ZONE))
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 18.5
     await runtime.async_shutdown()
 
 
