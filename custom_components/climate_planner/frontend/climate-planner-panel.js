@@ -288,8 +288,13 @@ class ClimatePlannerPanel extends HTMLElement {
 
       #overview-top .mode-palette .compact-mode-details,
       #schedules .quick-mode-details {
+        display: flex;
+        align-items: baseline;
+        flex-wrap: wrap;
+        gap: 0 8px;
         width: auto;
         min-width: 0;
+        line-height: 1.1;
       }
 
       #overview-top .mode-palette .compact-mode-row {
