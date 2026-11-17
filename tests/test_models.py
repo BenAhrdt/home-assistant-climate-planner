@@ -89,6 +89,14 @@ def test_window_open_delay_defaults_to_five_seconds_and_accepts_configured_value
     assert validate_planner(value)["schedules"][0]["window_open_delay_seconds"] == 300
 
 
+@pytest.mark.parametrize("legacy_delay", [0, 1, 4])
+def test_window_open_delay_migrates_legacy_values_to_five_seconds(legacy_delay):
+    value = planner()
+    value["schedules"][0]["window_open_delay_seconds"] = legacy_delay
+
+    assert validate_planner(value)["schedules"][0]["window_open_delay_seconds"] == 5
+
+
 @pytest.mark.parametrize("invalid_delay", [-1, 1801, True, 5.0])
 def test_window_open_delay_rejects_values_outside_integer_range(invalid_delay):
     value = planner()

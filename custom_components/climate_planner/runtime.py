@@ -111,7 +111,7 @@ class PlannerRuntime:
         self._window_entity_targets: dict[str, set[tuple[str, str]]] = {}
         self._window_target_entities: dict[tuple[str, str], set[str]] = {}
         self._window_overrides: dict[str, dict[str, bool]] = {}
-        self._window_pending: dict[tuple[str, str], tuple[bool, Any]] = {}
+        self._window_pending: dict[tuple[str, str], tuple[bool, Any, float]] = {}
         self._data_lock = asyncio.Lock()
         self._evaluation_lock = asyncio.Lock()
         self._started = False
@@ -468,6 +468,22 @@ class PlannerRuntime:
             }
             for schedule in schedules
         }
+        window_pending: dict[str, dict[str, Any]] = {}
+        for (schedule_id, climate_entity_id), (
+            desired,
+            _unsubscribe,
+            due_at,
+        ) in self._window_pending.items():
+            if not desired:
+                continue
+            pending = window_pending.setdefault(
+                schedule_id,
+                {"open_entity_ids": [], "due_at": due_at},
+            )
+            pending["open_entity_ids"].append(climate_entity_id)
+            pending["due_at"] = min(pending["due_at"], due_at)
+        for pending in window_pending.values():
+            pending["open_entity_ids"].sort()
         return {
             **clone_planner(self.data),
             "active": active,
@@ -484,6 +500,7 @@ class PlannerRuntime:
             "available_holidays": list(available_holiday_ids(self._holiday_region)),
             "climate_entities": climate_entities,
             "window_status": window_status,
+            "window_pending": window_pending,
         }
 
     async def async_activate_mode(
@@ -967,7 +984,7 @@ class PlannerRuntime:
         if self._window_unsub:
             self._window_unsub()
             self._window_unsub = None
-        for _desired, unsubscribe in self._window_pending.values():
+        for _desired, unsubscribe, _due_at in self._window_pending.values():
             unsubscribe()
         self._window_pending.clear()
         self._window_entity_targets.clear()
@@ -1133,6 +1150,7 @@ class PlannerRuntime:
             if pending:
                 pending[1]()
                 self._window_pending.pop(target, None)
+                self.hass.bus.async_fire(EVENT_UPDATED, {"entry_id": self.entry_id})
             return
         if pending and pending[0] == desired:
             return
@@ -1143,6 +1161,7 @@ class PlannerRuntime:
             if desired
             else WINDOW_CLOSE_DELAY_SECONDS
         )
+        due_at = self._now().timestamp() + delay
 
         async def apply_transition(_when) -> None:
             active_pending = self._window_pending.get(target)
@@ -1158,7 +1177,8 @@ class PlannerRuntime:
             await self.async_evaluate()
 
         unsubscribe = async_call_later(self.hass, delay, apply_transition)
-        self._window_pending[target] = (desired, unsubscribe)
+        self._window_pending[target] = (desired, unsubscribe, due_at)
+        self.hass.bus.async_fire(EVENT_UPDATED, {"entry_id": self.entry_id})
 
     async def _async_apply_due_auto_dates(self, now: datetime) -> None:
         """Apply each reached assignment auto-date event once."""

@@ -104,10 +104,12 @@ def _window_open_delay_seconds(value: object) -> int:
     if (
         isinstance(value, bool)
         or not isinstance(value, int)
-        or not WINDOW_OPEN_DELAY_MIN_SECONDS <= value <= WINDOW_OPEN_DELAY_MAX_SECONDS
+        or not 0 <= value <= WINDOW_OPEN_DELAY_MAX_SECONDS
     ):
         raise InvalidData("invalid_window_open_delay_seconds")
-    return value
+    # Older releases allowed 0-4 seconds. Keep those stored plans valid while
+    # enforcing the new five-second minimum in the normalized representation.
+    return max(value, WINDOW_OPEN_DELAY_MIN_SECONDS)
 
 
 def _bool(value: object, code: str) -> bool:

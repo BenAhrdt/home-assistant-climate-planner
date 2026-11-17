@@ -171,6 +171,10 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
         return lambda: None
 
     monkeypatch.setattr(runtime_module, "async_call_later", fake_call_later)
+
+    async def no_climate_entities():
+        return []
+
     payload = planner_payload()
     payload["schedules"][0].update(
         {
@@ -193,6 +197,12 @@ async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, mo
     )
     assert delayed[-1][0] == 30
     assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
+    monkeypatch.setattr(runtime, "_async_climate_entities", no_climate_entities)
+    snapshot = await runtime.snapshot()
+    assert snapshot["window_pending"]["schedule_living"]["open_entity_ids"] == ["climate.living"]
+    assert (
+        snapshot["window_pending"]["schedule_living"]["due_at"] > datetime.now(tz=ZONE).timestamp()
+    )
     await delayed[-1][1](datetime.now(tz=ZONE))
     assert {call[2]["temperature"] for call in fake_runtime.services.calls[-2:]} == {18.5, 21.0}
     assert runtime._window_overrides["schedule_living"]["climate.living"] is True

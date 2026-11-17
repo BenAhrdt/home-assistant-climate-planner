@@ -141,9 +141,12 @@ und es muss nichts neu angelegt oder ausgewählt werden. Nur beim Löschen und
 anschließenden Neuerstellen entsteht eine neue ID.
 
 Mindestens ein sicher offenes Fenster löst nach der im Heizplan eingestellten
-Verzögerung die Absenkung aus. Die Verzögerung kann zwischen 0 und 1800
+Verzögerung die Absenkung aus. Die Verzögerung kann zwischen 5 und 1800
 Sekunden liegen; das Panel bietet dafür 5, 10, 30, 60, 120, 300, 600, 900 und
-1800 Sekunden als Vorschläge an. Standardmäßig beträgt sie fünf Sekunden. Sind
+1800 Sekunden als Vorschläge an. Standardmäßig beträgt sie fünf Sekunden. Ältere
+Werte unter fünf Sekunden werden beim Laden auf fünf Sekunden angehoben. Während
+der Öffnungsverzögerung zeigt der Heizplan einen Countdown bis zur Absenkung an.
+Sind
 alle zugeordneten Fenster sicher geschlossen, wird die Temperatur des aktuell
 aktiven Modes intern nach fünf Sekunden wiederhergestellt; diese
 Schließverzögerung ist nicht einstellbar. Unbekannte oder nicht verfügbare

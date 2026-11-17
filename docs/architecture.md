@@ -64,7 +64,7 @@ Planner
     ├── climate_entity_ids[]    # eine oder mehrere climate.<object_id>
     ├── window_open_enabled     # Fensterabsenkung für diesen Heizplan
     ├── window_open_temperature # Absenktemperatur bei offenem Fenster in °C
-    ├── window_open_delay_seconds # Öffnungsverzögerung, 0 bis 1800 Sekunden
+    ├── window_open_delay_seconds # Öffnungsverzögerung, 5 bis 1800 Sekunden
     ├── enabled
     └── assignments[]
         ├── id
