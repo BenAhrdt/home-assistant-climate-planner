@@ -199,7 +199,7 @@ class ClimatePlannerPanel extends HTMLElement {
 
   windowOpenCountdownSeconds(pending) {
     const dueAt = Number(pending?.due_at);
-    return Number.isFinite(dueAt) ? Math.max(0, Math.ceil(dueAt - Date.now() / 1000)) : null;
+    return Number.isFinite(dueAt) ? Math.max(1, Math.ceil(dueAt - Date.now() / 1000)) : null;
   }
 
   windowOpenCountdownText(seconds) {
