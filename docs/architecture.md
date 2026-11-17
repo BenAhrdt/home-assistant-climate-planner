@@ -224,8 +224,11 @@ letzten Planner-Vorgabe verglichen. Weicht er unter Berücksichtigung der
 Thermostat-Schrittweite ab, erscheint der wertlose Hinweis `extern`; der zuletzt
 aktivierte Mode bleibt davon getrennt als Verlauf erhalten. Während einer
 Fenster-Absenkung wird der tatsächliche Absenk-Sollwert angezeigt, ohne den
-Hinweis `extern` zu setzen. Das ist reine Zustandsdarstellung: Es gibt weder
-Polling noch automatische Nachregelung.
+Hinweis `extern` zu setzen. Laufende interne Planner-Aufträge werden im
+Snapshot kenntlich gemacht; zusätzlich wartet die Anzeige kurz auf die
+Rückmeldung der Climate-Entität. Erst eine danach weiterhin bestehende
+Abweichung wird als `extern` markiert. Das ist reine Zustandsdarstellung: Es
+gibt weder Polling noch automatische Nachregelung.
 
 Beim Übergang eines Heizplans von pausiert zu aktiviert wird ein vorhandener
 manueller Override beendet, der zu diesem Zeitpunkt passende Zeitplan-Mode

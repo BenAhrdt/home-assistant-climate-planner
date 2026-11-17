@@ -11,6 +11,7 @@ const newId = (prefix) => {
 const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
+const EXTERNAL_TARGET_GRACE_MS = 1200;
 const WINDOW_LABEL_FORM_SCHEMA = [{
   name: "window_label",
   required: false,
@@ -74,6 +75,13 @@ class ClimatePlannerPanel extends HTMLElement {
     this.lastScheduleRenderSignature = "";
     this.scheduleInteractionActive = false;
     this.scheduleRenderPending = false;
+    this.scheduleRenderTimer = null;
+    this.loadInFlight = null;
+    this.loadQueued = false;
+    this.saveQueue = Promise.resolve();
+    this.externalTargetMismatches = new Map();
+    this.externalTargetTimers = new Map();
+    this.optimisticActivations = new Map();
     this.windowLabelDraft = "";
     this.windowLabelDirty = false;
     this.windowLabelNativeLoadPending = false;
@@ -92,7 +100,7 @@ class ClimatePlannerPanel extends HTMLElement {
     else if (this.started && this.data && !this.detailOpen && !this.dragActive
       && this.scheduleRenderSignature() !== this.lastScheduleRenderSignature) {
       if (this.scheduleInteractionActive) this.scheduleRenderPending = true;
-      else this.renderSchedules(Boolean(this._hass.user?.is_admin));
+      else this.queueScheduleRender();
     }
   }
 
@@ -102,9 +110,16 @@ class ClimatePlannerPanel extends HTMLElement {
 
   disconnectedCallback() {
     clearInterval(this.clockTimer);
+    clearTimeout(this.scheduleRenderTimer);
+    this.scheduleRenderTimer = null;
     this.removeModeDragCursor();
     this.eventUnsub?.();
     this.eventUnsub = null;
+    for (const timer of this.externalTargetTimers.values()) clearTimeout(timer);
+    this.externalTargetTimers.clear();
+    this.externalTargetMismatches.clear();
+    this.optimisticActivations.clear();
+    this.loadQueued = false;
     this.started = false;
   }
 
@@ -118,7 +133,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.renderShell();
     try {
       this.eventUnsub = await this._hass.connection.subscribeEvents(
-        () => this.load(), "climate_planner_updated",
+        () => { void this.load(); }, "climate_planner_updated",
       );
     } catch (_) { /* Manual refresh remains available if events are unavailable. */ }
     await this.load();
@@ -167,6 +182,16 @@ class ClimatePlannerPanel extends HTMLElement {
         return [entityId, state?.state, state?.last_updated, state?.attributes?.temperature, state?.attributes?.current_temperature, state?.attributes?.target_temp_step];
       }),
     });
+  }
+
+  queueScheduleRender() {
+    if (this.scheduleRenderTimer) return;
+    this.scheduleRenderTimer = setTimeout(() => {
+      this.scheduleRenderTimer = null;
+      if (this.started && this.data && !this.detailOpen && !this.dragActive) {
+        this.renderSchedules(Boolean(this._hass.user?.is_admin));
+      }
+    }, 0);
   }
 
   renderShell() {
@@ -243,6 +268,7 @@ class ClimatePlannerPanel extends HTMLElement {
     style.textContent += "main.overview-layout{height:100vh;min-height:0;overflow:hidden}main.overview-layout #overview-top{min-height:0;overflow:visible}main.overview-layout #schedules-section{display:flex;min-height:0;overflow:hidden;flex-direction:column}main.overview-layout #schedules{min-height:0;overflow-y:auto;overflow-x:hidden;align-content:start}@media(max-width:700px){main.overview-layout{height:auto;min-height:100vh;overflow:visible}main.overview-layout #schedules-section{display:block;overflow:visible}main.overview-layout #schedules{overflow:visible}}";
     style.textContent += ".compact-mode-row{min-width:0}.compact-mode-name,.compact-mode-temperature,.compact-mode-priority{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.compact-mode-name{flex:1 1 auto}.compact-mode-temperature,.compact-mode-priority{flex:0 1 auto}#schedules .quick-mode-copy{min-width:0;overflow:hidden}#schedules .quick-mode-copy strong,#schedules .quick-mode-copy small{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:0 1 auto}";
     style.textContent += ".compact-mode-row{height:36px;min-height:36px}.compact-mode-copy{display:flex;align-items:center;gap:8px;min-width:0;flex:1;line-height:1}.compact-mode-name{flex:1 1 auto;font-size:14px;line-height:14px}.compact-mode-details{display:grid;align-content:center;gap:1px;min-width:0;flex:none;line-height:10px}.compact-mode-temperature,.compact-mode-priority{font-size:10px;line-height:10px;flex:0 1 auto}.compact-mode-priority{color:var(--secondary-text-color)}#schedules .quick-mode-copy{display:flex;align-items:center;gap:8px;line-height:1}.quick-mode-details{display:grid;align-content:center;gap:1px;min-width:0;flex:none;line-height:10px}#schedules .quick-mode-copy strong{line-height:14px;flex:1 1 auto}#schedules .quick-mode-copy small{font-size:10px;line-height:10px;flex:0 1 auto}#schedules .quick-mode-copy .quick-mode-priority{color:var(--secondary-text-color)}#schedules .quick-mode-copy .quick-mode-details small{flex:0 1 auto}";
+    style.textContent += "#schedules{align-items:stretch}#schedules .schedule-card{display:flex;flex-direction:column}#schedules .schedule-card>.actions{margin-top:auto;padding-top:12px}";
     const header = this.shadowRoot.querySelector("header");
     const notice = this.$("notice");
     header.insertBefore(notice, this.$("refresh"));
@@ -354,6 +380,24 @@ class ClimatePlannerPanel extends HTMLElement {
   }
 
   async load() {
+    if (this.loadInFlight) {
+      this.loadQueued = true;
+      return this.loadInFlight;
+    }
+    const request = this._load();
+    this.loadInFlight = request;
+    try {
+      return await request;
+    } finally {
+      if (this.loadInFlight === request) this.loadInFlight = null;
+      if (this.loadQueued && this.started) {
+        this.loadQueued = false;
+        void this.load();
+      }
+    }
+  }
+
+  async _load() {
     if (this.data) this.notice(this.t.loading);
     try {
       this.data = await this._hass.callWS({ type: "climate_planner/data" });
@@ -375,17 +419,40 @@ class ClimatePlannerPanel extends HTMLElement {
     return { modes: structuredClone(this.data.modes), schedules: structuredClone(this.data.schedules) };
   }
 
-  async save(data) {
-    try {
-      await this._hass.callWS({ type: "climate_planner/configure", revision: this.data.revision, ...data });
-      await this.load();
-      this.closeDialog();
-      return true;
-    } catch (error) {
-      if (error?.code === "conflict") { this.notice(this.t.conflict, true); await this.load(); }
-      else this.notice(error?.code === "invalid_input" ? `${this.t.invalid} (${error.message || ""})` : this.t.saveError, true);
-      return false;
-    }
+  applyOptimisticConfiguration(data) {
+    this.data = {
+      ...this.data,
+      modes: structuredClone(data.modes),
+      schedules: structuredClone(data.schedules),
+    };
+    this.render();
+  }
+
+  save(data) {
+    if (!this.data) return Promise.resolve(false);
+    this.applyOptimisticConfiguration(data);
+    const request = this.saveQueue.then(async () => {
+      this.applyOptimisticConfiguration(data);
+      try {
+        await this._hass.callWS({
+          type: "climate_planner/configure",
+          revision: this.data.revision,
+          ...data,
+        });
+        await this.load();
+        this.closeDialog();
+        return true;
+      } catch (error) {
+        await this.load();
+        if (error?.code === "conflict") this.notice(this.t.conflict, true);
+        else this.notice(error?.code === "invalid_input"
+          ? `${this.t.invalid} (${error.message || ""})`
+          : this.t.saveError, true);
+        return false;
+      }
+    });
+    this.saveQueue = request.catch(() => {});
+    return request;
   }
 
   exportSettings() {
@@ -842,6 +909,11 @@ class ClimatePlannerPanel extends HTMLElement {
     else { this.renderModes(admin); this.renderSchedules(admin); }
   }
 
+  lastActivatedForSchedule(schedule) {
+    return this.optimisticActivations.get(schedule.id)
+      || this.data.last_activated?.[schedule.id];
+  }
+
   openScheduleDetails(scheduleId) {
     this.selectedSchedule = scheduleId;
     this.detailOpen = true;
@@ -955,7 +1027,7 @@ class ClimatePlannerPanel extends HTMLElement {
     this.lastScheduleRenderSignature = this.scheduleRenderSignature();
     if (!this.data.schedules.length) { target.innerHTML = `<p class="empty">${this.t.noSchedules}</p>`; return; }
     target.innerHTML = this.data.schedules.map((schedule) => {
-      const lastActivated = this.data.last_activated?.[schedule.id];
+      const lastActivated = this.lastActivatedForSchedule(schedule);
       const lastActivatedMode = lastActivated ? this.mode(lastActivated.mode_id) : null;
       const lastActivatedMarkup = lastActivated
         ? escapeHTML(lastActivatedMode?.name || lastActivated.mode_name)
@@ -2123,10 +2195,48 @@ class ClimatePlannerPanel extends HTMLElement {
 
   async activateMode(scheduleId, modeId, assignmentId) {
     if (!this._hass.user?.is_admin) return;
+    const schedule = this.data?.schedules?.find((item) => item.id === scheduleId);
+    const mode = this.mode(modeId);
+    const assignment = schedule?.assignments?.find((item) => item.id === assignmentId)
+      || schedule?.assignments?.find((item) => item.mode_id === modeId);
+    const requestId = newId("activation");
+    if (schedule && mode) {
+      this.optimisticActivations.set(scheduleId, {
+        mode_id: mode.id,
+        mode_name: mode.name,
+        assignment_id: assignment?.id || assignmentId || "",
+        phase_id: null,
+        target_temperature: Number(assignment
+          ? this.assignmentTemperature(schedule, assignment, mode)
+          : mode.target_temperature),
+        activated_at: new Date().toISOString(),
+        request_id: requestId,
+      });
+      this.renderSchedules(true);
+    }
     try {
       await this._hass.callWS({ type: "climate_planner/activate_mode", schedule_id: scheduleId, mode_id: modeId, ...(assignmentId ? { assignment_id: assignmentId } : {}) });
       await this.load();
+      const optimistic = this.optimisticActivations.get(scheduleId);
+      const activated = this.data?.last_activated?.[scheduleId];
+      const settled = activated?.mode_id === modeId
+        && Math.abs(Number(activated.target_temperature) - Number(optimistic?.target_temperature)) <= 0.001;
+      if (optimistic?.request_id === requestId && !settled) {
+        // A state event may have delivered the snapshot that was captured
+        // before the service request finished. Fetch one authoritative
+        // snapshot before dropping the optimistic view.
+        await this.load();
+      }
+      if (this.optimisticActivations.get(scheduleId)?.request_id === requestId) {
+        this.optimisticActivations.delete(scheduleId);
+        this.renderSchedules(true);
+      }
     } catch (error) {
+      if (this.optimisticActivations.get(scheduleId)?.request_id === requestId) {
+        this.optimisticActivations.delete(scheduleId);
+        await this.load();
+        if (this.data && !this.detailOpen) this.renderSchedules(true);
+      }
       this.notice(error?.code === "invalid_input" ? `${this.t.invalid} (${error.message || ""})` : this.t.saveError, true);
     }
   }
@@ -2343,14 +2453,75 @@ class ClimatePlannerPanel extends HTMLElement {
     return Math.max(0.051, celsiusStep / 2 + 0.001);
   }
 
+  externalTargetKey(schedule, entityId) {
+    return `${schedule?.id || ""}:${entityId}`;
+  }
+
+  clearExternalTargetTracking(key) {
+    this.externalTargetMismatches.delete(key);
+    const timer = this.externalTargetTimers.get(key);
+    if (timer) clearTimeout(timer);
+    this.externalTargetTimers.delete(key);
+  }
+
+  scheduleExternalTargetRefresh(key, delay) {
+    if (this.externalTargetTimers.has(key)) return;
+    const timer = setTimeout(() => {
+      this.externalTargetTimers.delete(key);
+      if (!this.data || !this.started || this.detailOpen || this.dragActive) return;
+      if (this.scheduleInteractionActive) {
+        this.scheduleRenderPending = true;
+      } else {
+        this.renderSchedules(Boolean(this._hass.user?.is_admin));
+      }
+    }, Math.max(0, delay));
+    this.externalTargetTimers.set(key, timer);
+  }
+
   externalTargetForEntity(schedule, entityId, requestedTemperature) {
-    if (requestedTemperature == null || requestedTemperature === "") return false;
+    const key = this.externalTargetKey(schedule, entityId);
+    if (requestedTemperature == null || requestedTemperature === "") {
+      this.clearExternalTargetTracking(key);
+      return false;
+    }
     const requested = Number(requestedTemperature);
-    if (!Number.isFinite(requested)) return false;
+    if (!Number.isFinite(requested)) {
+      this.clearExternalTargetTracking(key);
+      return false;
+    }
     const windowOpenEntityIds = new Set(this.data.window_status?.[schedule.id]?.open_entity_ids || []);
-    if (windowOpenEntityIds.has(entityId)) return false;
+    if (windowOpenEntityIds.has(entityId)) {
+      this.clearExternalTargetTracking(key);
+      return false;
+    }
+    if (this.optimisticActivations.has(schedule.id)) {
+      this.clearExternalTargetTracking(key);
+      return false;
+    }
+    const pendingActivations = this.data.pending_activations?.[schedule.id];
+    if (pendingActivations && Object.prototype.hasOwnProperty.call(pendingActivations, entityId)) {
+      this.clearExternalTargetTracking(key);
+      return false;
+    }
     const entityTarget = this.climateEntityTemperatureValue(entityId, "temperature", "target_temperature");
-    if (entityTarget == null || Math.abs(entityTarget - requested) <= this.targetTemperatureTolerance(entityId)) return false;
+    if (entityTarget == null || Math.abs(entityTarget - requested) <= this.targetTemperatureTolerance(entityId)) {
+      this.clearExternalTargetTracking(key);
+      return false;
+    }
+    const now = Date.now();
+    const previous = this.externalTargetMismatches.get(key);
+    const sameMismatch = previous
+      && previous.requested === requested
+      && Math.abs(previous.entityTarget - entityTarget) <= this.targetTemperatureTolerance(entityId);
+    const mismatch = sameMismatch
+      ? previous
+      : { requested, entityTarget, since: now };
+    if (!sameMismatch) this.externalTargetMismatches.set(key, mismatch);
+    const remaining = EXTERNAL_TARGET_GRACE_MS - (now - mismatch.since);
+    if (remaining > 0) {
+      this.scheduleExternalTargetRefresh(key, remaining);
+      return false;
+    }
     return true;
   }
 

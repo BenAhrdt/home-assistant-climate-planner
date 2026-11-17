@@ -244,7 +244,10 @@ Weicht dieser unter Berücksichtigung der Thermostat-Schrittweite von der
 letzten Planner-Vorgabe ab, erscheint der Hinweis **extern** ohne zusätzlichen
 Temperaturwert. Während der Fenster-Absenkung wird der tatsächliche
 Absenk-Sollwert angezeigt, aber nicht als **extern** markiert. Der Hinweis löst
-keine automatische Nachregelung aus. **Zuletzt aktiviert** bleibt der zuletzt
+keine automatische Nachregelung aus. Interne Sollwertwechsel des Planners
+werden während der laufenden Service-Anfrage und für eine kurze Rückmeldezeit
+nicht als extern markiert; bleibt die Abweichung danach bestehen, wird sie
+angezeigt. **Zuletzt aktiviert** bleibt der zuletzt
 vom Climate Planner aktivierte Mode; die Anzeige **Fenster offen – Absenkung
 aktiv** bleibt dabei erhalten. Der zuletzt aktivierte Mode bleibt auch nach
 einem Neustart der Integration erhalten.

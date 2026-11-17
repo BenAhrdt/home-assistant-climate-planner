@@ -104,6 +104,7 @@ class PlannerRuntime:
         self._auto_date_actions: dict[str, str] = {}
         self._applied: dict[str, tuple | None] = {}
         self._last_activated: dict[str, dict[str, Any]] = {}
+        self._pending_activations: dict[str, dict[str, float]] = {}
         self._timer_unsub = None
         self._window_unsub = None
         self._window_registry_unsubs = []
@@ -234,6 +235,7 @@ class PlannerRuntime:
         self._manual_overrides.clear()
         self._auto_date_actions.clear()
         self._last_activated.clear()
+        self._pending_activations.clear()
         self._clear_timer()
         self._clear_window_tracking()
         self._window_overrides.clear()
@@ -470,6 +472,7 @@ class PlannerRuntime:
             **clone_planner(self.data),
             "active": active,
             "last_activated": deepcopy(self._last_activated),
+            "pending_activations": deepcopy(self._pending_activations),
             "next_events": next_events,
             "week_views": weeks,
             "timezone": self.hass.config.time_zone,
@@ -1305,6 +1308,14 @@ class PlannerRuntime:
                 ", ".join(entity_ids),
             )
             return False
+        self._pending_activations[schedule["id"]] = {
+            entity_id: float(effective_temperatures[entity_id])
+            for entity_id in available_entity_ids
+        }
+        # Publish this before awaiting the climate service. The panel can then
+        # distinguish a planner-owned transition from a real external change,
+        # even if Home Assistant updates the climate state first.
+        self.hass.bus.async_fire(EVENT_UPDATED, {"entry_id": self.entry_id})
         try:
             target_unit = getattr(
                 getattr(self.hass.config, "units", None),
@@ -1357,3 +1368,5 @@ class PlannerRuntime:
                 schedule["name"],
             )
             return False
+        finally:
+            self._pending_activations.pop(schedule["id"], None)

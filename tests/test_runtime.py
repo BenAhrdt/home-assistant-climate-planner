@@ -1,3 +1,4 @@
+import asyncio
 from copy import deepcopy
 from datetime import datetime
 from types import SimpleNamespace
@@ -255,6 +256,44 @@ async def test_explicit_activation_reasserts_and_records_unchanged_mode(fake_run
     assert len(fake_runtime.services.calls) == 2
     assert runtime._last_activated["schedule_living"]["mode_name"] == "Home"
     assert runtime._last_activated["schedule_living"]["assignment_id"] == "assignment_home"
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
+async def test_snapshot_marks_planner_temperature_while_service_is_pending(
+    fake_runtime, monkeypatch
+):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    runtime = PlannerRuntime(fake_runtime, "entry")
+
+    async def no_climate_entities():
+        return []
+
+    monkeypatch.setattr(runtime, "_async_climate_entities", no_climate_entities)
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**planner_payload(), "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+
+    service_started = asyncio.Event()
+    release_service = asyncio.Event()
+    original_async_call = fake_runtime.services.async_call
+
+    async def delayed_async_call(domain, service, data, *, target, blocking):
+        service_started.set()
+        await release_service.wait()
+        await original_async_call(domain, service, data, target=target, blocking=blocking)
+
+    fake_runtime.services.async_call = delayed_async_call
+    activation = asyncio.create_task(runtime.async_activate_mode("schedule_living", "mode_home"))
+    await service_started.wait()
+
+    snapshot = await runtime.snapshot()
+
+    assert snapshot["pending_activations"] == {"schedule_living": {"climate.living": 21.0}}
+    release_service.set()
+    await activation
+    assert (await runtime.snapshot())["pending_activations"] == {}
     await runtime.async_shutdown()
 
 
