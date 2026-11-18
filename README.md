@@ -53,6 +53,7 @@ entities and uses centrally managed modes with target temperatures.
 - per-plan window-detection switches plus select entities for the global window
   label and German holiday region
 - a dedicated Home Assistant device for each heating plan
+- an installable Home Assistant blueprint for filtered calendar-event actions
 
 The integration intentionally does not implement feedback control loops,
 cyclic re-adjustment, HVAC mode changes or ioBroker state/device-manager
@@ -67,6 +68,10 @@ the sidebar.
 The complete English installation, user, automation, data-model and
 troubleshooting guide is maintained in the
 [Climate Planner Wiki](https://github.com/BenAhrdt/home-assistant-climate-planner/wiki).
+
+The repository also contains the [filtered calendar-event blueprint](docs/calendar-blueprint.md),
+which can run separate actions at configurable offsets before or after matching
+calendar-event beginnings or ends.
 
 ### Installation through HACS
 

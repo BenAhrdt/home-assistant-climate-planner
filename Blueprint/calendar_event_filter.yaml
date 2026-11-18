@@ -1,0 +1,140 @@
+blueprint:
+  name: Kalenderereignis mit Textfilter
+  description: >-
+    Führt getrennte Aktionsfolgen aus, wenn ein Kalenderereignis den
+    konfigurierten Textfilter erfüllt beziehungsweise nicht mehr erfüllt.
+    Der Filter wird gegen den Ereignistitel (summary) geprüft. Für beide
+    Fälle können Beginn oder Ende des Ereignisses sowie ein eigener
+    Zeitversatz gewählt werden.
+  domain: automation
+  source_url: https://github.com/BenAhrdt/home-assistant-climate-planner/blob/main/Blueprint/calendar_event_filter.yaml
+  min_version: "2024.10.0"
+  input:
+    calendar_entities:
+      name: Kalender
+      description: Ein oder mehrere Kalender, die überwacht werden sollen.
+      selector:
+        entity:
+          multiple: true
+          filter:
+            - domain: calendar
+
+    filter_text:
+      name: Filtertext
+      description: Der Text, der im Ereignistitel gesucht wird.
+      default: Urlaub
+      selector:
+        text:
+          type: search
+
+    filter_mode:
+      name: Filtervergleich
+      description: Groß-/Kleinschreibung wird nicht berücksichtigt.
+      default: contains
+      selector:
+        select:
+          options:
+            - label: Enthält
+              value: contains
+            - label: Exakt
+              value: exact
+
+    match_event:
+      name: Zeitpunkt für "Trifft zu"
+      description: Beginn oder Ende des passenden Ereignisses.
+      default: start
+      selector:
+        select:
+          options:
+            - label: Bei Beginn
+              value: start
+            - label: Bei Ende
+              value: end
+
+    match_offset:
+      name: Zeitversatz für "Trifft zu"
+      description: Vor oder nach dem gewählten Ereigniszeitpunkt.
+      default:
+        hours: -4
+      selector:
+        duration:
+          enable_day: true
+          enable_second: true
+          mode: offset
+
+    matched_actions:
+      name: Aktionen bei "Trifft zu"
+      description: Aktionen, die beim passenden Kalenderereignis ausgeführt werden.
+      selector:
+        action:
+
+    no_match_event:
+      name: Zeitpunkt für "Trifft nicht mehr zu"
+      description: Beginn oder Ende des Ereignisses, an dem der Filter nicht mehr gilt.
+      default: end
+      selector:
+        select:
+          options:
+            - label: Bei Beginn
+              value: start
+            - label: Bei Ende
+              value: end
+
+    no_match_offset:
+      name: Zeitversatz für "Trifft nicht mehr zu"
+      description: Vor oder nach dem gewählten Ereigniszeitpunkt.
+      default:
+        days: -2
+      selector:
+        duration:
+          enable_day: true
+          enable_second: true
+          mode: offset
+
+    no_match_actions:
+      name: Aktionen bei "Trifft nicht mehr zu"
+      description: Aktionen, die ausgeführt werden, wenn der passende Zeitraum endet.
+      selector:
+        action:
+
+variables:
+  filter_value: !input filter_text
+  filter_comparison: !input filter_mode
+
+triggers:
+  - trigger: calendar
+    id: matched
+    entity_id: !input calendar_entities
+    event: !input match_event
+    offset: !input match_offset
+  - trigger: calendar
+    id: no_match
+    entity_id: !input calendar_entities
+    event: !input no_match_event
+    offset: !input no_match_offset
+
+conditions:
+  - condition: template
+    value_template: >-
+      {% set summary = trigger.calendar_event.summary | default('', true) | string | trim | lower %}
+      {% set needle = filter_value | default('', true) | string | trim | lower %}
+      {% if not needle %}
+        false
+      {% elif filter_comparison == 'exact' %}
+        {{ summary == needle }}
+      {% else %}
+        {{ needle in summary }}
+      {% endif %}
+
+actions:
+  - choose:
+      - conditions:
+          - condition: trigger
+            id: matched
+        sequence: !input matched_actions
+      - conditions:
+          - condition: trigger
+            id: no_match
+        sequence: !input no_match_actions
+
+mode: queued

@@ -362,6 +362,20 @@ in der Oberfläche nur eine Zuordnung und damit einen Switch sowie einen
 Aktivierungs-Button. Ein Aktivierungs-Button kann auch eine pausierte Zuordnung
 manuell aktivieren.
 
+## Kalenderereignis-Blueprint
+
+Der separate [Kalenderereignis-Blueprint](calendar-blueprint.md) überwacht einen
+oder mehrere Home-Assistant-Kalender und filtert deren Ereignistitel. Für einen
+Treffer und für das Ende der passenden Gültigkeit können jeweils eigene
+Zeitpunkte, Zeitversätze und Aktionen aus dem normalen Home-Assistant-
+Aktionseditor konfiguriert werden. Das eignet sich beispielsweise für:
+
+- `Urlaub` im Titel: vier Stunden vor Beginn eine Entität einschalten,
+- zwei Tage vor dem geplanten Ende: dieselbe Entität ausschalten.
+
+Die vollständige Installationsanleitung und die Grenzen der Kalender-Trigger
+stehen auf der verlinkten Seite.
+
 ## Wochenansicht
 
 Die Wochenansicht zeigt für den ausgewählten Heizplan Montag bis Sonntag,
