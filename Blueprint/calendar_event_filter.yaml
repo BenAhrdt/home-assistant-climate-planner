@@ -22,8 +22,10 @@ blueprint:
 
     filter_text:
       name: Filtertext
-      description: Der Text, der im Ereignistitel gesucht wird.
-      default: Urlaub
+      description: >-
+        Der Text, der im Ereignistitel gesucht wird. Leer lassen, um auf jeden
+        Kalendereintrag zu reagieren.
+      default: ""
       selector:
         text:
           type: search
@@ -139,8 +141,10 @@ conditions:
       {% set needle = filter_value | default('', true) | string | trim | lower %}
       {% set matched_trigger = 'matched_' ~ selected_match_event %}
       {% set no_match_trigger = 'no_match_' ~ selected_no_match_event %}
-      {% if trigger.id not in [matched_trigger, no_match_trigger] or not needle %}
+      {% if trigger.id not in [matched_trigger, no_match_trigger] %}
         false
+      {% elif not needle %}
+        true
       {% elif filter_comparison == 'exact' %}
         {{ summary == needle }}
       {% else %}

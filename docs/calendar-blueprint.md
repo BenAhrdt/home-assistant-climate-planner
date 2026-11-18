@@ -50,7 +50,9 @@ Ereignisses ausgeführt. Die zweite Aktionsfolge wird zwei Tage vor dem
 geplanten Ende desselben passenden Ereignisses ausgeführt.
 
 Der Filter wird case-insensitiv ausschließlich auf den Ereignistitel angewandt.
-Ein leerer Filtertext führt absichtlich zu keiner Ausführung.
+Wenn der Filtertext leer bleibt, passt der Blueprint auf jeden
+Kalendereintrag. Das ist die Einstellung für eine allgemeine Reaktion auf
+Kalenderereignisse.
 
 Der Blueprint verwendet die aktuellen Kalender-Trigger
 `calendar.event_started` und `calendar.event_ended`. Dadurch können mehrere
