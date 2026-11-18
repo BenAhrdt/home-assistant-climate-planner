@@ -64,6 +64,7 @@ blueprint:
     matched_actions:
       name: Aktionen bei "Trifft zu"
       description: Aktionen, die beim passenden Kalenderereignis ausgeführt werden.
+      default: []
       selector:
         action:
 
@@ -93,6 +94,7 @@ blueprint:
     no_match_actions:
       name: Aktionen bei "Trifft nicht mehr zu"
       description: Aktionen, die ausgeführt werden, wenn der passende Zeitraum endet.
+      default: []
       selector:
         action:
 

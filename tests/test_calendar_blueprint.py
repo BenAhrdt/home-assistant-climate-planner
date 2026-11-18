@@ -36,6 +36,8 @@ def test_calendar_blueprint_has_installable_structure() -> None:
     ]
     assert inputs["matched_actions"]["selector"] == {"action": None}
     assert inputs["no_match_actions"]["selector"] == {"action": None}
+    assert inputs["matched_actions"]["default"] == []
+    assert inputs["no_match_actions"]["default"] == []
 
     triggers = blueprint["triggers"]
     assert [trigger["id"] for trigger in triggers] == ["matched", "no_match"]
