@@ -8,7 +8,6 @@ blueprint:
     Zeitversatz gewählt werden.
   domain: automation
   source_url: https://github.com/BenAhrdt/home-assistant-climate-planner/blob/main/Blueprint/calendar_event_filter.yaml
-  min_version: "2024.10.0"
   input:
     calendar_entities:
       name: Kalender
