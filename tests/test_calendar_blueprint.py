@@ -15,11 +15,7 @@ BlueprintLoader.add_constructor(
 )
 
 
-BLUEPRINT_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "Blueprint"
-    / "calendar_event_filter.yaml"
-)
+BLUEPRINT_PATH = Path(__file__).resolve().parents[1] / "Blueprint" / "calendar_event_filter.yaml"
 
 
 def test_calendar_blueprint_has_installable_structure() -> None:
@@ -39,9 +35,7 @@ def test_calendar_blueprint_has_installable_structure() -> None:
         {"label": "Alle Textfilter müssen zutreffen (UND)", "value": "and"},
     ]
     assert inputs["calendar_entities"]["selector"]["entity"]["multiple"] is True
-    assert inputs["calendar_entities"]["selector"]["entity"]["filter"] == [
-        {"domain": "calendar"}
-    ]
+    assert inputs["calendar_entities"]["selector"]["entity"]["filter"] == [{"domain": "calendar"}]
     assert inputs["matched_actions"]["selector"] == {"action": None}
     assert inputs["no_match_actions"]["selector"] == {"action": None}
     assert inputs["matched_actions"]["default"] == []
@@ -60,10 +54,7 @@ def test_calendar_blueprint_has_installable_structure() -> None:
         "calendar.event_started",
         "calendar.event_ended",
     ]
-    assert all(
-        trigger["target"] == {"entity_id": "calendar_entities"}
-        for trigger in triggers
-    )
+    assert all(trigger["target"] == {"entity_id": "calendar_entities"} for trigger in triggers)
     assert triggers[0]["options"]["offset"] == "match_offset"
     assert triggers[1]["options"]["offset"] == "match_offset"
     assert triggers[2]["options"]["offset"] == "no_match_offset"

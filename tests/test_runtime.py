@@ -666,6 +666,53 @@ async def test_auto_dates_apply_in_order_and_manual_toggle_remains_independent(f
 
 
 @pytest.mark.asyncio
+async def test_manual_enable_reactivates_continuous_assignment_after_auto_off(fake_runtime):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    payload = planner_payload()
+    assignment_value = payload["schedules"][0]["assignments"][0]
+    assignment_value.update(
+        {
+            "enabled": True,
+            "continuous": True,
+            "weekday_rules": {"monday": ["23:00"]},
+            "auto_rules": [
+                {
+                    "id": "cycle",
+                    "name": "Cycle",
+                    "kind": "date",
+                    "date": "2026-11-10",
+                    "actions": {
+                        "on": {"time": "09:00"},
+                        "off": {"time": "18:00"},
+                    },
+                }
+            ],
+        }
+    )
+    runtime = PlannerRuntime(fake_runtime, "entry")
+    runtime._now = lambda: datetime(2026, 11, 10, 20, tzinfo=ZONE)
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+
+    assert runtime.data["schedules"][0]["assignments"][0]["enabled"] is False
+    assert runtime.active["schedule_living"] is None
+    fake_runtime.services.calls.clear()
+
+    await runtime.async_set_assignment_enabled("schedule_living", "assignment_home", True)
+
+    assert runtime.active["schedule_living"] is not None
+    assert runtime.active["schedule_living"].mode["id"] == "mode_home"
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 21.0
+
+    await runtime.async_set_assignment_enabled("schedule_living", "assignment_home", False)
+
+    assert runtime.active["schedule_living"] is None
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
 async def test_manual_mode_activation_applies_paused_plan_and_assignment(fake_runtime):
     fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
     payload = planner_payload()

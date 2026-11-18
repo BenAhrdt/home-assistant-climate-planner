@@ -447,16 +447,6 @@ def _candidates(
             details = _latest_auto_event_details(
                 assignment, local_now, holiday_region=holiday_region
             )
-            has_auto_on = any(
-                action == "on"
-                for rule in assignment.get("auto_rules", [])
-                if isinstance(rule, dict)
-                for action, _config in _auto_rule_actions(rule)
-            )
-            if details is None and has_auto_on:
-                continue
-            if details is not None and not details[2]:
-                continue
             occurrence = (
                 details[0] if details is not None else _at_local(local_now.date(), "00:00", zone)
             )
@@ -523,7 +513,7 @@ def select_active_mode(
     respect_schedule_enabled: bool = True,
     respect_assignment_enabled: bool = True,
 ) -> ActiveMatch | None:
-    """Select the matching mode while applying automatic-rule day boundaries.
+    """Select the matching mode while applying configured activation state.
 
     Higher mode priority wins first. Equal priorities use the latest matching
     activation, then configured assignment and mode order as deterministic
@@ -531,7 +521,9 @@ def select_active_mode(
     reached on the current local day; a 00:00 phase makes them available
     immediately after an automatic enable event. A higher-priority assignment
     whose first phase today is still in the future cannot win early through a
-    carry-over from the previous day.
+    carry-over from the previous day. Continuous assignments use their
+    persisted enabled state directly, so a manual toggle has the same effect
+    as the corresponding automatic toggle.
     """
 
     if respect_schedule_enabled and not schedule["enabled"]:

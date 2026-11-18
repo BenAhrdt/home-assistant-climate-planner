@@ -67,10 +67,11 @@ bundesweite Feiertage oder zusätzlich die gesetzlichen Feiertage eines
 Bundeslands angeboten und berechnet werden. Gemeinde- oder ortsabhängige
 Sonderfälle, etwa in Teilen Bayerns, Sachsens oder Thüringens, werden nicht
 automatisch berücksichtigt. Das zuletzt erreichte Ereignis bestimmt den
-Aktivierungszustand; bei gleichem Zeitpunkt hat **Auto aus** Vorrang. Die
-manuellen Play-/Pause-Schalter bleiben unabhängig davon bedienbar. Wird eine
-bisher pausierte Mode-Zuordnung manuell eingeschaltet, endet dabei eine aktive
-manuelle Mode-Auswahl und die Automatik wird sofort neu ausgewertet.
+Aktivierungszustand; bei gleichem Zeitpunkt hat **Auto aus** Vorrang. Der
+manuelle Ein-/Ausschalter der Mode-Zuordnung hat dabei dieselbe Wirkung wie
+**Auto ein** beziehungsweise **Auto aus** und wird sofort neu ausgewertet.
+Wird eine bisher pausierte Mode-Zuordnung manuell eingeschaltet, endet dabei
+eine aktive manuelle Mode-Auswahl.
 
 Eine Regel mit dem Anlass **Zyklisch** verwendet eine Wiederholung. Auto ein und
 Auto aus besitzen dabei jeweils eigene Uhrzeit-, Startdatum- und optionale
@@ -88,16 +89,18 @@ gemeinsam die zeitliche Gültigkeit.
 
 Für eine Mode-Zuordnung gibt es zentral die Option **Wochentagszeiten für
 diese Mode-Zuordnung ignorieren**. Sie eignet sich besonders für Feiertage,
-einmalige Termine und zyklische Regeln: Sobald die automatische Zuordnung
-gültig ist, werden Wochentage und Tageszeiten nicht als zusätzliche Grenze
-ausgewertet. Sie kann auch ohne automatische Regel verwendet werden; dann gilt
-die aktivierte Mode-Zuordnung durchgehend. Die Wochentagsfelder werden im
-Dialog ausgeblendet; die bereits gespeicherten Zeiten werden dabei nicht
-gelöscht. Wird die Option später abgewählt, erscheinen sie wieder und gelten
-erneut. Beim Anlegen der ersten Feiertagsregel wird die Option automatisch
-aktiviert. Ohne diese Option bilden die Wochentagszeiten die zweite Zeitgrenze
-nach dem automatischen Einschalten; so können beispielsweise mittwochs andere
-Zeiten als an den übrigen Tagen verwendet werden.
+einmalige Termine und zyklische Regeln: Sobald die Zuordnung aktiviert ist,
+werden Wochentage und Tageszeiten nicht als zusätzliche Grenze ausgewertet.
+Manuelles Ein- und Ausschalten hat dabei exakt dieselbe Wirkung wie **Auto
+ein** und **Auto aus**. Die Option kann auch ohne automatische Regel verwendet
+werden; dann gilt die aktivierte Mode-Zuordnung durchgehend. Die
+Wochentagsfelder werden im Dialog ausgeblendet; die bereits gespeicherten
+Zeiten werden dabei nicht gelöscht. Wird die Option später abgewählt,
+erscheinen sie wieder und gelten erneut. Beim Anlegen der ersten Feiertagsregel
+wird die Option automatisch aktiviert. Ohne diese Option bilden die
+Wochentagszeiten die zweite Zeitgrenze nach dem automatischen Einschalten; so
+können beispielsweise mittwochs andere Zeiten als an den übrigen Tagen
+verwendet werden.
 
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.
@@ -293,6 +296,12 @@ stabile Konfigurationsreihenfolge. Die Priorität schaltet einen Mode nicht ein
 und ersetzt keine Uhrzeit: Sie entscheidet nur, welcher bereits zeitlich
 gültige Mode gewinnt. Bei Mode-Zuordnungen mit automatischen Regeln wird nur
 eine bereits erreichte Phase des aktuellen lokalen Tages berücksichtigt.
+
+Bei einer Mode-Zuordnung mit aktivierter Option **Wochentagszeiten ignorieren**
+ist die Zuordnung während ihres aktivierten Zustands den ganzen Tag gültig.
+Ein manuelles Einschalten oder Ausschalten wird genauso behandelt wie das
+entsprechende automatische Ereignis und kann dadurch den aktuellen Zustand bis
+zum nächsten automatischen Ereignis übersteuern.
 
 Beispiel: Ein normaler Mode mit 21 °C hat Priorität 0 und beginnt um 06:00.
 Ein Geburtstags-Mode mit 22 °C hat Priorität 10, wird am Geburtstag per Auto

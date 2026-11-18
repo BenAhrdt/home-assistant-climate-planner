@@ -204,12 +204,13 @@ def test_auto_rule_priority_can_start_immediately_at_midnight():
     assert match is not None and match.mode["id"] == "birthday"
 
 
-def test_continuous_auto_rule_uses_auto_period_without_weekday_phases():
+def test_continuous_assignment_uses_enabled_state_without_weekday_phases():
     modes = [mode("holiday", "Holiday", 22)]
     value = schedule(
         [
             {
                 **assignment("holiday-rule", "holiday"),
+                "enabled": False,
                 "continuous": True,
                 "weekday_rules": {},
                 "auto_rules": [
@@ -229,18 +230,43 @@ def test_continuous_auto_rule_uses_auto_period_without_weekday_phases():
     )
 
     assert select_active_mode(value, modes, datetime(2026, 11, 9, 8, 59, tzinfo=ZONE)) is None
+    value["assignments"][0]["enabled"] = True
     assert select_active_mode(value, modes, datetime(2026, 11, 9, 9, 0, tzinfo=ZONE)) is not None
     assert select_active_mode(value, modes, datetime(2026, 11, 9, 21, 59, tzinfo=ZONE)) is not None
+    value["assignments"][0]["enabled"] = False
     assert select_active_mode(value, modes, datetime(2026, 11, 9, 22, 0, tzinfo=ZONE)) is None
 
-    view = week_view(value, modes, datetime(2026, 11, 9, 7, tzinfo=ZONE))
-    monday = next(day for day in view["days"] if day["weekday"] == "monday")
-    assert [(segment["start"], segment["end"]) for segment in monday["tracks"][0]["segments"]] == [
-        (540, 1320)
-    ]
-    assert [
-        (segment["start"], segment["end"]) for segment in monday["priority_tracks"][0]["segments"]
-    ] == [(540, 1320)]
+
+def test_continuous_assignment_uses_manual_enabled_state_after_auto_off():
+    modes = [mode("holiday", "Holiday", 22, priority=10)]
+    value = schedule(
+        [
+            {
+                **assignment("holiday-rule", "holiday"),
+                "continuous": True,
+                "weekday_rules": {"monday": ["23:00"]},
+                "auto_rules": [
+                    {
+                        "id": "holiday-period",
+                        "name": "Holiday period",
+                        "kind": "date",
+                        "date": "2026-11-09",
+                        "actions": {
+                            "on": {"time": "09:00"},
+                            "off": {"time": "22:00"},
+                        },
+                    }
+                ],
+            }
+        ]
+    )
+
+    value["assignments"][0]["enabled"] = False
+    assert select_active_mode(value, modes, datetime(2026, 11, 9, 22, 30, tzinfo=ZONE)) is None
+
+    value["assignments"][0]["enabled"] = True
+    match = select_active_mode(value, modes, datetime(2026, 11, 9, 22, 30, tzinfo=ZONE))
+    assert match is not None and match.mode["id"] == "holiday"
 
 
 def test_week_view_hides_future_continuous_auto_period_while_assignment_is_paused():
