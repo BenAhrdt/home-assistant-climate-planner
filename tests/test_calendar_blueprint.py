@@ -40,8 +40,25 @@ def test_calendar_blueprint_has_installable_structure() -> None:
     assert inputs["no_match_actions"]["default"] == []
 
     triggers = blueprint["triggers"]
-    assert [trigger["id"] for trigger in triggers] == ["matched", "no_match"]
-    assert triggers[0]["event"] == "start"
-    assert triggers[1]["event"] == "end"
+    assert [trigger["id"] for trigger in triggers] == [
+        "matched_start",
+        "matched_end",
+        "no_match_start",
+        "no_match_end",
+    ]
+    assert [trigger["trigger"] for trigger in triggers] == [
+        "calendar.event_started",
+        "calendar.event_ended",
+        "calendar.event_started",
+        "calendar.event_ended",
+    ]
+    assert all(
+        trigger["target"] == {"entity_id": "calendar_entities"}
+        for trigger in triggers
+    )
+    assert triggers[0]["options"]["offset"] == "match_offset"
+    assert triggers[1]["options"]["offset"] == "match_offset"
+    assert triggers[2]["options"]["offset"] == "no_match_offset"
+    assert triggers[3]["options"]["offset"] == "no_match_offset"
 
     assert blueprint["mode"] == "queued"

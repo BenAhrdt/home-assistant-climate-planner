@@ -101,25 +101,43 @@ blueprint:
 variables:
   filter_value: !input filter_text
   filter_comparison: !input filter_mode
+  selected_match_event: !input match_event
+  selected_no_match_event: !input no_match_event
 
 triggers:
-  - trigger: calendar
-    id: matched
-    entity_id: !input calendar_entities
-    event: !input match_event
-    offset: !input match_offset
-  - trigger: calendar
-    id: no_match
-    entity_id: !input calendar_entities
-    event: !input no_match_event
-    offset: !input no_match_offset
+  - trigger: calendar.event_started
+    id: matched_start
+    target:
+      entity_id: !input calendar_entities
+    options:
+      offset: !input match_offset
+  - trigger: calendar.event_ended
+    id: matched_end
+    target:
+      entity_id: !input calendar_entities
+    options:
+      offset: !input match_offset
+  - trigger: calendar.event_started
+    id: no_match_start
+    target:
+      entity_id: !input calendar_entities
+    options:
+      offset: !input no_match_offset
+  - trigger: calendar.event_ended
+    id: no_match_end
+    target:
+      entity_id: !input calendar_entities
+    options:
+      offset: !input no_match_offset
 
 conditions:
   - condition: template
     value_template: >-
       {% set summary = trigger.calendar_event.summary | default('', true) | string | trim | lower %}
       {% set needle = filter_value | default('', true) | string | trim | lower %}
-      {% if not needle %}
+      {% set matched_trigger = 'matched_' ~ selected_match_event %}
+      {% set no_match_trigger = 'no_match_' ~ selected_no_match_event %}
+      {% if trigger.id not in [matched_trigger, no_match_trigger] or not needle %}
         false
       {% elif filter_comparison == 'exact' %}
         {{ summary == needle }}
@@ -130,12 +148,14 @@ conditions:
 actions:
   - choose:
       - conditions:
-          - condition: trigger
-            id: matched
+          - condition: template
+            value_template: >-
+              {{ trigger.id == ('matched_' ~ selected_match_event) }}
         sequence: !input matched_actions
       - conditions:
-          - condition: trigger
-            id: no_match
+          - condition: template
+            value_template: >-
+              {{ trigger.id == ('no_match_' ~ selected_no_match_event) }}
         sequence: !input no_match_actions
 
 mode: queued

@@ -52,6 +52,10 @@ geplanten Ende desselben passenden Ereignisses ausgeführt.
 Der Filter wird case-insensitiv ausschließlich auf den Ereignistitel angewandt.
 Ein leerer Filtertext führt absichtlich zu keiner Ausführung.
 
+Der Blueprint verwendet die aktuellen Kalender-Trigger
+`calendar.event_started` und `calendar.event_ended`. Dadurch können mehrere
+Kalender als Ziel ausgewählt werden.
+
 ## Verhalten und Grenzen
 
 - Der Blueprint liest Kalenderereignisse; er schreibt keine Termine und benötigt
