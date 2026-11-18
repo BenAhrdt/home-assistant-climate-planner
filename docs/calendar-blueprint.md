@@ -54,7 +54,10 @@ Ein leerer Filtertext führt absichtlich zu keiner Ausführung.
 
 Der Blueprint verwendet die aktuellen Kalender-Trigger
 `calendar.event_started` und `calendar.event_ended`. Dadurch können mehrere
-Kalender als Ziel ausgewählt werden.
+Kalender als Ziel ausgewählt werden. Dafür ist Home Assistant 2026.2 oder
+neuer erforderlich; falls die Kalender-Trigger in deiner Installation noch
+unter **Einstellungen → System → Labs** geführt werden, müssen sie dort
+aktiviert sein.
 
 ## Verhalten und Grenzen
 

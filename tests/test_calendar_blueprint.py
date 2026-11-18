@@ -27,6 +27,7 @@ def test_calendar_blueprint_has_installable_structure() -> None:
 
     metadata = blueprint["blueprint"]
     assert metadata["domain"] == "automation"
+    assert metadata["homeassistant"]["min_version"] == "2026.2.0"
     assert metadata["source_url"].endswith("/Blueprint/calendar_event_filter.yaml")
 
     inputs = metadata["input"]
