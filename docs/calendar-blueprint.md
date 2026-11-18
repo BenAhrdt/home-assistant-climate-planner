@@ -3,7 +3,8 @@
 Der Blueprint
 [`Blueprint/calendar_event_filter.yaml`](../Blueprint/calendar_event_filter.yaml)
 überwacht einen oder mehrere Home-Assistant-Kalender und vergleicht den Titel
-(`summary`) jedes ausgelösten Kalenderereignisses mit einem Filtertext.
+(`summary`) jedes ausgelösten Kalenderereignisses mit einem oder mehreren
+Filtertexten.
 
 Für ein passendes Ereignis und für das Ende der passenden Gültigkeit können
 unabhängige Aktionen über den normalen Home-Assistant-Aktionseditor hinterlegt
@@ -38,21 +39,24 @@ Für einen Termin mit dem Titel **Urlaub**:
 1. Einen oder mehrere Kalender auswählen.
 2. Als Filtertext `Urlaub` eintragen.
 3. **Enthält** auswählen, damit auch Titel wie `Familienurlaub` passen.
-4. Unter **Zeitpunkt für „Trifft zu“** `Bei Beginn` auswählen.
-5. Unter **Zeitversatz für „Trifft zu“** `Vor 4 Stunden` einstellen.
-6. Unter **Aktionen bei „Trifft zu“** die zu aktivierende Entität einschalten.
-7. Unter **Zeitpunkt für „Trifft nicht mehr zu“** `Bei Ende` auswählen.
-8. Unter **Zeitversatz für „Trifft nicht mehr zu“** `Vor 2 Tagen` einstellen.
-9. Unter **Aktionen bei „Trifft nicht mehr zu“** die Entität ausschalten.
+4. Bei mehreren Filtertexten **Ein Textfilter muss zutreffen (ODER)** wählen,
+   wenn einer genügt, oder **Alle Textfilter müssen zutreffen (UND)**, wenn
+   jeder Text im Titel vorkommen muss.
+5. Unter **Zeitpunkt für „Trifft zu“** `Bei Beginn` auswählen.
+6. Unter **Zeitversatz für „Trifft zu“** `Vor 4 Stunden` einstellen.
+7. Unter **Aktionen bei „Trifft zu“** die zu aktivierende Entität einschalten.
+8. Unter **Zeitpunkt für „Trifft nicht mehr zu“** `Bei Ende` auswählen.
+9. Unter **Zeitversatz für „Trifft nicht mehr zu“** `Vor 2 Tagen` einstellen.
+10. Unter **Aktionen bei „Trifft nicht mehr zu“** die Entität ausschalten.
 
 Damit wird die erste Aktionsfolge vier Stunden vor dem Beginn eines passenden
 Ereignisses ausgeführt. Die zweite Aktionsfolge wird zwei Tage vor dem
 geplanten Ende desselben passenden Ereignisses ausgeführt.
 
-Der Filter wird case-insensitiv ausschließlich auf den Ereignistitel angewandt.
-Wenn der Filtertext leer bleibt, passt der Blueprint auf jeden
-Kalendereintrag. Das ist die Einstellung für eine allgemeine Reaktion auf
-Kalenderereignisse.
+Die Filter werden case-insensitiv ausschließlich auf den Ereignistitel
+angewandt. Leere zusätzliche Filtertexte werden ignoriert. Wenn kein Filtertext
+verbleibt, passt der Blueprint auf jeden Kalendereintrag. Das ist die
+Einstellung für eine allgemeine Reaktion auf Kalenderereignisse.
 
 Der Blueprint verwendet die aktuellen Kalender-Trigger
 `calendar.event_started` und `calendar.event_ended`. Dadurch können mehrere

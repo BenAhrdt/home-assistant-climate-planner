@@ -31,7 +31,13 @@ def test_calendar_blueprint_has_installable_structure() -> None:
     assert metadata["source_url"].endswith("/Blueprint/calendar_event_filter.yaml")
 
     inputs = metadata["input"]
-    assert inputs["filter_text"]["default"] == ""
+    assert inputs["filter_text"]["default"] == []
+    assert inputs["filter_text"]["selector"]["text"]["multiple"] is True
+    assert inputs["filter_logic"]["default"] == "or"
+    assert inputs["filter_logic"]["selector"]["select"]["options"] == [
+        {"label": "Ein Textfilter muss zutreffen (ODER)", "value": "or"},
+        {"label": "Alle Textfilter müssen zutreffen (UND)", "value": "and"},
+    ]
     assert inputs["calendar_entities"]["selector"]["entity"]["multiple"] is True
     assert inputs["calendar_entities"]["selector"]["entity"]["filter"] == [
         {"domain": "calendar"}

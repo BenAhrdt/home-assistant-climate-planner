@@ -3,8 +3,9 @@ blueprint:
   description: >-
     Führt getrennte Aktionsfolgen aus, wenn ein Kalenderereignis den
     konfigurierten Textfilter erfüllt beziehungsweise nicht mehr erfüllt.
-    Der Filter wird gegen den Ereignistitel (summary) geprüft. Für beide
-    Fälle können Beginn oder Ende des Ereignisses sowie ein eigener
+    Der Filter wird gegen den Ereignistitel (summary) geprüft. Es können
+    mehrere Filtertexte mit ODER- oder UND-Verknüpfung verwendet werden. Für
+    beide Fälle können Beginn oder Ende des Ereignisses sowie ein eigener
     Zeitversatz gewählt werden.
   domain: automation
   homeassistant:
@@ -21,14 +22,28 @@ blueprint:
             - domain: calendar
 
     filter_text:
-      name: Filtertext
+      name: Filtertexte
       description: >-
-        Der Text, der im Ereignistitel gesucht wird. Leer lassen, um auf jeden
-        Kalendereintrag zu reagieren.
-      default: ""
+        Die Texte, die im Ereignistitel gesucht werden. Über "Weiteren
+        Filtertext hinzufügen" können mehrere Filtertexte erfasst werden. Alle
+        Texte leer lassen, um auf jeden Kalendereintrag zu reagieren.
+      default: []
       selector:
         text:
           type: search
+          multiple: true
+
+    filter_logic:
+      name: Filterverknüpfung
+      description: Ob ein oder alle Filtertexte zutreffen müssen.
+      default: or
+      selector:
+        select:
+          options:
+            - label: Ein Textfilter muss zutreffen (ODER)
+              value: or
+            - label: Alle Textfilter müssen zutreffen (UND)
+              value: and
 
     filter_mode:
       name: Filtervergleich
@@ -104,6 +119,7 @@ blueprint:
 
 variables:
   filter_value: !input filter_text
+  filter_logic_value: !input filter_logic
   filter_comparison: !input filter_mode
   selected_match_event: !input match_event
   selected_no_match_event: !input no_match_event
@@ -138,17 +154,37 @@ conditions:
   - condition: template
     value_template: >-
       {% set summary = trigger.calendar_event.summary | default('', true) | string | trim | lower %}
-      {% set needle = filter_value | default('', true) | string | trim | lower %}
       {% set matched_trigger = 'matched_' ~ selected_match_event %}
       {% set no_match_trigger = 'no_match_' ~ selected_no_match_event %}
       {% if trigger.id not in [matched_trigger, no_match_trigger] %}
         false
-      {% elif not needle %}
-        true
-      {% elif filter_comparison == 'exact' %}
-        {{ summary == needle }}
       {% else %}
-        {{ needle in summary }}
+        {% set raw_filter_values = filter_value | default([], true) %}
+        {% if raw_filter_values is string %}
+          {% set raw_filter_values = [raw_filter_values] %}
+        {% endif %}
+        {% set normalized_filters = namespace(items=[]) %}
+        {% for value in raw_filter_values %}
+          {% set normalized_value = value | string | trim | lower %}
+          {% if normalized_value %}
+            {% set normalized_filters.items = normalized_filters.items + [normalized_value] %}
+          {% endif %}
+        {% endfor %}
+        {% set matched_count = namespace(value=0) %}
+        {% for filter_value_item in normalized_filters.items %}
+          {% if filter_comparison == 'exact' and summary == filter_value_item %}
+            {% set matched_count.value = matched_count.value + 1 %}
+          {% elif filter_comparison != 'exact' and filter_value_item in summary %}
+            {% set matched_count.value = matched_count.value + 1 %}
+          {% endif %}
+        {% endfor %}
+        {% if normalized_filters.items | length == 0 %}
+          true
+        {% elif filter_logic_value == 'and' %}
+          {{ matched_count.value == normalized_filters.items | length }}
+        {% else %}
+          {{ matched_count.value > 0 }}
+        {% endif %}
       {% endif %}
 
 actions:
