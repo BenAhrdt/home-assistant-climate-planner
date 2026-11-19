@@ -79,7 +79,6 @@ blueprint:
           enable_day: true
           enable_second: true
           mode: offset
-          label: Zeitversatz
 
     matched_actions:
       name: Aktionen bei "Trifft zu"
