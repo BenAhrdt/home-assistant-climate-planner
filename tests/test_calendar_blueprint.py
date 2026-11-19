@@ -43,7 +43,7 @@ def test_calendar_blueprint_has_installable_structure() -> None:
 
     for offset_input in (inputs["match_offset"], inputs["no_match_offset"]):
         assert offset_input["name"].startswith("Zeitversatz")
-        assert "Zeitversatz" in offset_input["description"]
+        assert offset_input["description"] == "Vor oder nach dem gewählten Ereigniszeitpunkt."
         selector = offset_input["selector"]["object"]
         assert set(selector["fields"]) == {"offset_type", "offset"}
         assert selector["fields"]["offset_type"]["label"] == "Richtung"
