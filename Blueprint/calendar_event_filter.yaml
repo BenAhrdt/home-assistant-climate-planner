@@ -71,7 +71,10 @@ blueprint:
 
     match_offset:
       name: Zeitversatz für "Trifft zu"
-      description: Vor oder nach dem gewählten Ereigniszeitpunkt.
+      description: >-
+        Vor oder nach dem gewählten Ereigniszeitpunkt. Die Zeitangabe im
+        Feld „Dauer“ ist hier der Zeitversatz, nicht die Dauer des
+        Kalenderereignisses.
       default:
         hours: -4
       selector:
@@ -101,7 +104,10 @@ blueprint:
 
     no_match_offset:
       name: Zeitversatz für "Trifft nicht mehr zu"
-      description: Vor oder nach dem gewählten Ereigniszeitpunkt.
+      description: >-
+        Vor oder nach dem gewählten Ereigniszeitpunkt. Die Zeitangabe im
+        Feld „Dauer“ ist hier der Zeitversatz, nicht die Dauer des
+        Kalenderereignisses.
       default:
         days: -2
       selector:

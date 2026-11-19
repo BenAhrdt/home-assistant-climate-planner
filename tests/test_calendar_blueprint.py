@@ -41,6 +41,13 @@ def test_calendar_blueprint_has_installable_structure() -> None:
     assert inputs["matched_actions"]["default"] == []
     assert inputs["no_match_actions"]["default"] == []
 
+    for offset_input in (inputs["match_offset"], inputs["no_match_offset"]):
+        assert offset_input["name"].startswith("Zeitversatz")
+        assert "Zeitangabe im Feld „Dauer“ ist hier der Zeitversatz" in offset_input[
+            "description"
+        ]
+        assert offset_input["selector"]["duration"]["mode"] == "offset"
+
     triggers = blueprint["triggers"]
     assert [trigger["id"] for trigger in triggers] == [
         "matched_start",
