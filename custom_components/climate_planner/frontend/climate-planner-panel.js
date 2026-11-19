@@ -504,6 +504,23 @@ class ClimatePlannerPanel extends HTMLElement {
           grid-template-columns: 1fr;
         }
       }
+
+      @container climate-planner-overview (min-width: 1600px) {
+        main.overview-layout {
+          width: 100%;
+          max-width: none;
+        }
+
+        #overview-top .mode-palette .grid {
+          grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        }
+      }
+
+      @container climate-planner-overview (min-width: 1800px) {
+        main.overview-layout #schedules {
+          grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+        }
+      }
     `;
     const header = this.shadowRoot.querySelector("header");
     const notice = this.$("notice");
