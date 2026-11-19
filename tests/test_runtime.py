@@ -535,6 +535,26 @@ async def test_manual_mode_activation_is_allowed_when_schedule_is_paused(fake_ru
 
 
 @pytest.mark.asyncio
+async def test_continuous_assignment_manual_activation_uses_local_temperature(fake_runtime):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    payload = planner_payload()
+    payload["schedules"][0]["enabled"] = False
+    payload["schedules"][0]["assignments"][0].update(
+        {"continuous": True, "target_temperature": 22, "weekday_rules": {}}
+    )
+    runtime = PlannerRuntime(fake_runtime, "entry")
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+
+    await runtime.async_activate_mode("schedule_living", "mode_home")
+
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 22.0
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
 async def test_enabling_assignment_clears_manual_override_and_reselects_mode(fake_runtime):
     fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
     payload = planner_payload()

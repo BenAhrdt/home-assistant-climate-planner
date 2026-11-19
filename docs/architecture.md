@@ -71,6 +71,7 @@ Planner
         ├── mode_id              # stabile Referenz in modes[]
         ├── enabled
         ├── continuous?         # Wochentagszeiten für die Zuordnung ignorieren
+        ├── target_temperature? # lokaler Override für kontinuierliche Zuordnung in °C
         ├── auto_rules[]?        # beliebig viele automatische Regelgruppen
         │   ├── id
         │   ├── name              # Bezeichnung der Regel

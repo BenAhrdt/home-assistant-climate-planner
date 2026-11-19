@@ -53,6 +53,7 @@ from .const import (
 )
 from .engine import (
     ActiveMatch,
+    assignment_target_temperature,
     available_holiday_ids,
     latest_assignment_phase,
     latest_auto_event,
@@ -542,7 +543,11 @@ class PlannerRuntime:
                 if isinstance(rule, dict)
             )
             latest_phase = None if continuous else latest_assignment_phase(assignment, now)
-            target_temperature = mode["target_temperature"]
+            target_temperature = (
+                assignment_target_temperature(assignment, mode)
+                if continuous
+                else mode["target_temperature"]
+            )
             if latest_phase and isinstance(latest_phase[1], dict):
                 target_temperature = latest_phase[1].get("target_temperature", target_temperature)
             self._manual_overrides[schedule_id] = {

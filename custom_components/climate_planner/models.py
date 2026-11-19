@@ -388,6 +388,7 @@ def _normalize_assignment(
         "mode_id",
         "enabled",
         "continuous",
+        "target_temperature",
         "auto_rules",
         "weekday_rules",
     }:
@@ -403,6 +404,9 @@ def _normalize_assignment(
     continuous = raw.get("continuous", any(rule.get("continuous") for rule in auto_rules))
     if type(continuous) is not bool:
         raise InvalidData("invalid_assignment_continuous")
+    target_temperature = raw.get("target_temperature")
+    if target_temperature is not None:
+        target_temperature = _temperature(target_temperature)
     result = {
         "id": assignment_id,
         "mode_id": mode_id,
@@ -418,6 +422,8 @@ def _normalize_assignment(
     }
     if continuous:
         result["continuous"] = True
+    if target_temperature is not None:
+        result["target_temperature"] = target_temperature
     if auto_rules:
         result["auto_rules"] = auto_rules
     return result

@@ -39,6 +39,23 @@ def _mode_map(modes: list[dict]) -> dict[str, dict]:
     return {mode["id"]: mode for mode in modes}
 
 
+def assignment_target_temperature(assignment: dict, mode: dict) -> float:
+    """Return the local target temperature for an assignment."""
+
+    configured = assignment.get("target_temperature")
+    if configured is not None:
+        return float(configured)
+    overrides = [
+        phase["target_temperature"]
+        for phases in assignment.get("weekday_rules", {}).values()
+        for phase in phases
+        if isinstance(phase, dict) and phase.get("target_temperature") is not None
+    ]
+    if overrides and all(value == overrides[0] for value in overrides):
+        return float(overrides[0])
+    return float(mode["target_temperature"])
+
+
 def _phase_time(phase: dict | str) -> str:
     """Return a phase time while tolerating pre-migration data."""
 
@@ -454,6 +471,9 @@ def _candidates(
                 "id": details[1] if details is not None else f"continuous:{assignment['id']}",
                 "time": occurrence.strftime("%H:%M"),
             }
+            target_temperature = assignment_target_temperature(assignment, mode)
+            if target_temperature != mode["target_temperature"]:
+                phase["target_temperature"] = target_temperature
             candidates.append(
                 (
                     occurrence,
@@ -831,7 +851,7 @@ def week_view(
                         "target_temperature": (
                             phase.get("target_temperature", mode["target_temperature"])
                             if isinstance(phase, dict)
-                            else mode["target_temperature"]
+                            else assignment_target_temperature(assignment, mode)
                         ),
                         "color": mode.get("color"),
                         "icon": mode.get("icon"),

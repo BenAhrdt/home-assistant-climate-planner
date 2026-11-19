@@ -8,6 +8,10 @@
 3. Das neue **Climate Planner**-Panel in der Seitenleiste öffnen.
 
 Die Integration benötigt keinen externen Dienst und keine Zugangsdaten.
+Auf schmalen Mobilansichten öffnet der Menüknopf im Panelkopf die normale
+Home-Assistant-Seitenleiste, über die zu anderen Dashboards gewechselt werden
+kann. Beim Aktivieren oder Umschalten eines Modes bleibt die aktuelle
+Scrollposition erhalten.
 
 ## Modes und Heizpläne
 
@@ -101,6 +105,11 @@ wird die Option automatisch aktiviert. Ohne diese Option bilden die
 Wochentagszeiten die zweite Zeitgrenze nach dem automatischen Einschalten; so
 können beispielsweise mittwochs andere Zeiten als an den übrigen Tagen
 verwendet werden.
+
+Auch bei einer kontinuierlichen Mode-Zuordnung kann im Feld **Temperatur** ein
+lokaler Sollwert für diese Zuordnung eingetragen werden. Dieser Wert wird im
+Mode-Kärtchen des Heizplans angezeigt und bei automatischer oder manueller
+Aktivierung verwendet; die zentrale Temperatur des Modes bleibt unverändert.
 
 Ein Heizplan kann eine oder mehrere `climate`-Entitäten enthalten. Alle
 ausgewählten Geräte erhalten beim Mode-Wechsel denselben Sollwert.

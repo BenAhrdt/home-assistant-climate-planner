@@ -237,6 +237,25 @@ def test_continuous_assignment_uses_enabled_state_without_weekday_phases():
     assert select_active_mode(value, modes, datetime(2026, 11, 9, 22, 0, tzinfo=ZONE)) is None
 
 
+def test_continuous_assignment_uses_local_temperature_override():
+    modes = [mode("holiday", "Holiday", 21)]
+    value = schedule(
+        [
+            {
+                **assignment("holiday-rule", "holiday"),
+                "continuous": True,
+                "target_temperature": 22,
+                "weekday_rules": {},
+            }
+        ]
+    )
+
+    match = select_active_mode(value, modes, datetime(2026, 11, 9, 12, 0, tzinfo=ZONE))
+
+    assert match is not None
+    assert match.phase["target_temperature"] == 22.0
+
+
 def test_continuous_assignment_uses_manual_enabled_state_after_auto_off():
     modes = [mode("holiday", "Holiday", 22, priority=10)]
     value = schedule(

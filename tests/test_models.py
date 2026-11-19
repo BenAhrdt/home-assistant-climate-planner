@@ -221,6 +221,18 @@ def test_continuous_assignment_without_auto_rules_is_valid():
     assert "auto_rules" not in normalized
 
 
+def test_continuous_assignment_preserves_local_temperature_override():
+    value = planner()
+    assignment_value = value["schedules"][0]["assignments"][0]
+    assignment_value["continuous"] = True
+    assignment_value["weekday_rules"] = {}
+    assignment_value["target_temperature"] = 22
+
+    normalized = validate_planner(value)["schedules"][0]["assignments"][0]
+
+    assert normalized["target_temperature"] == 22.0
+
+
 def test_grouped_cyclic_auto_rule_has_independent_action_ranges():
     value = planner()
     value["schedules"][0]["assignments"][0]["auto_rules"] = [
