@@ -10,10 +10,10 @@ Für ein passendes Ereignis und für das Ende der passenden Gültigkeit können
 unabhängige Aktionen über den normalen Home-Assistant-Aktionseditor hinterlegt
 werden.
 
-Die beiden Eingaben heißen **Zeitversatz**. Home Assistant bezeichnet das
-Zeitfeld innerhalb seines Offset-Selectors technisch als **Dauer**. Gemeint ist
-dort nicht die Länge des Kalenderereignisses, sondern die Zeitspanne, um die
-der Trigger vor oder nach dem gewählten Ereigniszeitpunkt ausgelöst wird.
+Die beiden Eingaben heißen **Zeitversatz**. Die Richtung sowie Tage, Stunden,
+Minuten und Sekunden werden direkt als Zeitversatz erfasst. Gemeint ist nicht
+die Länge des Kalenderereignisses, sondern die Zeitspanne, um die der Trigger
+vor oder nach dem gewählten Ereigniszeitpunkt ausgelöst wird.
 
 ## Installation
 

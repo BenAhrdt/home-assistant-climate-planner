@@ -43,10 +43,21 @@ def test_calendar_blueprint_has_installable_structure() -> None:
 
     for offset_input in (inputs["match_offset"], inputs["no_match_offset"]):
         assert offset_input["name"].startswith("Zeitversatz")
-        assert "Zeitangabe im Feld „Dauer“ ist hier der Zeitversatz" in offset_input[
-            "description"
+        assert "Zeitversatz" in offset_input["description"]
+        selector = offset_input["selector"]["object"]
+        assert set(selector["fields"]) == {"offset_type", "offset"}
+        assert selector["fields"]["offset_type"]["label"] == "Richtung"
+        assert selector["fields"]["offset_type"]["selector"]["select"]["options"] == [
+            {"label": "Vorher", "value": "before"},
+            {"label": "Nachher", "value": "after"},
         ]
-        assert offset_input["selector"]["duration"]["mode"] == "offset"
+        assert selector["fields"]["offset"]["label"] == "Zeitversatz"
+        assert set(selector["fields"]["offset"]["selector"]["object"]["fields"]) == {
+            "days",
+            "hours",
+            "minutes",
+            "seconds",
+        }
 
     triggers = blueprint["triggers"]
     assert [trigger["id"] for trigger in triggers] == [
@@ -62,9 +73,9 @@ def test_calendar_blueprint_has_installable_structure() -> None:
         "calendar.event_ended",
     ]
     assert all(trigger["target"] == {"entity_id": "calendar_entities"} for trigger in triggers)
-    assert triggers[0]["options"]["offset"] == "match_offset"
-    assert triggers[1]["options"]["offset"] == "match_offset"
-    assert triggers[2]["options"]["offset"] == "no_match_offset"
-    assert triggers[3]["options"]["offset"] == "no_match_offset"
+    assert triggers[0]["options"] == "match_offset"
+    assert triggers[1]["options"] == "match_offset"
+    assert triggers[2]["options"] == "no_match_offset"
+    assert triggers[3]["options"] == "no_match_offset"
 
     assert blueprint["mode"] == "queued"

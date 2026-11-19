@@ -72,16 +72,67 @@ blueprint:
     match_offset:
       name: Zeitversatz für "Trifft zu"
       description: >-
-        Vor oder nach dem gewählten Ereigniszeitpunkt. Die Zeitangabe im
-        Feld „Dauer“ ist hier der Zeitversatz, nicht die Dauer des
-        Kalenderereignisses.
+        Vor oder nach dem gewählten Ereigniszeitpunkt. Die Eingabe ist der
+        Zeitversatz zum gewählten Kalenderereignis.
       default:
-        hours: -4
+        offset_type: before
+        offset:
+          days: 0
+          hours: 4
+          minutes: 0
+          seconds: 0
       selector:
-        duration:
-          enable_day: true
-          enable_second: true
-          mode: offset
+        object:
+          fields:
+            offset_type:
+              label: Richtung
+              required: true
+              default: before
+              selector:
+                select:
+                  options:
+                    - label: Vorher
+                      value: before
+                    - label: Nachher
+                      value: after
+            offset:
+              label: Zeitversatz
+              required: true
+              selector:
+                object:
+                  fields:
+                    days:
+                      label: Tage
+                      required: true
+                      default: 0
+                      selector:
+                        number:
+                          min: 0
+                          mode: box
+                    hours:
+                      label: Stunden
+                      required: true
+                      default: 4
+                      selector:
+                        number:
+                          min: 0
+                          mode: box
+                    minutes:
+                      label: Minuten
+                      required: true
+                      default: 0
+                      selector:
+                        number:
+                          min: 0
+                          mode: box
+                    seconds:
+                      label: Sekunden
+                      required: true
+                      default: 0
+                      selector:
+                        number:
+                          min: 0
+                          mode: box
 
     matched_actions:
       name: Aktionen bei "Trifft zu"
@@ -105,16 +156,67 @@ blueprint:
     no_match_offset:
       name: Zeitversatz für "Trifft nicht mehr zu"
       description: >-
-        Vor oder nach dem gewählten Ereigniszeitpunkt. Die Zeitangabe im
-        Feld „Dauer“ ist hier der Zeitversatz, nicht die Dauer des
-        Kalenderereignisses.
+        Vor oder nach dem gewählten Ereigniszeitpunkt. Die Eingabe ist der
+        Zeitversatz zum gewählten Kalenderereignis.
       default:
-        days: -2
+        offset_type: before
+        offset:
+          days: 2
+          hours: 0
+          minutes: 0
+          seconds: 0
       selector:
-        duration:
-          enable_day: true
-          enable_second: true
-          mode: offset
+        object:
+          fields:
+            offset_type:
+              label: Richtung
+              required: true
+              default: before
+              selector:
+                select:
+                  options:
+                    - label: Vorher
+                      value: before
+                    - label: Nachher
+                      value: after
+            offset:
+              label: Zeitversatz
+              required: true
+              selector:
+                object:
+                  fields:
+                    days:
+                      label: Tage
+                      required: true
+                      default: 2
+                      selector:
+                        number:
+                          min: 0
+                          mode: box
+                    hours:
+                      label: Stunden
+                      required: true
+                      default: 0
+                      selector:
+                        number:
+                          min: 0
+                          mode: box
+                    minutes:
+                      label: Minuten
+                      required: true
+                      default: 0
+                      selector:
+                        number:
+                          min: 0
+                          mode: box
+                    seconds:
+                      label: Sekunden
+                      required: true
+                      default: 0
+                      selector:
+                        number:
+                          min: 0
+                          mode: box
 
     no_match_actions:
       name: Aktionen bei "Trifft nicht mehr zu"
@@ -135,26 +237,22 @@ triggers:
     id: matched_start
     target:
       entity_id: !input calendar_entities
-    options:
-      offset: !input match_offset
+    options: !input match_offset
   - trigger: calendar.event_ended
     id: matched_end
     target:
       entity_id: !input calendar_entities
-    options:
-      offset: !input match_offset
+    options: !input match_offset
   - trigger: calendar.event_started
     id: no_match_start
     target:
       entity_id: !input calendar_entities
-    options:
-      offset: !input no_match_offset
+    options: !input no_match_offset
   - trigger: calendar.event_ended
     id: no_match_end
     target:
       entity_id: !input calendar_entities
-    options:
-      offset: !input no_match_offset
+    options: !input no_match_offset
 
 conditions:
   - condition: template
