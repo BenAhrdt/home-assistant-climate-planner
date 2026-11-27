@@ -270,7 +270,7 @@ vom Climate Planner aktivierte Mode; die Anzeige **Fenster offen – Absenkung
 aktiv** bleibt dabei erhalten. Der zuletzt aktivierte Mode bleibt auch nach
 einem Neustart der Integration erhalten.
 
-Phasen lassen sich im 15-Minuten-Raster verschieben, über die sichtbaren
+Phasen lassen sich minutengenau verschieben, über die sichtbaren
 Zeitgriffe bis zur nächsten Phase verlängern oder verkürzen und einzeln
 löschen. Beim Verschieben bleibt die bisherige Blockdauer erhalten; die
 folgende Zeitgrenze wird entsprechend mitverschoben. Für neue Eingaben dient

@@ -41,7 +41,7 @@ entities and uses centrally managed modes with target temperatures.
 - one-time target-temperature application through `climate.set_temperature`
 - point-in-time scheduling without short-interval polling
 - responsive heating-plan and mode overview plus a detail view for each plan
-- 15-minute timeline controls, target-time preview, an eight-hour guideline for
+- one-minute timeline controls, target-time preview, an eight-hour guideline for
   new entries, and a fixed 24:00 end for the final daily phase
 - phase duplication one hour before the selected phase
 - versioned atomic persistence and server-side validation

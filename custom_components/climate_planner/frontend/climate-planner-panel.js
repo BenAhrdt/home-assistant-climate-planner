@@ -9,6 +9,7 @@ const newId = (prefix) => {
 };
 
 const TIME_PATTERN = /^(?:[01]\d|2[0-3]):[0-5]\d$/;
+const PHASE_TIME_STEP_MINUTES = 1;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"];
 const EXTERNAL_TARGET_GRACE_MS = 1200;
@@ -1443,8 +1444,12 @@ class ClimatePlannerPanel extends HTMLElement {
           const transitionPhaseId = phaseStartsHere && schedule ? this.phaseForSegmentStart(schedule, day.weekday, segment) : "";
           const previousSegment = resolvedSegments[segmentIndex - 1];
           const nextSegment = resolvedSegments[segmentIndex + 1];
-          const minimumStart = previousSegment ? previousSegment.start + 15 : 0;
-          const maximumStart = nextSegment ? nextSegment.start - 15 : 1439;
+          const minimumStart = previousSegment
+            ? previousSegment.start + PHASE_TIME_STEP_MINUTES
+            : 0;
+          const maximumStart = nextSegment
+            ? nextSegment.start - PHASE_TIME_STEP_MINUTES
+            : 1439;
           const transition = admin && transitionPhaseId
             ? `<span class="transition-handle" data-phase-id="${escapeHTML(transitionPhaseId)}" data-segment-day="${escapeHTML(day.weekday)}" data-min-start="${minimumStart}" data-max-start="${maximumStart}" style="top:${(segment.start / 1440) * 100}%" tabindex="0" title="${escapeHTML(this.t.transition)}" draggable="false"></span>`
             : "";
@@ -1589,7 +1594,10 @@ class ClimatePlannerPanel extends HTMLElement {
   timeAtDrop(event, track, offsetMinutes = 0) {
     const rect = track.getBoundingClientRect();
     const minutes = Math.max(0, Math.min(1439, ((event.clientY - rect.top) / rect.height) * 1440 - offsetMinutes));
-    const value = Math.round(minutes);
+    const value = Math.min(
+      1439,
+      Math.round(minutes / PHASE_TIME_STEP_MINUTES) * PHASE_TIME_STEP_MINUTES,
+    );
     return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
   }
 
@@ -1625,7 +1633,13 @@ class ClimatePlannerPanel extends HTMLElement {
   }
 
   timeFromMinutes(minutes) {
-    const value = Math.max(0, Math.min(1439, Math.round(minutes)));
+    const value = Math.max(
+      0,
+      Math.min(
+        1439,
+        Math.round(minutes / PHASE_TIME_STEP_MINUTES) * PHASE_TIME_STEP_MINUTES,
+      ),
+    );
     return `${String(Math.floor(value / 60)).padStart(2, "0")}:${String(value % 60).padStart(2, "0")}`;
   }
 
@@ -1682,10 +1696,10 @@ class ClimatePlannerPanel extends HTMLElement {
     const nextBoundary = this.followingPhase(schedule, weekday, currentStart, phaseId);
     const minimum = Number.isFinite(visibleMinimum)
       ? Math.max(0, visibleMinimum)
-      : previousBoundary ? previousBoundary.minutes + 15 : 0;
+      : previousBoundary ? previousBoundary.minutes + PHASE_TIME_STEP_MINUTES : 0;
     const maximum = Number.isFinite(visibleMaximum)
       ? Math.min(1439, visibleMaximum)
-      : nextBoundary ? nextBoundary.minutes - 15 : 1439;
+      : nextBoundary ? nextBoundary.minutes - PHASE_TIME_STEP_MINUTES : 1439;
     if (maximum < minimum) return this.notice(this.t.invalid, true);
     entry.phase.time = this.timeFromMinutes(Math.max(minimum, Math.min(maximum, requested)));
     entry.phases.sort((left, right) => this.phaseMinutes(left) - this.phaseMinutes(right));
@@ -1717,7 +1731,10 @@ class ClimatePlannerPanel extends HTMLElement {
     const entry = schedule && this.schedulePhases(schedule).find((item) => this.phaseId(item.phase) === phaseId && item.weekday === weekday);
     if (!schedule || !entry) return;
     const following = this.followingPhase(schedule, weekday, startMinutes, phaseId);
-    const duration = Math.max(15, (following?.minutes ?? 1440) - startMinutes);
+    const duration = Math.max(
+      PHASE_TIME_STEP_MINUTES,
+      (following?.minutes ?? 1440) - startMinutes,
+    );
     const previous = this.previousPhase(schedule, weekday, startMinutes, phaseId);
     const minimumStart = Math.max(60, (previous?.minutes ?? 0) + 60);
     const targetMinutes = startMinutes - duration;
@@ -1779,7 +1796,9 @@ class ClimatePlannerPanel extends HTMLElement {
     if (!found) return;
     const newStart = this.phaseMinutes({ time });
     const followingStart = found.following ? found.following.minutes : null;
-    const duration = followingStart == null ? null : Math.max(15, followingStart - found.oldStart);
+    const duration = followingStart == null
+      ? null
+      : Math.max(PHASE_TIME_STEP_MINUTES, followingStart - found.oldStart);
     if (typeof found.phase === "string") found.phase = { id: newId("phase"), time };
     else found.phase.time = time;
     if (!Object.keys(found.assignment.weekday_rules).length) {
@@ -2197,8 +2216,8 @@ class ClimatePlannerPanel extends HTMLElement {
       const used = new Set(inputs.map((input) => input.value).filter((value) => TIME_PATTERN.test(value)));
       const values = [...used].map((value) => this.phaseMinutes({ time: value }));
       const base = values.length ? Math.max(...values) + 60 : this.phaseMinutes({ time: bulkTime.value });
-      for (let offset = 0; offset < 96; offset += 1) {
-        const minutes = (base + offset * 15) % 1440;
+      for (let offset = 0; offset < 1440 / PHASE_TIME_STEP_MINUTES; offset += 1) {
+        const minutes = (base + offset * PHASE_TIME_STEP_MINUTES) % 1440;
         const value = this.timeFromMinutes(minutes);
         if (!used.has(value)) return value;
       }
