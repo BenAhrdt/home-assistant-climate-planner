@@ -136,6 +136,56 @@ async def test_initial_evaluation_applies_temperature_once(fake_runtime):
 
 
 @pytest.mark.asyncio
+async def test_lower_priority_phase_does_not_reapply_active_high_priority_mode(fake_runtime):
+    fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
+    payload = planner_payload()
+    payload["modes"] = [
+        {"id": "mode_low", "name": "Low", "target_temperature": 19, "priority": 0},
+        {"id": "mode_high", "name": "High", "target_temperature": 18, "priority": 10},
+    ]
+    payload["schedules"][0]["assignments"] = [
+        {
+            "id": "assignment_high",
+            "mode_id": "mode_high",
+            "enabled": True,
+            "weekday_rules": {
+                day: ["00:00"]
+                for day in (
+                    "monday",
+                    "tuesday",
+                    "wednesday",
+                    "thursday",
+                    "friday",
+                    "saturday",
+                    "sunday",
+                )
+            },
+        },
+        {
+            "id": "assignment_low",
+            "mode_id": "mode_low",
+            "enabled": True,
+            "weekday_rules": {"monday": ["21:45"]},
+        },
+    ]
+    runtime = PlannerRuntime(fake_runtime, "entry")
+    runtime._now = lambda: datetime(2026, 11, 9, 8, tzinfo=ZONE)
+    await runtime.async_start()
+    await runtime.async_replace(
+        {**payload, "revision": runtime.data["revision"]}, runtime.data["revision"]
+    )
+    assert fake_runtime.services.calls[-1][2]["temperature"] == 18.0
+
+    fake_runtime.services.calls.clear()
+    runtime._now = lambda: datetime(2026, 11, 9, 21, 46, tzinfo=ZONE)
+    await runtime.async_evaluate()
+
+    assert fake_runtime.services.calls == []
+    assert (await runtime.snapshot())["next_events"]["schedule_living"] is None
+    await runtime.async_shutdown()
+
+
+@pytest.mark.asyncio
 async def test_labelled_window_is_matched_by_area_and_debounced(fake_runtime, monkeypatch):
     fake_runtime.states.values["climate.living"] = SimpleNamespace(state="heat")
     fake_runtime.states.values["climate.bedroom"] = SimpleNamespace(state="heat")

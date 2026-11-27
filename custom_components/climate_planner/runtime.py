@@ -59,6 +59,7 @@ from .engine import (
     latest_auto_event,
     next_activation,
     next_auto_date,
+    next_effective_activation,
     select_active_mode,
     week_view,
 )
@@ -442,12 +443,15 @@ class PlannerRuntime:
                 else None
             )
             upcoming_points = []
-            automatic_date = next_auto_date(schedule, now, holiday_region=self._holiday_region)
-            if automatic_date:
-                upcoming_points.append(automatic_date)
             if schedule["enabled"]:
-                upcoming = next_activation(
-                    schedule, modes, now, holiday_region=self._holiday_region
+                upcoming = (
+                    next_activation(
+                        schedule, modes, now, holiday_region=self._holiday_region
+                    )
+                    if override
+                    else next_effective_activation(
+                        schedule, modes, now, holiday_region=self._holiday_region
+                    )
                 )
                 if upcoming:
                     upcoming_points.append(upcoming)
@@ -1294,15 +1298,28 @@ class PlannerRuntime:
                         schedule, modes, now, holiday_region=self._holiday_region
                     )
                 self.active[schedule["id"]] = match
-                automatic_date = next_auto_date(schedule, now, holiday_region=self._holiday_region)
-                if automatic_date:
-                    next_points.append(automatic_date)
                 if schedule["enabled"]:
-                    upcoming = next_activation(
-                        schedule, modes, now, holiday_region=self._holiday_region
+                    upcoming = (
+                        next_activation(
+                            schedule, modes, now, holiday_region=self._holiday_region
+                        )
+                        if override
+                        else next_effective_activation(
+                            schedule, modes, now, holiday_region=self._holiday_region
+                        )
                     )
                     if upcoming:
                         next_points.append(upcoming)
+                # Automatic state changes still need a timer so their persisted
+                # enable state is updated even when they do not change the
+                # effective climate target.
+                automatic_date = next_auto_date(
+                    schedule, now, holiday_region=self._holiday_region
+                )
+                if automatic_date:
+                    next_points.append(automatic_date)
+                if override and override.get("until"):
+                    next_points.append(override["until"])
                 desired = None
                 if match and (schedule["enabled"] or override):
                     effective_temperatures = self._effective_temperatures(schedule, match)

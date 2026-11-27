@@ -614,6 +614,7 @@ def next_activation(
     now: datetime,
     *,
     holiday_region: str = DEFAULT_HOLIDAY_REGION,
+    days: int = 7,
 ) -> datetime | None:
     """Return the next configured activation strictly after ``now``."""
 
@@ -621,10 +622,14 @@ def next_activation(
     zone = local_now.tzinfo
     assert zone is not None
     mode_by_id = _mode_map(modes)
-    occurrences: list[datetime] = []
-    for offset in range(8):
+    day_limit = max(0, days)
+    search_end = _at_local(
+        local_now.date() + timedelta(days=day_limit + 1), "00:00", zone
+    )
+    for offset in range(day_limit + 1):
         day = local_now.date() + timedelta(days=offset)
         weekday = WEEKDAYS[day.weekday()]
+        occurrences: list[datetime] = []
         for assignment in schedule["assignments"]:
             mode = mode_by_id.get(assignment["mode_id"])
             continuous = assignment.get("continuous") is True or any(
@@ -647,7 +652,128 @@ def next_activation(
                         assignment, local_now, holiday_region=holiday_region
                     )
                 )
-    return min(occurrences) if occurrences else None
+        if occurrences:
+            earliest = min(occurrences)
+            next_day = _at_local(day + timedelta(days=1), "00:00", zone)
+            if earliest <= next_day and earliest < search_end:
+                return earliest
+    return None
+
+
+def _schedule_after_auto_point(
+    schedule: dict,
+    previous: datetime,
+    now: datetime,
+    *,
+    holiday_region: str,
+) -> dict:
+    """Apply automatic events exactly at ``now`` to the current schedule state."""
+
+    assignments = []
+    for assignment in schedule["assignments"]:
+        state = dict(assignment)
+        events = [
+            event
+            for event in _next_auto_events(
+                state, previous, holiday_region=holiday_region
+            )
+            if event[0] == now
+        ]
+        if events:
+            state["enabled"] = max(events)[4]
+        assignments.append(state)
+    return {**schedule, "assignments": assignments}
+
+
+def _match_signature(match: ActiveMatch | None) -> tuple[str, float] | None:
+    """Return the mode and effective phase temperature represented by a match."""
+
+    if match is None:
+        return None
+    target_temperature = (
+        match.phase.get("target_temperature", match.mode["target_temperature"])
+        if isinstance(match.phase, dict)
+        else match.mode["target_temperature"]
+    )
+    return match.mode["id"], float(target_temperature)
+
+
+def _next_scheduled_point(
+    schedule: dict,
+    modes: list[dict],
+    now: datetime,
+    *,
+    holiday_region: str,
+    days: int,
+) -> datetime | None:
+    """Return the next phase or automatic-rule point after ``now``."""
+
+    points = [
+        point
+        for point in (
+            next_activation(
+                schedule,
+                modes,
+                now,
+                holiday_region=holiday_region,
+                days=days,
+            ),
+            next_auto_date(schedule, now, holiday_region=holiday_region),
+        )
+        if point is not None
+    ]
+    return min(points) if points else None
+
+
+def next_effective_activation(
+    schedule: dict,
+    modes: list[dict],
+    now: datetime,
+    *,
+    holiday_region: str = DEFAULT_HOLIDAY_REGION,
+    lookahead_days: int = 370,
+) -> datetime | None:
+    """Return the next point that changes the effective mode or temperature.
+
+    All configured phase and automatic-rule points at one timestamp are evaluated
+    together. A lower-priority phase that does not change the selected result is
+    skipped, so the returned point represents an actual planner transition.
+    """
+
+    local_now = _local_now(now)
+    horizon = local_now + timedelta(days=max(0, lookahead_days))
+    cursor = local_now
+    state_schedule = {
+        **schedule,
+        "assignments": [dict(assignment) for assignment in schedule["assignments"]],
+    }
+    current = select_active_mode(
+        state_schedule, modes, cursor, holiday_region=holiday_region
+    )
+    current_signature = _match_signature(current)
+
+    while True:
+        point = _next_scheduled_point(
+            state_schedule,
+            modes,
+            cursor,
+            holiday_region=holiday_region,
+            days=lookahead_days,
+        )
+        if point is None or point > horizon or point <= cursor:
+            return None
+        point_schedule = _schedule_after_auto_point(
+            state_schedule, cursor, point, holiday_region=holiday_region
+        )
+        candidate = select_active_mode(
+            point_schedule, modes, point, holiday_region=holiday_region
+        )
+        candidate_signature = _match_signature(candidate)
+        if candidate_signature != current_signature:
+            return point
+        cursor = point
+        state_schedule = point_schedule
+        current_signature = candidate_signature
 
 
 def _continuous_auto_segments(

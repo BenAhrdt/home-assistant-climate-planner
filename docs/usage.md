@@ -312,6 +312,11 @@ Ein manuelles Einschalten oder Ausschalten wird genauso behandelt wie das
 entsprechende automatische Ereignis und kann dadurch den aktuellen Zustand bis
 zum nächsten automatischen Ereignis übersteuern.
 
+Die Anzeige **Nächster Wechsel** und die Laufzeitplanung berücksichtigen nur
+tatsächlich wirksame Übergänge. Eine Phase mit niedrigerer Priorität, die den
+aktuell gewinnenden Mode oder seine Zieltemperatur nicht verändert, wird weder
+als nächster Wechsel angezeigt noch als Climate-Sollwertwechsel angewendet.
+
 Beispiel: Ein normaler Mode mit 21 °C hat Priorität 0 und beginnt um 06:00.
 Ein Geburtstags-Mode mit 22 °C hat Priorität 10, wird am Geburtstag per Auto
 ein freigeschaltet und beginnt an diesem Wochentag um 07:00. Bis 07:00 bleiben

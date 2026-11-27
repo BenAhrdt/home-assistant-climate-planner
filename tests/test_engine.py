@@ -9,6 +9,7 @@ from custom_components.climate_planner.engine import (
     latest_auto_event,
     next_activation,
     next_auto_date,
+    next_effective_activation,
     select_active_mode,
     week_view,
 )
@@ -333,6 +334,107 @@ def test_next_activation_is_targeted():
     value = schedule([assignment("rule", "comfort", tuesday=["07:15"])])
     now = datetime(2026, 11, 9, 7, 0, tzinfo=ZONE)
     assert next_activation(value, modes, now).isoformat() == "2026-11-10T07:15:00+01:00"
+
+
+def test_next_effective_activation_skips_lower_priority_phase():
+    modes = [mode("low", "Low", 18), mode("high", "High", 22, priority=10)]
+    every_day = {
+        day: ["00:00"]
+        for day in (
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        )
+    }
+    value = schedule(
+        [
+            assignment("high-rule", "high", **every_day),
+            assignment("low-rule", "low", monday=["21:45"]),
+        ]
+    )
+
+    assert (
+        next_effective_activation(
+            value, modes, datetime(2026, 11, 9, 8, 0, tzinfo=ZONE)
+        )
+        is None
+    )
+
+
+def test_next_effective_activation_returns_higher_priority_start():
+    modes = [mode("low", "Low", 18), mode("high", "High", 22, priority=10)]
+    value = schedule(
+        [
+            assignment("low-rule", "low", monday=["00:00"]),
+            assignment("high-rule", "high", monday=["09:00"]),
+        ]
+    )
+
+    assert next_effective_activation(
+        value, modes, datetime(2026, 11, 9, 8, 0, tzinfo=ZONE)
+    ).isoformat() == "2026-11-09T09:00:00+01:00"
+    assert next_effective_activation(
+        value, modes, datetime(2026, 11, 9, 10, 0, tzinfo=ZONE)
+    ).isoformat() == "2026-11-10T00:00:00+01:00"
+
+
+def test_next_effective_activation_returns_lower_mode_after_auto_off():
+    modes = [mode("low", "Low", 18), mode("high", "High", 22, priority=10)]
+    value = schedule(
+        [
+            assignment("low-rule", "low", monday=["00:00"]),
+            {
+                **assignment("high-rule", "high"),
+                "continuous": True,
+                "auto_rules": [
+                    {
+                        "id": "high-off",
+                        "name": "High off",
+                        "kind": "date",
+                        "date": "2026-11-09",
+                        "actions": {"off": {"time": "18:00"}},
+                    }
+                ],
+            },
+        ]
+    )
+
+    assert next_effective_activation(
+        value, modes, datetime(2026, 11, 9, 10, 0, tzinfo=ZONE)
+    ).isoformat() == "2026-11-09T18:00:00+01:00"
+
+
+def test_next_effective_activation_respects_manual_reactivation():
+    modes = [mode("low", "Low", 18), mode("high", "High", 22, priority=10)]
+    value = schedule(
+        [
+            assignment("low-rule", "low", monday=["21:45"]),
+            {
+                **assignment("high-rule", "high"),
+                "enabled": True,
+                "continuous": True,
+                "auto_rules": [
+                    {
+                        "id": "high-off",
+                        "kind": "date",
+                        "date": "2026-11-08",
+                        "actions": {"off": {"time": "18:00"}},
+                    }
+                ],
+            },
+        ]
+    )
+
+    assert (
+        next_effective_activation(
+            value, modes, datetime(2026, 11, 9, 8, 0, tzinfo=ZONE)
+        )
+        is None
+    )
 
 
 def test_individual_weekday_times_are_evaluated_independently():
